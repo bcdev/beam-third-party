@@ -1,0 +1,64 @@
+<module>
+    <manifestVersion>1.0.0</manifestVersion>
+    <symbolicName>beam-wew-water</symbolicName>
+    <version>1.1</version>
+    <name>WeW Water Processor</name>
+    <description>
+        The WeW Water Processor calculates a
+        Level 2 water product from a given MERIS Level 1b product.
+    </description>
+
+    <vendor>Freie Universität Berlin (FUB)</vendor>
+    <contactAddress>
+        michael.schaale@wew.fu-berlin.de /
+        Department of Earth Sciences /
+        Institute for Space Sciences /
+        Carl-Heinrich-Becker-Weg 6-10 /
+        D-12165 Berlin
+    </contactAddress>
+    <url>http://www.userpage.fu-berlin.de/~geoiss/en/home.html</url>
+    <copyright>Copyright (C) 2005/7 by WeW</copyright>
+    <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
+
+    <changelog>
+        <![CDATA[From 1.0 to 1.1
+        <ul>
+        <li>[BEAM-668] Port FUB WeW Water Processor.</li>
+        <li>[BEAM-669] Improve performance of FUB/WeW Water Processor.</li>
+        </ul>
+        ]]>
+    </changelog>
+
+    <dependency>
+        <module>beam-core</module>
+    </dependency>
+    <dependency>
+        <module>beam-ui</module>
+    </dependency>
+    <dependency>
+        <module>beam-meris-smac</module>
+    </dependency>
+    <dependency>
+        <module>beam-processing</module>
+    </dependency>
+    <dependency>
+        <module>beam-visat</module>
+        <optional>true</optional>
+    </dependency>
+
+    <categories>Visat,Processor,Water,Case 2</categories>
+
+    <extension point="beam-visat:actions">
+        <action>
+            <id>WATERProcessorPlugIn</id>
+            <class>org.esa.beam.visat.actions.ProcessorAction</class>
+            <processor>wew.water.WaterProcessor</processor>
+            <text>FUB/WeW WATER Processor (MERIS)...</text>
+            <shortDescr>Invoke the FUB/WeW WATER Processor Plugin.</shortDescr>
+            <mnemonic>X</mnemonic>
+            <parent>tools</parent>
+            <helpID>WATERProcessorPlugIn</helpID>
+        </action>
+    </extension>
+
+</module>

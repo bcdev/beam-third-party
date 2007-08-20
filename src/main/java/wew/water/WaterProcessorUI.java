@@ -378,9 +378,9 @@ public class WaterProcessorUI implements ProcessorUI {
             // workaround was created.
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = new Boolean(false);
+                value = false;
                 if (param.getValue().equals("true")) {
-                    value = new Boolean(true);
+                    value = true;
                 }
             } else {
                 // Directly use the Boolean
@@ -404,9 +404,9 @@ public class WaterProcessorUI implements ProcessorUI {
             // workaround was created.
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = new Boolean(false);
+                value = false;
                 if (param.getValue().equals("true")) {
-                    value = new Boolean(true);
+                    value = true;
                 }
             } else {
                 // Directly use the Boolean
@@ -430,9 +430,9 @@ public class WaterProcessorUI implements ProcessorUI {
             // workaround was created.
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = new Boolean(false);
+                value = false;
                 if (param.getValue().equals("true")) {
-                    value = new Boolean(true);
+                    value = true;
                 }
             } else {
                 // Directly use the Boolean
@@ -456,9 +456,9 @@ public class WaterProcessorUI implements ProcessorUI {
             // workaround was created.
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = new Boolean(false);
+                value = false;
                 if (param.getValue().equals("true")) {
-                    value = new Boolean(true);
+                    value = true;
                 }
             } else {
                 // Directly use the Boolean
@@ -482,9 +482,9 @@ public class WaterProcessorUI implements ProcessorUI {
             // workaround was created.
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = new Boolean(false);
+                value = false;
                 if (param.getValue().equals("true")) {
-                    value = new Boolean(true);
+                    value = true;
                 }
             } else {
                 // Directly use the Boolean
@@ -508,9 +508,9 @@ public class WaterProcessorUI implements ProcessorUI {
             // workaround was created.
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = new Boolean(false);
+                value = false;
                 if (param.getValue().equals("true")) {
-                    value = new Boolean(true);
+                    value = true;
                 }
             } else {
                 // Directly use the Boolean
@@ -588,15 +588,15 @@ public class WaterProcessorUI implements ProcessorUI {
         Parameter param1 = _paramGroup.getParameter(WaterProcessor.CHECKBOX1_PARAM_NAME);
         // Get access to CHECKBOX2_PARAM_NAME
         Parameter param2 = _paramGroup.getParameter(WaterProcessor.CHECKBOX2_PARAM_NAME);
-        value_box2 = Boolean.valueOf(param2.getValue().toString()).booleanValue();
+        value_box2 = Boolean.valueOf(param2.getValue().toString());
 
         // Get the current boolean state
-        value_box1 = Boolean.valueOf(value.toString()).booleanValue();
+        value_box1 = Boolean.valueOf(value.toString());
 
         // Avoid that both checkboxes have the same state
         if (value_box1 == value_box2) {
             value_box2 = !value_box2;
-            param2.setValue(new Boolean(value_box2), null);
+            param2.setValue(value_box2, null);
         }
     }
 
@@ -609,17 +609,17 @@ public class WaterProcessorUI implements ProcessorUI {
 
         // Get access to CHECKBOX1_PARAM_NAME
         Parameter param1 = _paramGroup.getParameter(WaterProcessor.CHECKBOX1_PARAM_NAME);
-        value_box1 = Boolean.valueOf(param1.getValue().toString()).booleanValue();
+        value_box1 = Boolean.valueOf(param1.getValue().toString());
         // Get access to CHECKBOX2_PARAM_NAME
         Parameter param2 = _paramGroup.getParameter(WaterProcessor.CHECKBOX2_PARAM_NAME);
 
         // Get the current boolean state
-        value_box2 = Boolean.valueOf(value.toString()).booleanValue();
+        value_box2 = Boolean.valueOf(value.toString());
 
         // Avoid that both checkboxes have the same state
         if (value_box1 == value_box2) {
             value_box1 = !value_box1;
-            param1.setValue(new Boolean(value_box1), null);
+            param1.setValue(value_box1, null);
         }
     }
 
@@ -634,13 +634,13 @@ public class WaterProcessorUI implements ProcessorUI {
         Parameter param3 = _paramGroup.getParameter(WaterProcessor.CHECKBOX3_PARAM_NAME);
         // Get access to CHECKBOX4_PARAM_NAME
         Parameter param4 = _paramGroup.getParameter(WaterProcessor.CHECKBOX4_PARAM_NAME);
-        value_box4 = Boolean.valueOf(param4.getValue().toString()).booleanValue();
+        value_box4 = Boolean.valueOf(param4.getValue().toString());
 
         // Get the current boolean state
-        value_box3 = Boolean.valueOf(value.toString()).booleanValue();
+        value_box3 = Boolean.valueOf(value.toString());
 
 //*NO_CHANGE_ALLOWED
-        param3.setValue(new Boolean(WaterProcessor.CHECKBOX3_DEFAULT), null);
+        param3.setValue(WaterProcessor.CHECKBOX3_DEFAULT, null);
 //*/
 
         // Avoid that both checkboxes have the same state
@@ -662,15 +662,15 @@ public class WaterProcessorUI implements ProcessorUI {
 
         // Get access to CHECKBOX3_PARAM_NAME
         Parameter param3 = _paramGroup.getParameter(WaterProcessor.CHECKBOX3_PARAM_NAME);
-        value_box3 = Boolean.valueOf(param3.getValue().toString()).booleanValue();
+        value_box3 = Boolean.valueOf(param3.getValue().toString());
         // Get access to CHECKBOX4_PARAM_NAME
         Parameter param4 = _paramGroup.getParameter(WaterProcessor.CHECKBOX4_PARAM_NAME);
 
         // Get the current boolean state
-        value_box4 = Boolean.valueOf(value.toString()).booleanValue();
+        value_box4 = Boolean.valueOf(value.toString());
 
 //*NO_CHANGE_ALLOWED
-        param4.setValue(new Boolean(WaterProcessor.CHECKBOX4_DEFAULT), null);
+        param4.setValue(WaterProcessor.CHECKBOX4_DEFAULT, null);
 
         // Avoid that both checkboxes have the same state
 /*CHANGE_ALLOWED
@@ -693,7 +693,7 @@ public class WaterProcessorUI implements ProcessorUI {
         Parameter param5 = _paramGroup.getParameter(WaterProcessor.CHECKBOX5_PARAM_NAME);
 
         // Get the current boolean state
-        value_box5 = Boolean.valueOf(value.toString()).booleanValue();
+        value_box5 = Boolean.valueOf(value.toString());
 
         //param5.setValue(new Boolean(WaterProcessor.CHECKBOX5_DEFAULT), null);
     }
@@ -709,10 +709,10 @@ public class WaterProcessorUI implements ProcessorUI {
         Parameter param6 = _paramGroup.getParameter(WaterProcessor.CHECKBOX6_PARAM_NAME);
 
         // Get the current boolean state
-        value_box6 = Boolean.valueOf(value.toString()).booleanValue();
+        value_box6 = Boolean.valueOf(value.toString());
 
 //*NO_CHANGE_ALLOWED
-        param6.setValue(new Boolean(WaterProcessor.CHECKBOX6_DEFAULT), null);
+        param6.setValue(WaterProcessor.CHECKBOX6_DEFAULT, null);
 //*/
         //param6.setValue(new Boolean(WaterProcessor.CHECKBOX6_DEFAULT), null);
     }

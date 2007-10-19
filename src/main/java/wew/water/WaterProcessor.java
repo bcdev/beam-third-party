@@ -197,7 +197,7 @@ public class WaterProcessor extends Processor {
     private static int num_rho_w_extout = 8;
     private int num_rho_w;
 
-    private int MASK_TO_BE_USED = (GLINT_RISK | LAND_OCEAN | BRIGHT | COASTLINE | INVALID);
+    private int MASK_TO_BE_USED = (GLINT_RISK | BRIGHT | INVALID);
 //    private int MASK_TO_BE_USED = (0);
 
     // ID strings for all possible output bands

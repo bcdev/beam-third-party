@@ -1,0 +1,137 @@
+<html>
+<head>
+	<title>BEAM Data Processors - Algorithm Specification FAPAR</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+		FAPAR Algorithm Specification</td>
+	<td class="header" align="right" vspace=3 hspace=3><img src="../images/FAPARHeader.gif" border=0></td>
+    </tr>
+</table>
+
+
+<p>
+The FAPAR algorithm is described in detail in the Algorithm Theoretical Basis Document (ATBD) which is distributed (see file atbd_mgvi_jrc.pdf) as an integral part of the FAPAR Processor. The information provided below provides a short summary of essential information and does not replace the ATBD. 
+</p>
+
+<h3>FAPAR</h3>
+
+<p>
+The FAPAR algorithm consists in a set of rules designed to generate useful information on the state and productivity of the vegetation on land. Particular attention has been given to ensure that these products are uncontaminated by atmospheric effects (in particular aerosols), soil colour changes and anisotropic influences associated with the particular geometry of illumination and observation at the time of the measurements.
+</p>
+<p>
+The FAPAR Processor distributed for use with the BEAM Toolbox is specifically designed to analyze MERIS data and computes equivalent values of the MGVI and associated rectified channels which are the current Level 2 MERIS land products.
+</p>
+
+<h3>Design</h3>
+
+<p>
+The presence of vegetation on land exploit the fact that live green vegetation is highly reflecting in the near-infrared and is quite absorbing in the red spectral bands. The top of atmosphere reflectances are however strongly contaminated by the presence and properties of aerosols and water vapour in the atmosphere, can vary significantly with soil brightness changes (e.g., following rain events) and are very sensitive to the anisotropy of the surface (i.e., to the relative angular positions of the Sun and of the observing instrument). 
+</p>
+<p>
+The FAPAR algorithm used in this processor has been specifically designed to address these shortcomings and to provide not just a qualitative indicator but a quantitative estimate of an actual biophysical variable that is directly relevant to the physiology of the plants. It is optimized for the MERIS instrument, uses a spectral band in the blue region to characterize the atmospheric aerosol effects, and takes into account the typical anisotropy of vegetation covers. For a detailed description of the design of the algorithm, please refer to the ATBD that is distributed with the Processor. 
+</p>
+<p class="inote">
+<i><b>Please note that</b></i>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- A detailed understanding of the design of the algorithm may be useful to its performances, but is not necessary to generate the product with the Processor or to use this product in practical applications.
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Similar FAPAR algorithms have been also designed for other Earth orbiting sensors (e.g., SeaWiFS, MISR, Vegetation, and GLI). Because each of them is specifically crafted for each particular sensor, the products generated from anyone of these processors are <u>directly comparable</u> and users can mix and match such products without having to be concerned about the origin of the data (as long as the appropriate algorithm is used).
+</p>
+
+<p>
+In practice, the FAPAR Processor works in four steps
+<MENU>
+	<LI type="disc">The measured radiances at the top of reflectances are first converted into bidirectional reflectances factors (BRFs).
+	<LI type="disc">The vegetated land pixels are then detected by a multi-spectral threshold algorithm. This informs about the nature of non-vegetated pixels like bare soil, bright surfaces, or cloud shadow contamination pixels. 
+	<LI type="disc">The BRFs are corrected from angular effects thank to a parametric model. The blue band is then used, in conjunction with the red and near-infrared observations, to generate an intermediary product known as the <i>rectified red</i> and <i>near-infrared</i> bands: these essentially represent standardized measurements, in these two spectral bands, decontaminated from atmospheric and anisotropic effects. This component of the algorithm takes explicitly into account the characteristics of the orbit and the spectral band passes of the MERIS instrument.
+	<LI type="disc">The last step consists in computing FAPAR from the two rectified channels and in generating the associated flag values. 
+</MENU>
+
+<h3>FAPAR Input and Output Products</h3>
+<p>
+The FAPAR processor uses the following MERIS Level 1b TOA radiances bands and Tie Point Grids angles:
+<table><tr>
+	<td>As the near-infrared band:</td>
+	<td>radiance_13</td>
+	<td>865 nm</td>
+	</tr><tr>
+	<td>As the red band:</td>
+	<td>radiance_8</td>
+	<td>680 nm</td>
+	</tr><tr>
+	<td>As the blue band:</td>
+	<td>radiance_2</td>
+	<td>442 nm</td>
+	</tr> 	
+	<tr>
+		<td>As the sun zenith angle: </td>		
+		<td>sun_zenith</td>
+	</tr>
+	<tr>
+		<td>As the sun azimuth angle: </td>
+		<td>sun_azimuth</td>
+	</tr>	
+	<tr>
+		<td>As the view zenith angle: </td>
+		<td>view_zenith</td>
+	</tr>
+	<tr>
+		<td>As the view azimuth angle: </td>
+		<td>view_azimuth</td>
+	</tr>
+					
+</table>	
+<p>
+and generates the following output bands:
+<table>
+	<tr><th>Band</th><th>Band name</th><th>Comment</th></tr>
+	<tr><td>FAPAR</td><td>FAPAR</td><td> </td></tr>
+	<tr><td>blue reflectance</td><td>reflectance_TOA_2</td><td>Directly computed from radiance_TOA_2</td></tr>
+	<tr><td>green reflectance</td><td>reflectance_TOA_5</td><td>Directly computed from radiance_TOA_5</td></tr>
+	<tr><td>red reflectance</td><td>reflectance_TOA_8</td><td>Directly computed from radiance_TOA_8</td></tr>
+	<tr><td>near-infrared reflectance</td><td>reflectance_TOA_13</td><td>Directly computed from radiance_TOA_13</td></tr>
+	<tr><td>rectified near-infrared</td><td>rectified_reflectance_13</td><td>Created</td></tr>
+	<tr><td>rectified red</td><td>rectified_reflectance_8</td><td>Created</td></tr>
+	<tr><td>flags</td><td>l2_flags</td>Copied from Level 1 data and enhanced</tr>
+</table>
+<p>
+The product also includes the following ancillary information, which is copied straight from the input data: Tie Point Grids <i>latitude</i>, <i>longitude</i>, <i>sun_zenith</i>, <i>sun_azimuth</i>, <i>view_zenith</i> and <i>view_azimuth</i>.
+</p>
+
+<h3>FAPAR-Flags</h3>
+
+<p>
+A set of flags is provided with the FAPAR product to document the 
+performance of the processor and characterize the accuracy and 
+reliability of the product.
+</p>
+
+<p>
+The processor creates a band called 'l2_flags' containing the level 1 flags plus new ones computed by the algorithm and having the following bit coding:
+</p>
+<table>
+	<tr><th>Bit Position</th><th>Name</th><th>Description</th></tr>
+	<tr><td>Bit 9</td><td>MGVI_BAD_DATA</td><td>The algorithm encountered one or more negative reflectances</td></tr>
+	<tr><td>Bit 10</td><td>MGVI_CSI</td><td>The algorithm detected a cloud, snow or ice pixel</td></tr>
+	<tr><td>Bit 11</td><td>MGVI_WS</td><td>The algorithm detected a water or deep shadow pixel</td></tr>
+	<tr><td>Bit 12</td><td>MGVI_BRIGHT</td><td>The algorithm detected a bright surface pixel</td></tr>
+	<tr><td>Bit 13</td><td>MGVI_INVAL_FAPAR</td><td>The value of rectified reflectances or FAPAR are out of bounds</td></tr>
+</table>
+<p class="inote">
+Note that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Whenever the flags in bits 9 to 12 are set, the rectified reflectances and the FAPAR are set to -1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- In the case of the flag in bit 13, if one or more of the rectified reflectances are found to be out of bounds (strictly lower than 0 or larger than 1), it is reset to -1, and so is the FAPAR<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- In the case of the flag in bit 13, if the FAPAR is computed but found to be out of bounds, it is reset to -1 but the rectified reflectances are nevertheless reported.
+</p>
+<p>
+</p>
+<hr>
+
+</body>
+</html>

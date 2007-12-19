@@ -1,0 +1,10 @@
+# Auxiliary data file for the BEAR processor
+#
+# This file contains coefficients for the aer. diffuse transmission
+
+version=6.8
+description=test coefficients
+caer.0 = 0.0
+caer.1 = 1.0
+caer.2 = 2.0
+caer.3 = 3.0

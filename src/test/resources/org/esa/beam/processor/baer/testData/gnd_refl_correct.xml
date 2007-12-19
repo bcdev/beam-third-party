@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<GndReflList version="1.0" description="First test data">
+    <GndRefl name="LACE+MAPLE" description="2 x LACE + MAPLE modified" ground="VEG">
+        <Band index="1" reflec="0.0020"/>
+        <Band index="2" reflec="0.0055"/>
+        <Band index="3" reflec="0.0144"/>
+        <Band index="4" reflec="0.0230"/>
+        <Band index="5" reflec="0.0475"/>
+        <Band index="6" reflec="0.0700"/>
+        <Band index="7" reflec="0.323"/>
+        <Band index="13" reflec="0.378"/>
+    </GndRefl>
+</GndReflList>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<RequestList>
+    <Request type="TOA_VEG_PROCESS">
+        <Parameter name="bitmask" value="l1_flags.LAND_OCEAN" />
+        <Parameter name="log_prefix" value="toa_veg" />
+        <Parameter name="log_to_output" value="false" />
+        <InputProduct URL="file:/C:/Data/ENVISAT/MERIS/L1b/RR/MER_RR__1PNACR20020624_103000_00000087X000_00094_01651_0000_NORTH_SEA1_0303.N1" />
+        <OutputProduct URL="file:/C:/Data/DIM/MER_TOA_VEG.dim" />
+    </Request>
+</RequestList>
+

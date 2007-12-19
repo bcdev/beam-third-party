@@ -1,0 +1,69 @@
+<html>
+
+<head>
+    <title>TOA-VEG Processor Overview</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<table class="header" width="100%">
+    <tr class="header">
+        <td class="header">&nbsp;
+            TOA-VEG Processor Overview
+        </td>
+        <td class="header" align="right">
+           <a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h4>Introduction</h4>
+
+<p>The proposed algorithm called here TOA-VEG is based on the training of neural networks over a data base
+simulated using radiative transfer models. It requires top of atmosphere MERIS reflectances and associated
+geometry as inputs and allows the derivation of four vegetation biophysical variables:</p>
+
+
+<ul>
+<li><b>fAPAR</b>: it corresponds to the fraction of photosynthetically active
+radiation absorbed by the canopy and depends both on the canopy structure and illumination conditions.
+In order to be consistent with most of the potential users who are dealing with daily integrated fAPAR value
+as well as with other fAPAR products that are considering the instantaneous fAPAR value at the time of the
+satellite overpass under clear sky conditions (e.g. MODIS), we decided to use the fAPAR at 10:00 solar time
+under clear sky conditions. Note also that the fAPAR refers only to the green parts
+(leaf chlorophyll content higher that 15µg.cm<sup>-2</sup>) of the canopy.</li>
+
+<li><b>fCover</b>: it corresponds to the gap fraction for nadir direction.
+It is a canopy intrinsic variable that does not depend on variables such as the geometry of illumination
+as compared to fAPAR. For this reason, it is a very good candidate for the replacement of classical vegetation
+indices for the monitoring of green vegetation. Note that similarly to LAI and fAPAR, only the green elements
+(leaf chlorophyll content higher that 15µg.cm<sup>-2</sup>) will be considered.</li>
+
+<li><b>LAI</b>: it is defined as half the developed area of green
+(leaf chlorophyll content higher than 15 µg.cm<sup>-2</sup>) vegetation elements per unit of horizontal soil Note that
+LAI of vegetation as estimated from remote sensing will include all the green contributors, i.e. including
+understory when existing under forest canopies.</li>
+
+<li><b>LAI.C<sub>ab</sub></b>: the chlorophyll content can be calculated both at the
+leaf level and at the canopy level by multiplication of the leaf level chlorophyll content by the leaf
+area index. As the medium resolution scale of MERIS is generally associated with heterogeneous pixels, the
+product LAI.Cab more sound than the leaf level chlorophyll content: what would be the chlorophyll content of
+a pixel with half of very sparse canopy with very high leaf chlorophyll content and half of very dense
+canopy with very low leaf chlorophyll content? Therefore, the estimation of LAI.C<sub>ab</sub> has been preferred to
+that of the leaf chlorophyll content.</li>
+</ul>
+<h4>More Information</h4>
+<p>
+More information about the MERIS TOA-VEG processor implementation can be found in these chapters:
+<ol>
+    <li><a href="ToaVegAlgorithm.html">TOA-VEG Algorithm</a></li>
+    <li><a href="ToaVegProcessor.html">TOA-VEG Processor</a></li>
+</ol>
+
+<hr>
+
+</body>
+
+</html>

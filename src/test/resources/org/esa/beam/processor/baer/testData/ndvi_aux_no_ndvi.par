@@ -1,0 +1,6 @@
+# Auxiliray data file for the BEAR processor
+#
+# This file contains the ndvi tuning factor
+
+version=0.6
+description=this is a test

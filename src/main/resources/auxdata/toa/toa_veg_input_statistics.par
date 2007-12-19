@@ -1,0 +1,38 @@
+# Auxiliary data file for the VEG processor
+#
+# This file contains the min and the max of the input data of the training database
+
+version=3.0
+description=First test implementation
+theta_s_min=0.31792995
+theta_s_max=1.04718879
+theta_v_min=0.00000099616
+theta_v_max=0.68590864
+cos_phi_min=-0.999999
+cos_phi_max=1
+r1_min=0.0891215
+r1_max=0.41778551
+r2_min=0.07151076
+r2_max=0.46906965
+r3_min=0.05094766
+r3_max=0.52309721
+r4_min=0.04281358
+r4_max=0.56118259
+r5_min=0.02512556
+r5_max=0.61873024
+r6_min=0.01927991
+r6_max=0.63023794
+r7_min=0.01944251
+r7_max=0.69832564
+r8_min=0.01832826
+r8_max=0.7548423
+r9_min=0.01060944
+r9_max=0.76507422
+r10_min=0.0595014
+r10_max=0.87085622
+r11_min=0.07529407
+r11_max=0.92774513
+r12_min=0.08980312
+r12_max=1.10054001
+r13_min=0.09010581
+r13_max=1.1017671

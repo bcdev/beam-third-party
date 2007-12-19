@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<BaerConfig>
+    <Parameter name="ndvi_tuning" value="ndvi_aux.par" />
+    <Parameter name="soil_fraction" value="soil_fraction_aux.par" />
+    <Parameter name="f_tuning" value="f_tuning_aux.par" />
+    <Parameter name="aerosol_phase" value="aer_phase_function.xml" />
+    <Parameter name="rel_aerosol_phase" value="rel_aerosol_phase_aux.par" />
+    <Parameter name="ground_reflectance" value="ground_reflectances.xml" />
+    <Parameter name="aerosol_diffuse_transmission" value="aerosol_diff_transm.par" />
+    <Parameter name="hemispherical_reflectance" value="hemispherical_reflectance.par" />
+</BaerConfig>

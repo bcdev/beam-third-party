@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<RequestList>
+    <Request type="BAER">
+        <Parameter name="bitmask" value="l2_flags.LAND" />
+        <Parameter name="aer_phase_lut" value="LACE-98" />
+        <Parameter name="log_prefix" value="baer" />
+        <Parameter name="log_to_output" value="false" />
+        <Parameter name="baer_process" value="true" />
+        <Parameter name="atm_cor_process" value="true" />
+        <Parameter name="cloud_process" value="true" />
+        <Parameter name="atm_corr_method" value="UBAC" />
+        <InputProduct URL="file:/C:/Data/ENVISAT/MERIS/L2/RR/MER_RR__2PN01V20030929_101218_00000090X000_00194_08264_0000_Boussole.N1" />
+        <OutputProduct URL="file:/C:/Data/DIM/MER_BAER.dim" format="BEAM-DIMAP" />
+    </Request>
+</RequestList>
+

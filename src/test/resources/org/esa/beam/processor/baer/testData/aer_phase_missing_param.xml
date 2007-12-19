@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<AerLutList version="1.0" description="The first sketch of the format - data from Veronique">
+    <AerLut name="LACE-98_MER" bands="15">
+        <Band name="1">
+            <Parameter name="a.0" value="4.74719"/>
+            <Parameter name="a.2" value="0.98"/>
+        </Band>
+    </AerLut>
+</AerLutList>

@@ -1,0 +1,37 @@
+# Auxiliary data file for the BEAR processor
+#
+# This file contains the mean and the standard deviation of
+# the input data of the training database
+
+version=4.6
+description=missing values
+theta_s_min=12.0
+theta_v_min=14.0
+theta_v_max=15.0
+cos_phi_min=16.0
+r1_min=18.0
+r1_max=19.0
+r2_min=20.0
+r2_max=21.0
+r3_min=22.0
+r3_max=23.0
+r4_min=24.0
+r4_max=25.0
+r5_min=26.0
+r5_max=27.0
+r6_min=28.0
+r6_max=29.0
+r7_min=30.0
+r7_max=31.0
+r8_min=32.0
+r8_max=33.0
+r9_min=34.0
+r9_max=35.0
+r10_min=36.0
+r10_max=37.0
+r11_min=38.0
+r11_max=39.0
+r12_min=40.0
+r12_max=41.0
+r13_min=42.0
+r13_max=43.0

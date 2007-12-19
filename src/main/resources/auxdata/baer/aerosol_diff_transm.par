@@ -1,0 +1,11 @@
+# Auxiliary data file for the BAER processor
+#
+# This file contains coefficients for the aer. diffuse transmission
+
+version=1.0
+description=Polynomial coeffs. for the aerosol diffuse transmission
+caer.0 = 0.01176
+caer.1 = 1.01682
+caer.2 = -2.32949
+caer.3 = 2.11831
+caer.4 = -0.71737

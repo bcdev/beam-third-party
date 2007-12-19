@@ -1,0 +1,45 @@
+This file is used to store a list of to-do items.
+Each item in this list shall not require more than a few days to be completed.
+The items have the following syntax:
+    1. character: '-'  is a todo, 'o'  ongoing, in progress, '+'  completed
+    2. character: ' '
+    3 + 4. character: initials of the item author
+    5. character: ','
+    6 + 7. character: initials of the responsible
+    8. character: ':'
+    9. character: ' '
+    10+. character: free text
+
+
+Programming
+===========
++ nf,nf: check: ToaVegProcessor.getConfigPath, leading "/"
++ nf,nf: check: ToaVegProcessor.retrieveCurrentPath does nothing
++ nf,nf: generalize TOA-VEG  auxdata access for VISAT/BEAM integr. and stand-alone
+         redefine ToaVegConstants.AUXDATA_PATH as AUXDATA_DIR
+         redefine ToaVegConstants.CONFIG_PATH as CONFIG_FILE
+         access system property "toaveg.auxdata.dir" in method
+         ToaVegProcessor.getAuxdataDir
++ nf,nf: Change TOA-VEG constants and related tests which explicitely
+         used UNIX file separator '/'. On Windows OS systems, related tests fail.
++ nf,nf: move init code in processor constr. to Processor.initProcessor method
++ nf,nf: need a reasonable default output file name in TOA-VEG processor UI
+o nf,nf: generalize auxdata access for other processors as well
+- nf,nf: update UI, split into "I/O" and "Processing params"
+
+Configuration
+=============
++ nf,nf: add 'readme.txt' and 'changelog.txt'
++ nf,nf: add 'build.xml' for apache ant
++ nf,nf: add new source directory 'test' to CVS and move all existing test cases here
++ nf,cc: add some basic documentation to the merisveg-readme.txt regarding the TOA-VEG processor, e.g. what
+         goes in and what comes out.
+- nf,nf: talk with Carine about unit-level testing, philosophy, (non)sense of constant-testing
+
+Integration
+===========
++ cc,nf: integrate help pages
++ nf,cc: build plug-in JAR, test using BEAM 3.2, distribute
+o cc,cc: provide help documentation
+o cc,nf: verify BEAM integration
+- cc,nf: integrate code into BEAM CVS repository

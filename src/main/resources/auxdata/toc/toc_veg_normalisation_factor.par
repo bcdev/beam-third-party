@@ -1,0 +1,7 @@
+# Auxiliary data file for the BEAR processor
+#
+# This file contains factor for the normalisation of the input and output data
+
+version=1.0
+description=First test implementation
+norm_factor=0.66

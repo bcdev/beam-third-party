@@ -1,0 +1,24 @@
+#
+# Auxiliary data file for the VEG processor
+#
+# This file contains the mean, standard deviation, minimum and maximum values
+# of the output of the training database
+
+version=2.0
+description=First test implementation
+fAPAR_mean=0.70321
+fAPAR_std=0.22361
+fAPAR_min=3.7167e-5
+fAPAR_max=0.98728
+fCover_mean=0.60202
+fCover_std=0.26446
+fCover_min=2.9771e-5
+fCover_max=0.99556
+LAI_mean=3.1099
+LAI_std=1.9554
+LAI_min=6.0712e-5
+LAI_max=7.9669
+LAIxCab_mean=173.07
+LAIxCab_std=137.97
+LAIxCab_min=0.00091478
+LAIxCab_max=765.6

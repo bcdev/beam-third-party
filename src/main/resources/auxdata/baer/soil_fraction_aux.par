@@ -1,0 +1,7 @@
+# Auxiliary data file for the BAER processor
+#
+# This file contains the soil fraction factor
+
+version=1.0
+description=Soil fraction factor for surface reflectance calculation
+soil_fraction=1.3

@@ -1,0 +1,19 @@
+#
+# Auxiliary data file for the VEG processor
+#
+# This file contains the uncertainty model coefficients
+
+version=3.0
+description=first test implementation
+fAPAR.0=0.02205
+fAPAR.1=0.2312
+fAPAR.2=-0.2422
+fCover.0=0.0004322
+fCover.1=0.3711
+fCover.2=-0.3485
+LAI.0=-0.1535
+LAI.1=0.776
+LAI.2=-0.1207
+LAIxCab.0=0.5928
+LAIxCab.1=0.5024
+LAIxCab.2=-0.0007351

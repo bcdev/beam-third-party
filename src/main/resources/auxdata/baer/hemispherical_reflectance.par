@@ -1,0 +1,12 @@
+
+# Auxiliary data file for the BAER processor
+#
+# This file contains coefficients for the hemispherical reflectance
+
+version=1.0
+description=Polynomial coeffs. for the hemispherical reflectance
+crhem.0 = 0.0
+crhem.1 = 0.33185
+crhem.2 = -0.19653
+crhem.3 = 0.08935
+crhem.4 = -0.01674

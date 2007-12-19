@@ -1,0 +1,208 @@
+<module>
+    <manifestVersion>1.0.0</manifestVersion>
+    <symbolicName>beam-meris-veg</symbolicName>
+    <name>MERIS Vegetation Processors</name>
+    <version>2.0</version>
+
+    <description>
+        Contains the BAER, TOC-VEG and TOA-VEG processors.
+    </description>
+
+    <dependency>
+        <module>beam-core</module>
+    </dependency>
+    <dependency>
+        <module>beam-processing</module>
+    </dependency>
+    <dependency>
+        <module>beam-visat</module>
+        <optional>true</optional>
+    </dependency>
+    <dependency>
+        <module>beam-envisat-reader</module>
+    </dependency>
+
+    <categories>Processor, Application</categories>
+
+    <extension point="beam-visat:actions">
+        <action>
+            <id>MerisVeg</id>
+            <class>org.esa.beam.visat.actions.ActionGroup</class>
+            <text>Vegetation Processors (MERIS)</text>
+            <placeAfter>Binning</placeAfter>
+        </action>
+        <action>
+            <id>tocVegetationProcessor</id>
+            <class>org.esa.beam.visat.actions.ProcessorAction</class>
+            <processor>org.esa.beam.processor.toc.TocVegProcessor</processor>
+            <text>TOC Vegetation Processor (MERIS)...</text>
+            <mnemonic>C</mnemonic>
+            <helpID>TocVegOverview</helpID>
+            <parent>MerisVeg</parent>
+        </action>
+        <action>
+            <id>toaVegetationProcessor</id>
+            <class>org.esa.beam.visat.actions.ProcessorAction</class>
+            <processor>org.esa.beam.processor.toa.ToaVegProcessor</processor>
+            <text>TOA Vegetation Processor (MERIS)...</text>
+            <mnemonic>A</mnemonic>
+            <helpID>ToaVegOverview</helpID>
+            <parent>MerisVeg</parent>
+            <placeAfter>tocVegetationProcessor</placeAfter>
+        </action>
+        <action>
+            <id>baerProcessor</id>
+            <class>org.esa.beam.visat.actions.ProcessorAction</class>
+            <processor>org.esa.beam.processor.baer.BaerProcessor</processor>
+            <text>BEAR Aerosol Correction Processor (MERIS)...</text>
+            <mnemonic>B</mnemonic>
+            <helpID>BaerOverview</helpID>
+            <parent>MerisVeg</parent>
+            <placeAfter>toaVegetationProcessor</placeAfter>
+        </action>
+    </extension>
+
+    <extension point="beam-ui:helpSets">
+        <helpSet>
+            <parent>beam-help</parent>
+            <path>doc/help/merisVeg.hs</path>
+        </helpSet>
+    </extension>
+
+    <changelog>
+        <![CDATA[
+=========================================================<br>
+Meris TOA-VEG Changelog<br>
+=========================================================<br>
+<br>
+    Changes for Version 1.1.0 (nf, 28.03.2006)<br>
+     * added processing request file description and a sample to Java help<br>
+<br>
+    Changes for Version 1.0.4<br>
+     * suppress Normalisation factor (15.03.2006)<br>
+<br>
+    Changes for Version 1.0.3<br>
+     * added uncertainties estimations (06.03.2006)<br>
+     * changed NN coefficients (06.03.2006)<br>
+<br>
+    Changes for Version 1.0.2<br>
+     * Changes of the internal configuration<br>
+<br>
+    Changes for Version 1.0.1<br>
+     * UI: Output format label is now visible (mp, 14.11.2005)<br>
+     * Bitmask is now editable by expression editor (mp, 14.11.2005)<br>
+<br>
+    Changes for Version 1.0.0<br>
+     * Valid-pixel expressions have been assigned to all output bands of the TOA-VEG processor.<br>
+       The valid-pixel expressions allows VISAT to compute statisics and histograms on valid<br>
+       pixels only and enables the user to overlay an image with the resulting no-data mask.<br>
+       These are features which have been introduced in BEAM 3.3.<br>
+       The new valid-pixel expressions are<br>
+       for band LAI:     "not TOA_VEG_FLAGS.INVALID and not TOA_VEG_FLAGS.LAI_OUT_OF_RANGE"<br>
+       for band fCover:  "not TOA_VEG_FLAGS.INVALID and not TOA_VEG_FLAGS.FCOVER_OUT_OF_RANGE"<br>
+       for band LAIxCab: "not TOA_VEG_FLAGS.INVALID and not TOA_VEG_FLAGS.LAIXCAB_OUT_OF_RANGE"<br>
+       for band fAPAR:   "not TOA_VEG_FLAGS.INVALID and not TOA_VEG_FLAGS.FAPAR_OUT_OF_RANGE"<br>
+       Note that TOA_VEG_FLAGS.INVALID is set if<br>
+          "TOA_VEG_FLAGS.INVALID_INPUT or TOA_VEG_FLAGS.ALGORITHM_FAILURE"<br>
+       are set.<br>
+     * VISAT help files have been updated<br>
+<br>
+    Changes for Version 0.8<br>
+     * ToaVeg uses now the version 2 of NN input parameters files<br>
+     * ToaVegAlgorithm uses 2 versions of denormalisation<br>
+       (first for LAI, fCover, fapar - second for laixcab)<br>
+<br>
+    Changes for Version 0.3<br>
+     * ToaVegUi now extends AbstractProcessorUI as of BEAM-3.2 in order to<br>
+       support the help menu entries of the processor main frame.<br>
+     * Fixed: ToaVegProcessorConfigurationParser is now closing all opened URL<br>
+       streams which it has opened.<br>
+     * Converted Beatrice's TOA-VEG documentation into Java help files unde<br>
+       ./help. Updated ToaVegProcessorVPI, ToaVegProcessorMain and<br>
+       ToaVegConstants classe and 'build.xml' to support Java Help.<br>
+<br>
+    Changes for Version 0.2<br>
+     * static ToaVegProcessor.getAuxdataDir now returns auxdata directory for TOA-VEG.<br>
+       It makes use of the system property "toaveg.auxdata.dir" in order to<br>
+       set auxdata for the local stand-alone processor. For integrated version this<br>
+       property shall not be set, since BEAM's auxdata directory is used instead.<br>
+       Use Java system option, e.g. "-Dtoaveg.auxdata.dir=/usr/local/toa_veg" to<br>
+       set auxdata directory for stand-alone, non-integrated version of the processor.<br>
+     * Added test case for ToaVegProcessor.getAuxdataDir in ToaVegProcessorTest<br>
+     * Changed constants and related tests which explicitely used UNIX file separator '/'.<br>
+       On Windows OS systems, these tests failed.<br>
+     * TOA-VEG processor UI now provides default output file name "MER_TOA_VEG.dim".<br>
+<br>
+========================================================<br>
+Meris TOC-VEG Changelog<br>
+=========================================================<br>
+<br>
+    Changes for Version 0.6 (by nf 27.03.2006):<br>
+     * system property "toa_veg.auxdata.dir" now defines alternative auxdata location<br>
+     * making use of default output product name "MER_TOA_VEG.dim"<br>
+     * NullPointerException fixed which occurred if config.xml was not found<br>
+     * updated processor to use up-to-date MERIS L2 format where "MGVI" is named "toa_veg"<br>
+     * added processing request file description and a sample to Java help<br>
+     * integrated Java help system<br>
+<br>
+    Changes for Version 0.5:<br>
+     * changing NN coefficient<br>
+     * using only one NN<br>
+     * suppress uncertainties<br>
+<br>
+    Changes for Version 0.4:<br>
+     * Fixed: TocVegProcessorConfigurationParser is now closing all opened URL<br>
+       streams which it has opened.<br>
+     * UI: Output format label is now visible (mp, 14.11.2005)<br>
+     * Bitmask is now editable by expression editor (mp, 14.11.2005)<br>
+<br>
+=========================================================<br>
+Meris BAER Changelog<br>
+=========================================================<br>
+<br>
+    Changes for Version 1.0<br>
+     * split in 3 process (cloud, baer, atmospheric correction)<br>
+     * changing interface (Cloud Detection, Baer Process, Atmospheric Correction)<br>
+     * suppress cloud shadow<br>
+     * changing coefficient rhoclibx into 0.20 (cloud test)<br>
+     * renamed processing control labels (nf, 28/03/2006)<br>
+     * split of the UI into "I/O parameters" and "processing parameters" and<br>
+       changed help accordingly (nf, 28/03/2006)<br>
+     * added processing request file description and a sample to Java help<br>
+       (nf, 28/03/2006)<br>
+<br>
+    Changes for Version 0.9<br>
+     * Update BAER Algorithm from WHH Aerosol13.for (cc, 03.10.2005)<br>
+     * BAER output : aot at 412, 440 and 550; angstroem coefficient, surface<br>
+       reflectance (cc, 03.10.2005?)<br>
+     * Besides band aero_opt_thick, BAER now also accepts input products with<br>
+       band aero_opt_thick_865 as of MERIS Level-2 Reprocessing 2 (nf, 03.11.2005)<br>
+     * Default values for output file name and aerosol phase LUT are now set in<br>
+       the UI (nf, 03.11.2005)<br>
+     * Set valid-pixel expression for BAER output bands to<br>
+       !BAER_FLAGS.INVALID_INPUT && !BAER_FLAGS.INVALID_OUTPUT (nf, 04.11.2005)<br>
+     * Set output to zero when  BAER_FLAGS.INVALID_OUTPUT is true (cc, 07.11.2005)<br>
+     * Help integrated (mp, 10.11.2005)<br>
+     * UI: Output format label is now visible (mp, 14.11.2005)<br>
+     * Bitmask is now editable by expression editor (mp, 14.11.2005)<br>
+     * Change BAER option in "Atmospheric correction algorithm" into UBAC (cc, 15.11.2005)<br>
+
+    Changes for Version 0.7<br>
+     * BaerUi now extends AbstractProcessorUI as of BEAM-3.2 in order to<br>
+       support the help menu entries of the processor main frame.<br>
+     * Fixed: BAER's ProcessorConfigurationParser is now closing all opened URL<br>
+       streams which it has opened.<br>
+     * static BaerProcessor.getAuxdataDir now returns auxdata directory for BEAR.<br>
+       It makes use of the system property "baer.auxdata.dir" in order to<br>
+       set auxdata for the local stand-alone processor. For integrated version this<br>
+       property shall not be set, since BEAM's auxdata directory is used instead.<br>
+       Use Java system option, e.g. "-Dbaer.auxdata.dir=/usr/local/baer" to<br>
+       set auxdata directory for stand-alone, non-integrated version of the processor.<br>
+     * Added test case for BaerProcessor.getAuxdataDir in BaerProcessorTest<br>
+     * Changed constants and related tests which explicitely used UNIX file separator '/'.<br>
+       On Windows OS systems, these tests failed.<br>
+     * BAER processor UI now provides default output file name "MER_BAER.dim".<br>
+        ]]>
+    </changelog>
+
+</module>

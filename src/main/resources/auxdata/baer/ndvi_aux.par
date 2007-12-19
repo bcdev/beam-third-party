@@ -1,0 +1,7 @@
+# Auxiliray data file for the BAER processor
+#
+# This file contains the ndvi tuning factor
+
+version=1.0
+description=Ndvi tuning factor for veg. Fraction cover
+ndvi=0.9

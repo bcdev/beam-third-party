@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<RequestList>
+    <Request type="TOC_VEG_PROCESS">
+        <Parameter name="bitmask" value="l2_flags.LAND" />
+        <Parameter name="log_prefix" value="toc_veg" />
+        <Parameter name="log_to_output" value="false" />
+        <InputProduct URL="file:/C:/Data/ENVISAT/MERIS/L2/RR/MER_RR__2PN01V20030926_100640_00000090X000_00151_08221_0000_Boussole.N1" />
+        <OutputProduct URL="file:/C:/Data/DIM/MER_TOC_VEG.dim" />
+    </Request>
+</RequestList>
+

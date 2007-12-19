@@ -135,7 +135,7 @@ public class FaparProcessor extends Processor {
 
     // Processor description
     /**Processor Name*/
-    public static final String PROCESSOR_NAME = "FaparProcessor";
+    public static final String PROCESSOR_NAME = "Fapar Processor";
     private static final String _processorVersion = "2.1";
     //
     private static final String _processorCopyrightInfo = "Copyright (C) 2007 SOLO";

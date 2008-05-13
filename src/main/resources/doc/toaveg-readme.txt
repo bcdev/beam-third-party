@@ -1,7 +1,7 @@
                            README for
 
                    MERIS Vegetation Processor
-                     TOA-VEG Version 1.1
+                     TOA-VEG Version 1.1.1
 
 =======================================================================
 1. Introduction
@@ -81,6 +81,9 @@ architecture was optimized, resulting in 2 hidden layers of tangent-sigmoid
 neurones corresponding to a total around 340 coefficients to adjust.
 
 The theoretical performances were evaluated over the test simulated data set.
+The quality of the results is not guaranteed when solar zenith angle is larger
+than 60° due to the limitations in representativity of the canopy radiative
+transfer model used for training the neural network.
 
 TOA_VEG requires as input in addition to the measured top of atmosphere 
 reflectances in the 13 MERIS bands, the sun and view zenith angles, the relative
@@ -139,4 +142,4 @@ Installation, configuration, integration:
     norman.fomferra@brockmann-consult.de
 
 
-Ramonville Saint-Agne and Geesthacht the 07.04.2006
+Ramonville Saint-Agne and Geesthacht the 13.05.2008

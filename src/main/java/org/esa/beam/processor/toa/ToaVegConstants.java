@@ -21,7 +21,7 @@ public class ToaVegConstants {
     // processor name, version and copyright
     //
     public static final String PROC_NAME = "MERIS TOA-VEG";
-    public static final String PROC_VERSION = "1.1";
+    public static final String PROC_VERSION = "1.1.1";
     public static final String PROC_COPYRIGHT = "Copyright 2005 by NOVELTIS";
 
     public static final String LOGGER_NAME = "beam.processor.toa";

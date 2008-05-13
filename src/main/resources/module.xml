@@ -2,7 +2,7 @@
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-meris-veg</symbolicName>
     <name>MERIS Vegetation Processors</name>
-    <version>2.0</version>
+    <version>2.0.1</version>
 
     <description>
         Contains the BAER, TOC-VEG and TOA-VEG processors.
@@ -74,6 +74,9 @@
 =========================================================<br>
 Meris TOA-VEG Changelog<br>
 =========================================================<br>
+<br>
+    Changes in 1.1.1<br>
+     * help update regarding the limitation of solar zenith angle greater than 60°<br>
 <br>
     Changes for Version 1.1.0 (nf, 28.03.2006)<br>
      * added processing request file description and a sample to Java help<br>

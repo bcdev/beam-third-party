@@ -1,18 +1,23 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>jrc-fapar</symbolicName>
-    <version>2.1</version>
+    <version>2.1.1</version>
     <name>FAPAR Processor</name>
 
     <description>
-        Processor giving the FAPAR index from HDF5 AMORGOS output data.
+        Processor giving the FAPAR value (MGVI) from MERIS Level 1 files or/and Amorgos output
     </description>
 
     <vendor>Institute for Environment and Sustainability</vendor>
-    <contactAddress>Joint Research Centre, Via Enrico Fermi 1, I-21020 Ispra (VA), Italy</contactAddress>
+    <contactAddress>Joint Research Center, Via Enrico Fermi, 2749  I-21027 Ispra (VA), Italy</contactAddress>
     <url>http://fapar.jrc.it</url>
 
-
+    <changelog>
+        <![CDATA[
+        Changes in version 2.1.1:<br/>
+        - Changed module metadata information<br/>
+        ]]>
+    </changelog>
     <dependency>
         <module>beam-processing</module>
     </dependency>

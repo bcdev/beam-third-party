@@ -6,13 +6,19 @@
 <helpset version="2.0">
     <title>FAPAR Help</title>
     <maps>
-        <homeID>links</homeID>
+        <homeID>top</homeID>
         <mapref location="map.jhm"/>
     </maps>
     <view mergetype="javax.help.UniteAppendMerge">
-        <name >TOC</name>
+        <name>TOC</name>
         <label>Contents</label>
         <type>javax.help.TOCView</type>
         <data>toc.xml</data>
+    </view>
+    <view>
+        <name>Search</name>
+        <label>Search</label>
+        <type>javax.help.SearchView</type>
+        <data engine="com.sun.java.help.search.DefaultSearchEngine">JavaHelpSearch</data>
     </view>
 </helpset>

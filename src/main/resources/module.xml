@@ -8,7 +8,7 @@
         Level 2 water product from a given MERIS Level 1b product.
     </description>
 
-    <vendor>Freie Universität Berlin (FUB)</vendor>
+    <vendor>Freie Universitï¿½t Berlin (FUB)</vendor>
     <contactAddress>
         michael.schaale@wew.fu-berlin.de /
         Department of Earth Sciences /
@@ -48,7 +48,7 @@
 
     <categories>Visat,Processor,Water,Case 2</categories>
 
-    <extension point="beam-visat:actions">
+    <extension point="beam-ui:actions">
         <action>
             <id>WATERProcessorPlugIn</id>
             <class>org.esa.beam.visat.actions.ProcessorAction</class>

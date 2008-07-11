@@ -24,7 +24,7 @@
 
     <categories>Processor, Application</categories>
 
-    <extension point="beam-visat:actions">
+    <extension point="beam-ui:actions">
         <action>
             <id>MerisVeg</id>
             <class>org.esa.beam.visat.actions.ActionGroup</class>

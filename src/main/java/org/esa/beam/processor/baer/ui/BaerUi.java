@@ -485,21 +485,21 @@ public class BaerUi extends AbstractProcessorUI implements ParamChangeListener {
 
         if (BaerConstants.USE_BAER_PARAM_NAME.equals(paramName)) {
             handleParameterChangedEventUseBaer(param);
-
         } else if (BaerConstants.USE_ATM_COR_PARAM_NAME.equals(paramName)) {
-                  handleParameterChangedEventUseAtmCorr(param);
-        }else
-        {
-                final File file = (File) _paramGroup.getParameter(DefaultRequestElementFactory.INPUT_PRODUCT_PARAM_NAME).getValue();
-        Product inProduct = null;
-        try {
-            inProduct = ProductIO.readProduct(file, null);
-        } catch (IOException i) {
-            Debug.trace(i);
-        }
-        final Parameter parameter = _paramGroup.getParameter(BaerConstants.BITMASK_PARAM_NAME);
-        parameter.getProperties().setPropertyValue(BooleanExpressionEditor.PROPERTY_KEY_SELECTED_PRODUCT,
+            handleParameterChangedEventUseAtmCorr(param);
+        } else {
+            final File file = (File) _paramGroup.getParameter(DefaultRequestElementFactory.INPUT_PRODUCT_PARAM_NAME).getValue();
+            if (file != null && file.exists()) {
+                Product inProduct = null;
+                try {
+                    inProduct = ProductIO.readProduct(file, null);
+                } catch (IOException i) {
+                    Debug.trace(i);
+                }
+                final Parameter parameter = _paramGroup.getParameter(BaerConstants.BITMASK_PARAM_NAME);
+                parameter.getProperties().setPropertyValue(BooleanExpressionEditor.PROPERTY_KEY_SELECTED_PRODUCT,
                                                    inProduct);
+            }
         }
     }
 

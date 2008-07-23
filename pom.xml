@@ -50,7 +50,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <configuration>
                             <tasks>
                                 <property file="../build.properties"/>

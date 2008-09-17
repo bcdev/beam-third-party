@@ -109,7 +109,8 @@ public class WaterProcessor extends Processor {
 
     public static final int RESULT_ERROR_NUM = 9;
 
-    public static final String[] RESULT_ERROR_TEXT = {"Pixel was a priori masked out",
+    public static final String[] RESULT_ERROR_TEXT = {
+            "Pixel was a priori masked out",
             "CHL retrieval failure (input)",
             "CHL retrieval failure (output)",
             "YEL retrieval failure (input)",
@@ -120,7 +121,8 @@ public class WaterProcessor extends Processor {
             "Atmospheric correction failure (output)"
     };
 
-    public static final String[] RESULT_ERROR_NAME = {"LEVEL1b_MASKED",
+    public static final String[] RESULT_ERROR_NAME = {
+            "LEVEL1b_MASKED",
             "CHL_IN",
             "CHL_OUT",
             "YEL_IN",
@@ -132,7 +134,8 @@ public class WaterProcessor extends Processor {
     };
 
 
-    public static final int[] RESULT_ERROR_VALUE = {0x00000001,
+    public static final int[] RESULT_ERROR_VALUE = {
+            0x00000001,
             0x00000002,
             0x00000004,
             0x00000008,
@@ -259,17 +262,20 @@ public class WaterProcessor extends Processor {
 
     // Wavelengths for the water leaving reflectances rho_w
     private static float tau_lambda[] = {
-            440.00f, 550.00f, 670.00f, 870.00f};
+            440.00f, 550.00f, 670.00f, 870.00f
+    };
 
     // Wavelengths for the water leaving reflectances rho_w
     private static float rho_w_lambda[] = {
             412.50f, 442.50f, 490.00f, 510.00f,
-            560.00f, 620.00f, 665.00f, 708.75f};
+            560.00f, 620.00f, 665.00f, 708.75f
+    };
 
     // Bandwidth for the water leaving reflectances rho_w
     private static float rho_w_bandw[] = {
             10.00f, 10.00f, 10.00f, 10.00f,
-            10.00f, 10.00f, 10.00f, 10.00f};
+            10.00f, 10.00f, 10.00f, 10.00f
+    };
 
     // Mask value to be written if inversion fails 
     private float RESULT_MASK_VALUE = +5.0f;    // constant
@@ -278,6 +284,7 @@ public class WaterProcessor extends Processor {
 
     private int output_planes;
     private Band[] _outputBand;
+    private static final String ICOL_PATTERN = "MER_.*L1N";
 
     public WaterProcessor() {
         _logger = Logger.getLogger(LOGGER_NAME);
@@ -401,6 +408,7 @@ public class WaterProcessor extends Processor {
      * Loads the input product from the request. Opens all bands needed to 
      * process the water.
      */
+
     private void loadInputProduct() throws ProcessorException, IOException {
         _inputBandList = new ArrayList<Band>();
 
@@ -471,14 +479,16 @@ public class WaterProcessor extends Processor {
 
         if (dsf == null) {
             _logger.log(Level.WARNING, "No solar flux values found. Using some default values");
-            double defsol[] = {1670.5964, 1824.1444, 1874.9883,
+            double defsol[] = {
+                    1670.5964, 1824.1444, 1874.9883,
                     1877.6682, 1754.7749, 1606.6401,
                     1490.0026, 1431.8726, 1369.2035,
                     1231.7164, 1220.0767, 1144.9675,
-                    932.3497, 904.8193, 871.0908};
+                    932.3497, 904.8193, 871.0908
+            };
 
             // Prepare the defaults
-            dsf = new float [numbands.size()];
+            dsf = new float[numbands.size()];
             for (int i = 0; i < numbands.size(); i++) {
                 dsf[i] = (float) 1.0;
                 if (i < defsol.length) {
@@ -726,7 +736,6 @@ public class WaterProcessor extends Processor {
 
         return productType + "_FLH_MCI";
     }
-
 
     /* ***********************************************************************
     * ***************************  THE PROCESSOR ****************************
@@ -978,25 +987,32 @@ public class WaterProcessor extends Processor {
 
         // Grab a line in the middle of the scene
         _l1FlagsInputBand.readPixels(0, height / 2, width, 1, l1Flags);
-        mask_to_be_used = SUSPECT;
-        k = 0;
-        // Now sum up the cases which signal a SUSPECT behaviour
-        for (x = 0; x < width; x++) {
-            if ((l1Flags[x] & mask_to_be_used) != 0) {
-                k++;
-            }
-        }
-        // lower than 50 percent ?
-        if (k < width / 2)
-        // Make use of the SUSPECT flag
-        {
-            mask_to_be_used = MASK_TO_BE_USED | SUSPECT;
-        } else {
-            // Forget it ....
+        boolean icolMode = _inputProduct.getProductType().matches(ICOL_PATTERN);
+        if(icolMode){
             mask_to_be_used = MASK_TO_BE_USED;
-            System.out.println(
-                    "--- " + (float) k / (float) width * 100.0f + " % of the scan line are marked as SUSPECT ---");
+            System.out.println("--- Input product is of type icol ---");
             System.out.println("--- Switching to relaxed mask. ---");
+        } else {
+            mask_to_be_used = SUSPECT;
+            k = 0;
+            // Now sum up the cases which signal a SUSPECT behaviour
+            for (x = 0; x < width; x++) {
+                if ((l1Flags[x] & mask_to_be_used) != 0) {
+                    k++;
+                }
+            }
+            // lower than 50 percent ?
+            if (k < width / 2)
+            // Make use of the SUSPECT flag
+            {
+                mask_to_be_used = MASK_TO_BE_USED | SUSPECT;
+            } else {
+                // Forget it ....
+                mask_to_be_used = MASK_TO_BE_USED;
+                final float percent = (float) k / (float) width * 100.0f;
+                System.out.println("--- " + percent + " % of the scan line are marked as SUSPECT ---");
+                System.out.println("--- Switching to relaxed mask. ---");
+            }
         }
 
         // Notify process listeners that processing has started

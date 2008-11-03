@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <name>WeW Water Processor</name>
     <description>
         The WeW Water Processor calculates a
@@ -21,11 +21,14 @@
     <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
 
     <changelog>
-        <![CDATA[From 1.0 to 1.1
-        <ul>
-        <li>[BEAM-668] Port FUB WeW Water Processor.</li>
-        <li>[BEAM-669] Improve performance of FUB/WeW Water Processor.</li>
-        </ul>
+        <![CDATA[
+        From 1.1 to 1.2<br/>
+        [BEAM-877] Improve compatibility with icol products.<br/>
+        <br/>
+        From 1.0 to 1.1<br/>
+        [BEAM-668] Port FUB WeW Water Processor.<br/>
+        [BEAM-669] Improve performance of FUB/WeW Water Processor.<br/>
+        <br/>
         ]]>
     </changelog>
 

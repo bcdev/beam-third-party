@@ -5,7 +5,7 @@
     <name>WeW Water Processor</name>
     <description>
         The WeW Water Processor calculates a
-        Level 2 water product from a given MERIS Level 1b product.
+        Level 2 water product from MERIS Level 1b data.
     </description>
 
     <vendor>Freie Universitaet Berlin (FUB)</vendor>

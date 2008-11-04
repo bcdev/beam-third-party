@@ -1,0 +1,20 @@
+Copyright (C) 2004 by STARS
+
+Academic users:
+Are authorized to use this code for research and teaching,
+but must acknowledge the use of these routines explicitly
+and refer to the references in any publication or work.
+Original, complete, unmodified versions of these codes may be
+distributed free of charge to colleagues involved in similar
+activities.  Recipients must also agree with and abide by the
+same rules. The code may not be sold, nor distributed to
+commercial parties, under any circumstances.
+
+Commercial and other users:
+Use of this code in commercial applications is strictly
+forbidden without the written approval of the authors.
+Even with such authorization the code may not be distributed
+or sold to any other commercial or business partners under
+any circumstances.
+
+This software is provided as is without any warranty whatsoever.

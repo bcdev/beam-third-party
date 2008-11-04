@@ -5,7 +5,7 @@
     <name>FAPAR Processor</name>
 
     <description>
-        Processor giving the FAPAR value (MGVI) from MERIS Level 1 files or/and Amorgos output
+        Processor computing the FAPAR value (MGVI) from MERIS Level 1 files or/and Amorgos output.
     </description>
 
     <vendor>Institute for Environment and Sustainability</vendor>

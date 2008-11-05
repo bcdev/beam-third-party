@@ -32,6 +32,14 @@
             <version>[1.2,1.2.999]</version>
         </dependency>        
     </dependencies>
+    
+    <distributionManagement>
+        <repository>
+            <id>bc-public</id>
+            <name>Public Maven Repository at Brockmann-Consult</name>
+            <url></url>
+        </repository>
+    </distributionManagement>    
 
     <build>
         <plugins>

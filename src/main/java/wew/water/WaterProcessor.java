@@ -51,7 +51,7 @@ public class WaterProcessor extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
-    public static final String PROCESSOR_VERSION = "1.1";        // PROCESS
+    public static final String PROCESSOR_VERSION = "1.2";        // PROCESS
     public static final String PROCESSOR_COPYRIGHT = "Copyright (C) 2005/7 by WeW (michael.schaale@wew.fu-berlin.de)";
 
     public static final String LOGGER_NAME = "beam.processor.water";

@@ -51,7 +51,7 @@ public class WaterProcessor extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
-    public static final String PROCESSOR_VERSION = "1.2";        // PROCESS
+    public static final String PROCESSOR_VERSION = "1.2.1";        // PROCESS
     public static final String PROCESSOR_COPYRIGHT = "Copyright (C) 2005/7 by WeW (michael.schaale@wew.fu-berlin.de)";
 
     public static final String LOGGER_NAME = "beam.processor.water";
@@ -426,8 +426,9 @@ public class WaterProcessor extends Processor {
             && !EnvisatConstants.MERIS_FR_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
             && !EnvisatConstants.MERIS_FSG_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
             && !EnvisatConstants.MERIS_FRG_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
-            && !MERIS_FRS_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())) {
-            throw new ProcessorException("Invalid product type: MERIS Level 1b required.");
+            && !MERIS_FRS_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
+                && !_inputProduct.getProductType().matches(ICOL_PATTERN)) {
+            throw new ProcessorException("Invalid product type: MERIS Level 1b or MERIS Level 1N (icol) required.");
         }
 
 

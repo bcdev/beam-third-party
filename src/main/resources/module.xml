@@ -1,11 +1,11 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2</version>
+    <version>1.2.1</version>
     <name>WeW Water Processor</name>
     <description>
         The WeW Water Processor calculates a
-        Level 2 water product from MERIS Level 1b data.
+        Level 2 water product from MERIS Level 1b and MERIS Level 1N (ICOL) data.
     </description>
 
     <vendor>Freie Universitaet Berlin (FUB)</vendor>
@@ -22,8 +22,11 @@
 
     <changelog>
         <![CDATA[
+        From 1.2 to 1.2.1<br/>
+        [BEAM-886] Meris L1N data products are not accepted<br/>
+        <br/>
         From 1.1 to 1.2<br/>
-        [BEAM-877] Improve compatibility with icol products.<br/>
+        [BEAM-877] Improve compatibility with icol products<br/>
         <br/>
         From 1.0 to 1.1<br/>
         [BEAM-668] Port FUB WeW Water Processor.<br/>

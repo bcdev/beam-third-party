@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <name>WeW Water Processor</name>
     <description>
         The WeW Water Processor calculates a
@@ -22,6 +22,8 @@
 
     <changelog>
         <![CDATA[
+        From 1.2.1 to 1.2.2<br/>
+        [BEAM-894] Adapt check for valid ICOL product type<br/>
         From 1.2 to 1.2.1<br/>
         [BEAM-886] Meris L1N data products are not accepted<br/>
         <br/>

@@ -284,7 +284,7 @@ public class WaterProcessor extends Processor {
 
     private int output_planes;
     private Band[] _outputBand;
-    private static final String ICOL_PATTERN = "MER_.*L1N";
+    private static final String ICOL_PATTERN = "MER_.*1N";
 
     public WaterProcessor() {
         _logger = Logger.getLogger(LOGGER_NAME);

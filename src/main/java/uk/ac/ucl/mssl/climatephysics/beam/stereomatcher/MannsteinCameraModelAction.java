@@ -1,12 +1,11 @@
 package uk.ac.ucl.mssl.climatephysics.beam.stereomatcher;
 
 import org.esa.beam.framework.gpf.ui.DefaultSingleTargetProductDialog;
-import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
 import org.esa.beam.framework.ui.command.CommandEvent;
 import org.esa.beam.visat.actions.AbstractVisatAction;
 
 public class MannsteinCameraModelAction extends AbstractVisatAction {
-    private SingleTargetProductDialog dialog;
+    private DefaultSingleTargetProductDialog dialog;
 
     @Override
     public void actionPerformed(CommandEvent event) {
@@ -15,6 +14,7 @@ public class MannsteinCameraModelAction extends AbstractVisatAction {
                                                           getAppContext(),
                                                           "MSSL Mannstein Camera Model", 
                                                           null);
+            dialog.setTargetProductNameSuffix("_MannsteinCameraModel");
         }
         dialog.show();
     }

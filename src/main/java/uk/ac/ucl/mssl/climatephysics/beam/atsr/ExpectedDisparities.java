@@ -1,10 +1,6 @@
 package uk.ac.ucl.mssl.climatephysics.beam.atsr;
 
 
-import java.awt.Rectangle;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
@@ -19,9 +15,13 @@ import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.util.ProductUtils;
 
-import com.bc.ceres.core.ProgressMonitor;
+import java.awt.Rectangle;
 
-@OperatorMetadata(alias="ExpectedDisparities", description="Computes expected disparities from elevation")
+import com.bc.ceres.core.ProgressMonitor;
+import com.bc.ceres.core.SubProgressMonitor;
+
+@OperatorMetadata(alias="ExpectedDisparities", 
+                  description="Computes expected disparities from elevation")
 public class ExpectedDisparities extends Operator {
 
 	@SourceProduct(alias="atsrToaL1b")
@@ -33,23 +33,13 @@ public class ExpectedDisparities extends Operator {
 	@Parameter(alias="outputBandName", defaultValue="expectedDisparities", description="name of output band")
 	private String outputBandName;
 
-	@Parameter(alias="noDataValue", defaultValue="-999.0", description="no data value to embed in images")
-	protected double noDataValue;
-
-	protected double disparityStep = 800.0;
+	private static final double disparityStep = 800.0;
+	
 	// source bands
 	private TiePointGrid elevationTiePointGrid;
 
-	// target bands
-	private Band outputBand;
-
-	private Logger logger;
-	
 	@Override
 	public void initialize() throws OperatorException {
-		logger = Logger.getLogger("MSSL ExpectedDisparities");
-		logger.info("Starting initialisation");
-				
 		elevationTiePointGrid = sourceProduct.getTiePointGrid("altitude");
 
 		int rasterWidth = sourceProduct.getSceneRasterWidth();
@@ -59,33 +49,30 @@ public class ExpectedDisparities extends Operator {
 		ProductUtils.copyTiePointGrids(sourceProduct, targetProduct);
 		ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
 
-		outputBand = new Band(outputBandName,
-				ProductData.TYPE_UINT16,
-				rasterWidth, rasterHeight);
-		outputBand.setNoDataValue(noDataValue);
-		
-		targetProduct.addBand(outputBand);
+		targetProduct.addBand(outputBandName, ProductData.TYPE_UINT8);
 		setTargetProduct(targetProduct);
 	}
 
-	
 	@Override
-	public void computeTileStack(Map<Band, Tile> targetTiles,
-			Rectangle targetRectangle,
-			ProgressMonitor pm) throws OperatorException {
+	public void computeTile(Band targetBand, Tile targetTile, ProgressMonitor pm) throws OperatorException {
+	    Rectangle targetRect = targetTile.getRectangle();
+        pm.beginTask("Computing filter", targetRect.height+4);
+        try {
+            Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRect, SubProgressMonitor.create(pm, 4));
 		
-		logger.info("Computing tile stack for " + targetRectangle); 		
-		Tile elevationTile = getSourceTile(elevationTiePointGrid,
-				targetRectangle, pm);
-		Tile targetTile = targetTiles.get(outputBand);
-		
-		//for (Tile.Pos pos : targetTile) {
-		for (int y = (targetTile.getMinY()); y <= targetTile.getMaxY(); y++) {
-			for(int x = targetTile.getMinX(); x <= targetTile.getMaxX(); x++) {	
-				double elevation = elevationTile.getSampleDouble(x, y);
-				targetTile.setSample(x, y, Math.max(Math.round(elevation / disparityStep), 0));
-			}
-		}
+            for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
+                for(int x = targetRect.x; x < targetRect.x + targetRect.width; x++) {
+                    final double elevation = elevationTile.getSampleDouble(x, y);
+                    targetTile.setSample(x, y, Math.max(Math.round(elevation / disparityStep), 0));
+                }
+                if (pm.isCanceled()) {
+                    return;
+                }
+                pm.worked(1);
+            }
+        } finally {
+            pm.done();
+        }
 	}
 
 	public static class Spi extends OperatorSpi {

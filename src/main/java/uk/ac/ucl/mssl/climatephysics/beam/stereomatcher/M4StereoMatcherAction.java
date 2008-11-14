@@ -1,11 +1,10 @@
 package uk.ac.ucl.mssl.climatephysics.beam.stereomatcher;
 
 import org.esa.beam.framework.gpf.ui.DefaultSingleTargetProductDialog;
-import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
 import org.esa.beam.framework.ui.command.CommandEvent;
 
 public class M4StereoMatcherAction extends M5StereoMatcherAction {
-    private SingleTargetProductDialog dialog;
+    private DefaultSingleTargetProductDialog dialog;
 
     @Override
     public void actionPerformed(CommandEvent event) {
@@ -14,6 +13,7 @@ public class M4StereoMatcherAction extends M5StereoMatcherAction {
                                                           getAppContext(), 
                                                           "MSSL M4 Stereo Matcher",
                                                           null);
+            dialog.setTargetProductNameSuffix("_M4StereoMatcher");
         }
         dialog.show();
     }

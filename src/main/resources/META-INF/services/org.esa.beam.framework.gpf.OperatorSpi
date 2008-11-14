@@ -1,0 +1,8 @@
+uk.ac.ucl.mssl.climatephysics.beam.atsr.ClearLandFilter$Spi
+uk.ac.ucl.mssl.climatephysics.beam.atsr.ExpectedDisparities$Spi
+uk.ac.ucl.mssl.climatephysics.beam.atsr.SunElevationDataFilter$Spi
+uk.ac.ucl.mssl.climatephysics.beam.imaging.Normaliser$Spi
+uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.ImageCoregistration$Spi
+uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.M4StereoMatcher$Spi
+uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.M5StereoMatcher$Spi
+uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.MannsteinCameraModel$Spi

@@ -1,8 +1,5 @@
 package uk.ac.ucl.mssl.climatephysics.beam.stereomatcher;
 
-import java.awt.Rectangle;
-import java.util.Map;
-
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
@@ -20,9 +17,13 @@ import org.esa.beam.util.ProductUtils;
 import uk.ac.ucl.mssl.climatephysics.stereomatcher.HeightCalculator;
 import uk.ac.ucl.mssl.climatephysics.stereomatcher.MannsteinATSRCameraModel;
 
-import com.bc.ceres.core.ProgressMonitor;
+import java.awt.Rectangle;
 
-@OperatorMetadata(alias="MannsteinCameraModel", description="Computes geometric height from parallax using Mannstein Camera Model")
+import com.bc.ceres.core.ProgressMonitor;
+import com.bc.ceres.core.SubProgressMonitor;
+
+@OperatorMetadata(alias="MannsteinCameraModel", 
+                  description="Computes geometric height from parallax using Mannstein Camera Model")
 public class MannsteinCameraModel extends Operator {
 
 
@@ -55,17 +56,10 @@ public class MannsteinCameraModel extends Operator {
 	private Band yDisparityBand;
 	private TiePointGrid elevationTiePointGrid;
 
-	// output bands
-	private Band heights;
-	
 	private HeightCalculator heightCalculator;
 
 	@Override
 	public void initialize() throws OperatorException {
-
-		System.out.println("Initialising Mannstein Camera Model");
-
-		assert(null != sourceProduct);
 		int rasterWidth = sourceProduct.getSceneRasterWidth();
 		int rasterHeight = sourceProduct.getSceneRasterHeight();
 
@@ -83,12 +77,11 @@ public class MannsteinCameraModel extends Operator {
 		ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
 		ProductUtils.copyMetadata(sourceProduct, targetProduct);
 
-		heights = new Band("CloudTopHeight", ProductData.TYPE_INT16, 
-				rasterWidth, rasterHeight);
+		Band heights = targetProduct.addBand("CloudTopHeight", ProductData.TYPE_INT16);
 		heights.setUnit("m");
 		heights.setDescription("Cloud Top Height");
 		heights.setNoDataValue(noDataValue);
-		targetProduct.addBand(heights);
+		heights.setNoDataValueUsed(true);
 
 		heightCalculator = new HeightCalculator(new MannsteinATSRCameraModel(coneHalfAngle), 
 				minimumCloudHeight, maximumCloudHeight, disparityOffset, yDisparityBand.getNoDataValue(), noDataValue);
@@ -96,24 +89,30 @@ public class MannsteinCameraModel extends Operator {
 		setTargetProduct(targetProduct);
 	}
 
-
 	@Override
-	public void computeTileStack(Map<Band, Tile> targetTiles,
-			Rectangle targetRectangle,
-			ProgressMonitor pm) throws OperatorException {
-		System.out.println("Computing tile stack for " + targetRectangle);
-
-		Tile yDisparityTile = getSourceTile(yDisparityBand, targetRectangle, pm);	
-		Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRectangle, pm);		
-		Tile heightsTile = targetTiles.get(heights);
+	public void computeTile(Band targetBand, Tile targetTile, ProgressMonitor pm) throws OperatorException {
+	    Rectangle targetRect = targetTile.getRectangle();
+        pm.beginTask("Computing filter", targetRect.height+8);
+        try {
+            Tile yDisparityTile = getSourceTile(yDisparityBand, targetRect, SubProgressMonitor.create(pm, 4));	
+            Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRect, SubProgressMonitor.create(pm, 4));		
 		
-		for (int y = (yDisparityTile.getMinY()); y <= yDisparityTile.getMaxY(); y++) {
-			for(int x = yDisparityTile.getMinX(); x <= yDisparityTile.getMaxX(); x++) {					
-				heightsTile.setSample(x, y, heightCalculator.getHeight(x, yDisparityTile.getSampleFloat(x, y), elevationTile.getSampleDouble(x,y)));
-			}
-
+            for (int y = (yDisparityTile.getMinY()); y <= yDisparityTile.getMaxY(); y++) {
+                for(int x = yDisparityTile.getMinX(); x <= yDisparityTile.getMaxX(); x++) {					
+                    final double height = heightCalculator.getHeight(x, yDisparityTile.getSampleFloat(x, y), elevationTile.getSampleDouble(x,y));
+                    targetTile.setSample(x, y, height);
+                }
+                if (pm.isCanceled()) {
+                    return;
+                }
+                pm.worked(1);
+            }
+		} finally {
+		    pm.done();
 		}
 	}
+	
+	
 	public static class Spi extends OperatorSpi {
 		public Spi() {
 			super(MannsteinCameraModel.class);

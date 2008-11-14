@@ -27,6 +27,7 @@ import org.esa.beam.util.ProductUtils;
 import uk.ac.ucl.mssl.climatephysics.imaging.GaussianKernelFixedSize;
 
 import com.bc.ceres.core.ProgressMonitor;
+import com.bc.ceres.core.SubProgressMonitor;
 
 @OperatorMetadata(alias="Normaliser", description="Normalises an input image")
 public class Normaliser extends Operator {
@@ -36,10 +37,10 @@ public class Normaliser extends Operator {
 	
 	@TargetProduct
 	private Product targetProduct;
-	
 
 	@Parameter(alias="referenceBandName", defaultValue="btemp_nadir_1100", description="Reference band")
 	private String referenceBandName;
+	
 	@Parameter(alias="comparisonBandName", defaultValue="btemp_fward_1100", description="Comparison band")
 	private String comparisonBandName;
 
@@ -57,7 +58,7 @@ public class Normaliser extends Operator {
 	private Band stddevComparisonBand;
 	private Band meanComparisonBand;
 	
-	private float borderWidth = 21f;
+	private static final float borderWidth = 21f;
 	
 	@Override
 	public void initialize() throws OperatorException {
@@ -85,40 +86,43 @@ public class Normaliser extends Operator {
 		targetReferenceBand = ProductUtils.copyBand(referenceBandName, sourceProduct, targetProduct);
 		targetComparisonBand = ProductUtils.copyBand(comparisonBandName, sourceProduct, targetProduct);
 		
-		normalisedReferenceBand = new Band("referenceNormalised",
-                     					ProductData.TYPE_FLOAT64,
-                     					rasterWidth, rasterHeight);
-		meanReferenceBand = new Band("referenceRegionalMean",
-					ProductData.TYPE_FLOAT64,
-					rasterWidth, rasterHeight);
-		stddevReferenceBand = new Band("referenceRegionalStdDev",
-				ProductData.TYPE_FLOAT64,
-				rasterWidth, rasterHeight);		
-		
-		normalisedComparisonBand = new Band("comparisonNormalised",
-					ProductData.TYPE_FLOAT64,
-					rasterWidth, rasterHeight);
-		meanComparisonBand = new Band("comparisonRegionalMean",
-				ProductData.TYPE_FLOAT64,
-				rasterWidth, rasterHeight);
-		stddevComparisonBand = new Band("comparisonRegionalStdDev",
-			ProductData.TYPE_FLOAT64,
-			rasterWidth, rasterHeight);
-
-		targetProduct.addBand(normalisedReferenceBand);
-		targetProduct.addBand(normalisedComparisonBand);
-		targetProduct.addBand(meanReferenceBand);
-		targetProduct.addBand(stddevReferenceBand);
-		targetProduct.addBand(meanComparisonBand);
-		targetProduct.addBand(stddevComparisonBand);
+		normalisedReferenceBand = targetProduct.addBand("referenceNormalised",
+		                                                ProductData.TYPE_FLOAT64);
+		normalisedComparisonBand = targetProduct.addBand("comparisonNormalised",
+		                                                 ProductData.TYPE_FLOAT64);
+		meanReferenceBand = targetProduct.addBand("referenceRegionalMean",
+		                                          ProductData.TYPE_FLOAT64);
+		stddevReferenceBand = targetProduct.addBand("referenceRegionalStdDev",
+		                                            ProductData.TYPE_FLOAT64);
+		meanComparisonBand = targetProduct.addBand("comparisonRegionalMean",
+		                                           ProductData.TYPE_FLOAT64);
+		stddevComparisonBand = targetProduct.addBand("comparisonRegionalStdDev",
+		                                             ProductData.TYPE_FLOAT64);
 		
 		setTargetProduct(targetProduct);
 	}
+	
+	@Override
+	public void computeTileStack(Map<Band, Tile> targetTiles, Rectangle targetRectangle, ProgressMonitor pm) throws OperatorException {
+	    pm.beginTask("Normalise", 2);
+	    try {
+	        normaliseBand(referenceBand, targetReferenceBand, 
+	                      normalisedReferenceBand, stddevReferenceBand, meanReferenceBand, 
+	                      targetTiles, targetRectangle, SubProgressMonitor.create(pm, 1));
+	        if (pm.isCanceled()) {
+	            return;
+	        }
+	        normaliseBand(comparisonBand, targetComparisonBand, 
+	                      normalisedComparisonBand, stddevComparisonBand, meanComparisonBand, 
+	                      targetTiles, targetRectangle, SubProgressMonitor.create(pm, 1));
+	    } finally {
+	        pm.done();
+	    }
+	}
 
-	protected void normaliseBand(Band inputBand, Band copyInputBand, Band normalisedBand, Band stddevBand, Band meanBand, 
-			Map<Band, Tile> targetTiles,
-			Rectangle targetRectangle, ProgressMonitor pm){
-		boolean test = false;
+	private void normaliseBand(Band inputBand, Band copyInputBand, 
+	                           Band normalisedBand, Band stddevBand, Band meanBand, 
+	                           Map<Band, Tile> targetTiles, Rectangle targetRectangle, ProgressMonitor pm){
 		Tile inputTile = getSourceTile(inputBand, targetRectangle, pm);		
 
         RenderedImage inputImage = inputBand.getSourceImage();
@@ -142,43 +146,21 @@ public class Normaliser extends Operator {
         pbformat.add(DataBuffer.TYPE_DOUBLE);
         RenderedOp doubleFormat = JAI.create("Format", pbformat, null);
 		
-        if (test){
-        	Raster data = doubleFormat.getData();
-        	System.out.println("double " + data.getSampleDouble(100, 100, 0));
-        }
-        
 		KernelJAI kernel = new GaussianKernelFixedSize(21, 5.25f);	
 		ParameterBlock pbx = new ParameterBlock();
 		pbx.addSource(doubleFormat);
 		pbx.add(kernel);
 		RenderedOp mean = JAI.create("convolve", pbx, null);
 
-		if (test){
-        	Raster data = mean.getData();
-        	System.out.println("mean data " + data.getSampleDouble(100, 100, 0));
-        }
-			
 		ParameterBlock pb2 = new ParameterBlock();
 		pb2.addSource(doubleFormat);
 		pb2.addSource(mean);
 		RenderedOp imageMinusMean = JAI.create("subtract", pb2, null);
 		
-        if (test){
-        	Raster data = imageMinusMean.getData();
-        	System.out.println("image minus mean data " + data.getSampleDouble(100, 100, 0));
-        }
-
-		
 		ParameterBlock pb3 = new ParameterBlock();
 		pb3.addSource(imageMinusMean);
 		pb3.addSource(imageMinusMean);
 		RenderedOp multiplied = JAI.create("multiply", pb3, null);
-		
-        if (test){
-        	Raster data = multiplied.getData();
-        	System.out.println("multiply " + data.getSampleDouble(100, 100, 0));
-        }
-
 		
 		KernelJAI k2 = new GaussianKernelFixedSize(21, 5.25f);
 		ParameterBlock pb4 = new ParameterBlock();
@@ -186,42 +168,20 @@ public class Normaliser extends Operator {
 		pb4.add(k2);
 		RenderedOp x2 = JAI.create("convolve", pb4, null);
 		
-        if (test){
-        	Raster data  = x2.getData();
-        	System.out.println("cv again data " + data.getSampleDouble(100, 100, 0));
-        }
-
 		ParameterBlock pb5 = new ParameterBlock();
 		pb5.addSource(x2);
 		RenderedOp stddev = JAI.create("uk.ac.ucl.mssl.climatephysics.imaging.sqrt", pb5, null);
 
-        if (test){
-        	Raster data = stddev.getData();
-        	System.out.println("sqrt data " + data.getSampleDouble(100, 100, 0));
-        }
-
-		
 		double epsilon = 0.001;
 		ParameterBlock pb7 = new ParameterBlock();
 		pb7.addSource(stddev);
 		pb2.add(epsilon);
 		RenderedOp stddevPlusEpsilon = JAI.create("addconst", pb7, null);
 
-        if (test){
-        	Raster data = stddevPlusEpsilon.getData();
-        	System.out.println("epsilon data " + data.getSampleDouble(100, 100, 0));
-        }
-
 		ParameterBlock pb8 = new ParameterBlock();
 		pb8.addSource(imageMinusMean);
 		pb8.addSource(stddevPlusEpsilon);
 		RenderedOp normalised = JAI.create("divide", pb8, null);
-		
-        if (test){
-        	Raster data = normalised.getData();
-        	System.out.println("normalised " + data.getSampleDouble(100, 100, 0));
-        }
-
 		
 		ParameterBlock pb9 = new ParameterBlock();
 		pb9.addSource(normalised);
@@ -230,11 +190,6 @@ public class Normaliser extends Operator {
 		double[] high = {2.0d};
 		pb9.add(high);
 		RenderedOp clamped = JAI.create("clamp", pb9, null);
-        if (test){
-        	Raster data = clamped.getData();
-        	System.out.println("clamped data " + data.getSampleDouble(100, 100, 0));
-        }
-
 		
         Raster stddevImageTile = stddev.getData();
 		Raster meanImageTile = mean.getData();
@@ -256,16 +211,6 @@ public class Normaliser extends Operator {
 		
 	}
 	
-	@Override
-	public void computeTileStack(Map<Band, Tile> targetTiles,
-			Rectangle targetRectangle,
-			ProgressMonitor pm) throws OperatorException {
-		normaliseBand(referenceBand, targetReferenceBand, normalisedReferenceBand, stddevReferenceBand, meanReferenceBand, targetTiles,
-				targetRectangle, pm);
-		normaliseBand(comparisonBand, targetComparisonBand, normalisedComparisonBand, stddevReferenceBand, meanReferenceBand, targetTiles,
-				targetRectangle, pm);	
-	}
-
 	
 	public static class Spi extends OperatorSpi {
         public Spi() {

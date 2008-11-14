@@ -1,10 +1,6 @@
 package uk.ac.ucl.mssl.climatephysics.beam.stereomatcher;
 
 
-import java.awt.Rectangle;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
@@ -18,9 +14,14 @@ import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.util.ProductUtils;
 
-import com.bc.ceres.core.ProgressMonitor;
+import java.awt.Rectangle;
+import java.util.Map;
 
-@OperatorMetadata(alias="ImageCoregistration", description="Determines nadir/forward coregistration by determining shift for clear views of land")
+import com.bc.ceres.core.ProgressMonitor;
+import com.bc.ceres.core.SubProgressMonitor;
+
+@OperatorMetadata(alias="ImageCoregistration", 
+                  description="Determines nadir/forward coregistration by determining shift for clear views of land")
 public class ImageCoregistration extends Operator {
 
 	@SourceProduct(alias="disparities")
@@ -55,7 +56,7 @@ public class ImageCoregistration extends Operator {
 
 
 	@Parameter(alias="noDataValue", defaultValue="-999", description="no data value to embed in images")
-	protected int noDataValue;
+	private int noDataValue;
 
 
 	// source bands
@@ -68,13 +69,8 @@ public class ImageCoregistration extends Operator {
 	private Band xShiftBand;
 	private Band yShiftBand;
 
-	private Logger logger;
-
 	@Override
 	public void initialize() throws OperatorException {
-		logger = Logger.getLogger("MSSL ImageCoregistration");
-		logger.info("Starting initialisation");
-
 		xDispBand = disparitiesProduct.getBand(xDispBandName);
 		if (null == xDispBand){
 			throw new IllegalArgumentException("Band " + xDispBandName + " missing in source product");
@@ -95,7 +91,6 @@ public class ImageCoregistration extends Operator {
 			throw new IllegalArgumentException("Band " + filterBandName + " missing in source product");
 		}
 
-
 		int rasterWidth = disparitiesProduct.getSceneRasterWidth();
 		int rasterHeight = disparitiesProduct.getSceneRasterHeight();
 		targetProduct = new Product("MSSL_Coregistration", "MSSL_Coregistration",
@@ -104,17 +99,15 @@ public class ImageCoregistration extends Operator {
 		ProductUtils.copyGeoCoding(disparitiesProduct, targetProduct);
 		ProductUtils.copyMetadata(disparitiesProduct, targetProduct);
 
-		xShiftBand = new Band(xShiftBandName,
-				ProductData.TYPE_INT16,
-				rasterWidth, rasterHeight);
+		xShiftBand =targetProduct.addBand(xShiftBandName,
+		                                   ProductData.TYPE_INT16);
 		xShiftBand.setNoDataValue(noDataValue);
-		targetProduct.addBand(xShiftBand);
+		xShiftBand.setNoDataValueUsed(true);
 
-		yShiftBand = new Band(yShiftBandName,
-				ProductData.TYPE_INT16,
-				rasterWidth, rasterHeight);
+		yShiftBand = targetProduct.addBand(yShiftBandName,
+		                                   ProductData.TYPE_INT16);
 		yShiftBand.setNoDataValue(noDataValue);
-		targetProduct.addBand(yShiftBand);
+		yShiftBand.setNoDataValueUsed(true);
 
 		setTargetProduct(targetProduct);
 	}
@@ -122,35 +115,40 @@ public class ImageCoregistration extends Operator {
 
 	@Override
 	public void computeTileStack(Map<Band, Tile> targetTiles,
-			Rectangle targetRectangle,
+			Rectangle targetRect,
 			ProgressMonitor pm) throws OperatorException {
 
-		logger.info("Computing tile stack for " + targetRectangle); 		
-		Tile xDispTile = getSourceTile(xDispBand,
-				targetRectangle, pm);
-		Tile yDispTile = getSourceTile(yDispBand,
-				targetRectangle, pm);
-		Tile expectedDisparityTile = getSourceTile(expectedDispBand, targetRectangle, pm);
-		Tile filterTile = getSourceTile(filterBand, targetRectangle, pm);
+	    pm.beginTask("Computing filter", targetRect.height+16);
+        try {
+            Tile xDispTile = getSourceTile(xDispBand, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile yDispTile = getSourceTile(yDispBand, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile expectedDisparityTile = getSourceTile(expectedDispBand, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile filterTile = getSourceTile(filterBand, targetRect, SubProgressMonitor.create(pm, 4));
 
-		Tile xShiftTile = targetTiles.get(xShiftBand);
-		Tile yShiftTile = targetTiles.get(yShiftBand);
+            Tile xShiftTile = targetTiles.get(xShiftBand);
+            Tile yShiftTile = targetTiles.get(yShiftBand);
 
 
-		for (int y = (xShiftTile.getMinY()); y <= xShiftTile.getMaxY(); y++) {
-			for(int x = xShiftTile.getMinX(); x <= xShiftTile.getMaxX(); x++) {	
+            for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
+                for(int x = targetRect.x; x < targetRect.x + targetRect.width; x++) {
 
-				//for (Tile.Pos pos : xShiftTile) {
-				int xShift = noDataValue;
-				int yShift = noDataValue;
-				// 0 is everything cloudy or sea => no data value
-				if (1 == filterTile.getSampleInt(x, y)){
-					yShift = (int)(yDispTile.getSampleDouble(x, y) - expectedDisparityTile.getSampleDouble(x, y));
-					xShift = (int)xDispTile.getSampleDouble(x, y);
-				}
-				xShiftTile.setSample(x, y, xShift);
-				yShiftTile.setSample(x, y, yShift);
-			}
+                    int xShift = noDataValue;
+                    int yShift = noDataValue;
+                    // 0 is everything cloudy or sea => no data value
+                    if (filterTile.getSampleInt(x, y) == 1){
+                        yShift = (int)(yDispTile.getSampleDouble(x, y) - expectedDisparityTile.getSampleDouble(x, y));
+                        xShift = (int)xDispTile.getSampleDouble(x, y);
+                    }
+                    xShiftTile.setSample(x, y, xShift);
+                    yShiftTile.setSample(x, y, yShift);
+                }
+                if (pm.isCanceled()) {
+                    return;
+                }
+                pm.worked(1);
+            }
+		} finally {
+		    pm.done();
 		}
 	}
 

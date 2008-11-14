@@ -1,10 +1,6 @@
 package uk.ac.ucl.mssl.climatephysics.beam.atsr;
 
 
-import java.awt.Rectangle;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
@@ -18,12 +14,16 @@ import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.util.ProductUtils;
 
-import com.bc.ceres.core.ProgressMonitor;
+import java.awt.Rectangle;
 
-@OperatorMetadata(alias="ClearLandFilter", description="Filters input to be both clear and over land")
+import com.bc.ceres.core.ProgressMonitor;
+import com.bc.ceres.core.SubProgressMonitor;
+
+@OperatorMetadata(alias="ClearLandFilter", 
+                  description="Filters input to be both clear and over land")
 public class ClearLandFilter extends Operator {
 
-	@SourceProduct(alias="atsrToaL1b")
+	@SourceProduct(alias="atsrToaL1b", bands= {NADIR_CLOUD_FLAG_NAME, FORWARD_CLOUD_FLAG_NAME})
 	private Product sourceProduct;
 
 	@TargetProduct
@@ -32,35 +32,24 @@ public class ClearLandFilter extends Operator {
 	@Parameter(alias="filterBandName", defaultValue="filter", description="name of output filter band")
 	private String filterBandName;
 
-	@Parameter(alias="noDataValue", defaultValue="-999", description="no data value to embed in images")
-	protected double noDataValue;
-
 	@Parameter(alias="cloudyRadius", defaultValue="5", description="radius to be clear of clouds around pixel")
-	protected int cloudRadius;
+	private int cloudRadius;
 
+	private static final String NADIR_CLOUD_FLAG_NAME = "cloud_flags_nadir";
+	private static final String FORWARD_CLOUD_FLAG_NAME = "cloud_flags_fward";
 	// TODO at the edges of orbits the elevation is computed incorrectly
 	// this masks those areas out, but it should be fixed in BEAM/Envisat Data
-	protected int elevationErrorBorder = 6;
+	private static final int ELEVATION_ERROR_BORDER = 6;
 
 	// source bands
 	private Band nadirBand;
 	private Band forwardBand;
 
-	// target bands
-	private Band filterBand;
-
-	private String nadirCloudFlagName = "cloud_flags_nadir";
-	private String forwardCloudFlagName = "cloud_flags_fward";
-
-	private Logger logger;
 
 	@Override
 	public void initialize() throws OperatorException {
-		logger = Logger.getLogger("MSSL ClearLandFilter");
-		logger.info("Starting initialisation");
-		nadirBand = sourceProduct.getBand(nadirCloudFlagName);
-		forwardBand = sourceProduct.getBand(forwardCloudFlagName);
-		System.out.println("got bands -- " + nadirBand + forwardBand);
+		nadirBand = sourceProduct.getBand(NADIR_CLOUD_FLAG_NAME);
+		forwardBand = sourceProduct.getBand(FORWARD_CLOUD_FLAG_NAME);
 		int rasterWidth = sourceProduct.getSceneRasterWidth();
 		int rasterHeight = sourceProduct.getSceneRasterHeight();
 		targetProduct = new Product("MSSL_DataFilter", "MSSL_DataFilter",
@@ -69,62 +58,58 @@ public class ClearLandFilter extends Operator {
 		ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
 		ProductUtils.copyMetadata(sourceProduct, targetProduct);
 
-		filterBand = new Band(filterBandName,
-				ProductData.TYPE_UINT16,
-				rasterWidth, rasterHeight);
-		filterBand.setNoDataValue(noDataValue);
-
-		targetProduct.addBand(filterBand);
+		targetProduct.addBand(filterBandName, ProductData.TYPE_UINT8);
 		setTargetProduct(targetProduct);
 	}
 
 
 	@Override
-	public void computeTileStack(Map<Band, Tile> targetTiles,
-			Rectangle targetRectangle,
-			ProgressMonitor pm) throws OperatorException {
+	public void computeTile(Band targetBand, Tile targetTile, ProgressMonitor pm) throws OperatorException {
+	    Rectangle targetRect = targetTile.getRectangle();
+		pm.beginTask("Computing filter", targetRect.height+8);
+		try {
+		    Tile nadirTile = getSourceTile(nadirBand, targetRect, SubProgressMonitor.create(pm, 4));
+		    Tile forwardTile = getSourceTile(forwardBand, targetRect, SubProgressMonitor.create(pm, 4));
 
-		logger.info("Computing tile stack for " + targetRectangle); 		
-		Tile nadirTile = getSourceTile(nadirBand,
-				targetRectangle, pm);
-		Tile forwardTile = getSourceTile(forwardBand,
-				targetRectangle, pm);
-
-		Tile targetFilterTile = targetTiles.get(filterBand);
-
-		for (int y = (targetFilterTile.getMinY()); y <= targetFilterTile.getMaxY(); y++) {
-			for(int x = targetFilterTile.getMinX(); x <= targetFilterTile.getMaxX(); x++) {	
-//				for (Tile.Pos pos : targetFilterTile) {
-				boolean valid = true;
-				boolean cloudy = true;
-				boolean land = false;
-				// TODO this is to mask out areas of incorrect altitude from the Envisat files
-				if (x < elevationErrorBorder || x >= targetRectangle.getMaxX() - elevationErrorBorder){
-					valid = false;
-				}
-				if (valid){
-					land = nadirTile.getSampleBit(x, y, 0) || forwardTile.getSampleBit(x, y, 0);
-				}
-				if (valid && land){
-					for (int i = cloudRadius *(-1); i <= cloudRadius; ++i){
-						if ((x + i < nadirTile.getMinX()) || x +i > nadirTile.getMaxX()) {
-							continue;
-						}
-						for (int j = cloudRadius * (-1); j <= cloudRadius; ++j){
-							if (y +j < nadirTile.getMinY() || y +j > nadirTile.getMaxY()) {
-								continue;
-							}
-							cloudy = nadirTile.getSampleBit(x + i, y + j, 1) || forwardTile.getSampleBit(x + i, y + j, 1);
-							if (cloudy)
-								break;
-						}
-						if (cloudy)
-							break;
-					}
-				}
-				int value = (!valid) || (!land) || cloudy ? 0 : 1;
-				targetFilterTile.setSample(x, y, value);
-			}
+		    for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
+		        for(int x = targetRect.x; x < targetRect.x + targetRect.width; x++) {	
+		            boolean valid = true;
+		            boolean cloudy = true;
+		            boolean land = false;
+		            // TODO this is to mask out areas of incorrect altitude from the Envisat files
+		            if (x < ELEVATION_ERROR_BORDER || x >= targetRect.getMaxX() - ELEVATION_ERROR_BORDER){
+		                valid = false;
+		            }
+		            if (valid){
+		                land = nadirTile.getSampleBit(x, y, 0) || forwardTile.getSampleBit(x, y, 0);
+		            }
+		            if (valid && land){
+		                for (int i = cloudRadius *(-1); i <= cloudRadius; ++i){
+		                    if ((x + i < nadirTile.getMinX()) || x +i > nadirTile.getMaxX()) {
+		                        continue;
+		                    }
+		                    for (int j = cloudRadius * (-1); j <= cloudRadius; ++j){
+		                        if (y +j < nadirTile.getMinY() || y +j > nadirTile.getMaxY()) {
+		                            continue;
+		                        }
+		                        cloudy = nadirTile.getSampleBit(x + i, y + j, 1) || forwardTile.getSampleBit(x + i, y + j, 1);
+		                        if (cloudy)
+		                            break;
+		                    }
+		                    if (cloudy)
+		                        break;
+		                }
+		            }
+		            int value = (!valid) || (!land) || cloudy ? 0 : 1;
+		            targetTile.setSample(x, y, value);
+		        }
+		        if (pm.isCanceled()) {
+                    return;
+                }
+		        pm.worked(1);
+		    }
+		} finally {
+		    pm.done();
 		}
 	}
 

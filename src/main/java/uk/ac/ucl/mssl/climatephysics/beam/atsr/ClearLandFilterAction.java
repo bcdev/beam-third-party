@@ -1,12 +1,11 @@
 package uk.ac.ucl.mssl.climatephysics.beam.atsr;
 
 import org.esa.beam.framework.gpf.ui.DefaultSingleTargetProductDialog;
-import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
 import org.esa.beam.framework.ui.command.CommandEvent;
 import org.esa.beam.visat.actions.AbstractVisatAction;
 
 public class ClearLandFilterAction extends AbstractVisatAction {
-    private SingleTargetProductDialog dialog;
+    private DefaultSingleTargetProductDialog dialog;
 
     @Override
     public void actionPerformed(CommandEvent event) {
@@ -15,6 +14,7 @@ public class ClearLandFilterAction extends AbstractVisatAction {
                                                           getAppContext(), 
                                                           "MSSL Filter Clear Land",
                                                           null);
+            dialog.setTargetProductNameSuffix("_ClearLandFilter");
         }
         dialog.show();
     }

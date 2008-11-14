@@ -5,19 +5,18 @@ import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
 import org.esa.beam.framework.ui.command.CommandEvent;
 import org.esa.beam.visat.actions.AbstractVisatAction;
 
+public class ImageCoregistrationAction extends AbstractVisatAction {
+    private SingleTargetProductDialog dialog;
 
-	public class ImageCoregistrationAction extends AbstractVisatAction {
-		private SingleTargetProductDialog dialog;
-		public void actionPerformed(CommandEvent event){
-			if (null == dialog){
-				dialog = new DefaultSingleTargetProductDialog(
-						"ImageCoregistration",
-						getAppContext(),
-						"MSSL Image Coregistration",
-						null);
-			}
-			dialog.show();
-		}
-		
-	}
-	
+    @Override
+    public void actionPerformed(CommandEvent event) {
+        if (null == dialog) {
+            dialog = new DefaultSingleTargetProductDialog("ImageCoregistration", 
+                                                          getAppContext(),
+                                                          "MSSL Image Coregistration", 
+                                                          null);
+        }
+        dialog.show();
+    }
+
+}

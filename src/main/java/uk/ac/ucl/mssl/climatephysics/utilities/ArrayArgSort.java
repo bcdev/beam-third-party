@@ -7,14 +7,14 @@ public class ArrayArgSort {
 	private double[] data;
 
 	private class ArgSortComparator implements Comparator<Integer> {
-		private double[] data;
+		private double[] comparatorData;
 		private Comparator<Double> comparator;
 		public ArgSortComparator (double[] data, Comparator<Double> comparator){
-			this.data = data;
+			this.comparatorData = data;
 			this.comparator = comparator;
 		}
 		public int compare(Integer a, Integer b){
-			return comparator.compare(data[a], data[b]);
+			return comparator.compare(comparatorData[a], comparatorData[b]);
 		}
 	}
 	public ArrayArgSort(double data[]){

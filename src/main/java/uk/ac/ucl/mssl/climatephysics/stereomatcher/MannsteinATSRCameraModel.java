@@ -2,7 +2,7 @@ package uk.ac.ucl.mssl.climatephysics.stereomatcher;
 
 import uk.ac.ucl.mssl.climatephysics.utilities.Interpolation;
 
-public class MannsteinATSRCameraModel extends CameraModel {
+public class MannsteinATSRCameraModel implements CameraModel {
 
 	final private double earthRadius = 6371.0f;
 	final private double earthRadiusSq = earthRadius * earthRadius;

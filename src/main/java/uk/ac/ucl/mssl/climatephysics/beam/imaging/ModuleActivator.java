@@ -1,5 +1,8 @@
 package uk.ac.ucl.mssl.climatephysics.beam.imaging;
 
+import uk.ac.ucl.mssl.climatephysics.imaging.SqrtCRIF;
+import uk.ac.ucl.mssl.climatephysics.imaging.SqrtDescriptor;
+
 import java.awt.image.renderable.ContextualRenderedImageFactory;
 
 import javax.media.jai.JAI;
@@ -7,17 +10,13 @@ import javax.media.jai.OperationRegistry;
 import javax.media.jai.registry.CRIFRegistry;
 import javax.media.jai.registry.RIFRegistry;
 
-import uk.ac.ucl.mssl.climatephysics.imaging.SqrtCRIF;
-import uk.ac.ucl.mssl.climatephysics.imaging.SqrtDescriptor;
-
-import com.bc.ceres.core.CoreException;
 import com.bc.ceres.core.runtime.Activator;
 import com.bc.ceres.core.runtime.ModuleContext;
 
 public class ModuleActivator implements Activator {
 
 	@Override
-	public void start(ModuleContext arg0) throws CoreException {
+	public void start(ModuleContext arg0)  {
 
 		SqrtDescriptor.register();
 		OperationRegistry registry =
@@ -32,7 +31,7 @@ public class ModuleActivator implements Activator {
 	}
 
 	@Override
-	public void stop(ModuleContext arg0) throws CoreException {
+	public void stop(ModuleContext arg0) {
 		// nothing to do
 	}
 

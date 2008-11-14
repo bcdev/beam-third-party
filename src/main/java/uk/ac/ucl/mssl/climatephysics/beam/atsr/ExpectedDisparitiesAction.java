@@ -8,13 +8,14 @@ import org.esa.beam.visat.actions.AbstractVisatAction;
 
 public class ExpectedDisparitiesAction extends AbstractVisatAction {
 	private SingleTargetProductDialog dialog;
-	public void actionPerformed(CommandEvent event){
+	
+	@Override
+    public void actionPerformed(CommandEvent event){
 		if (null == dialog){
-			dialog = new DefaultSingleTargetProductDialog(
-					"ExpectedDisparities",
-					getAppContext(),
-					"MSSL Expected Disparities",
-					null);
+			dialog = new DefaultSingleTargetProductDialog("ExpectedDisparities",
+			                                              getAppContext(),
+                                                          "MSSL Expected Disparities", 
+                                                          null);
 		}
 		dialog.show();
 	}	

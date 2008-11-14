@@ -40,7 +40,8 @@ public class SqrtDescriptor extends OperationDescriptorImpl {
 			  1, paramNames, paramClasses, paramDefaults, validParamValues);
 	}
 
-	public boolean isRenderableSupported() {
+	@Override
+    public boolean isRenderableSupported() {
         return true;
     }
 

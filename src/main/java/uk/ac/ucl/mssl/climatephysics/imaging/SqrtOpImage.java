@@ -11,7 +11,6 @@ import javax.media.jai.PointOpImage;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 
-@SuppressWarnings("unchecked")
 public class SqrtOpImage extends PointOpImage {
 
 	public SqrtOpImage(RenderedImage source, 
@@ -19,7 +18,8 @@ public class SqrtOpImage extends PointOpImage {
 		super(source, layout, null, true);
 	}
 
-	protected void computeRect(Raster[] sources,
+	@Override
+    protected void computeRect(Raster[] sources,
 			WritableRaster dest,
 			Rectangle destRect) {
 		

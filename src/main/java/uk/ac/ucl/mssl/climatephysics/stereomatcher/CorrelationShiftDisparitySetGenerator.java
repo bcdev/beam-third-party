@@ -15,7 +15,7 @@ import javax.media.jai.operator.IDFTDescriptor;
 
 import uk.ac.ucl.mssl.climatephysics.utilities.ArrayArgSort;
 
-public class CorrelationShiftDisparitySetGenerator extends
+public class CorrelationShiftDisparitySetGenerator implements
 		DisparitySetGenerator {
 
 	private RenderedImage reference;

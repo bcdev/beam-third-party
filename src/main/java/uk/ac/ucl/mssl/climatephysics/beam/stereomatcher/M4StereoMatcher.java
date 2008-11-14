@@ -18,9 +18,9 @@ import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import uk.ac.ucl.mssl.climatephysics.stereomatcher.CorrelationShiftDisparitySetGenerator;
 import uk.ac.ucl.mssl.climatephysics.stereomatcher.DisparitySetGenerator;
 
-@OperatorMetadata(alias="M4StereoMatcher", description="Stereo matches using M4 Algorithm")
-public class M4StereoMatcher extends M5StereoMatcher
-{
+@OperatorMetadata(alias="M4StereoMatcher", 
+                  description="Stereo matches using M4 Algorithm")
+public class M4StereoMatcher extends M5StereoMatcher {
 
 	@SourceProduct(alias="source")
 	private Product sourceProductM4;
@@ -42,7 +42,8 @@ public class M4StereoMatcher extends M5StereoMatcher
 	}
 	
 	
-	protected synchronized List<Point2D.Float> generateDisparitySet(Rectangle targetRectangle){
+	@Override
+    protected synchronized List<Point2D.Float> generateDisparitySet(Rectangle targetRectangle){
 
 		System.out.println("Generating disp set for " + targetRectangle);
 		RenderedImage referenceImage = referenceBand.getSourceImage();

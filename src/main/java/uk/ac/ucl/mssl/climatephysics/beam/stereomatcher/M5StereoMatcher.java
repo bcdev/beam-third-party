@@ -31,7 +31,8 @@ import uk.ac.ucl.mssl.climatephysics.stereomatcher.DisparitySetGenerator;
 
 import com.bc.ceres.core.ProgressMonitor;
 
-@OperatorMetadata(alias="M5StereoMatcher", description="Stereo matches using M5 Algorithm")
+@OperatorMetadata(alias="M5StereoMatcher", 
+                  description="Stereo matches using M5 Algorithm")
 public class M5StereoMatcher extends Operator {
 
 

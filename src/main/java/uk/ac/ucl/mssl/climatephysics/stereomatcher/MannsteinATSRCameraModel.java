@@ -84,8 +84,8 @@ public class MannsteinATSRCameraModel implements CameraModel {
 		// find min and max
 		int minPos = 0;
 		int maxPos = 0;
-		Double minVal = Double.POSITIVE_INFINITY;
-		Double maxVal = Double.NEGATIVE_INFINITY;
+		double minVal = Double.POSITIVE_INFINITY;
+		double maxVal = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < n; ++i){
 			if (a[i] < minVal) {
 				minPos = i;
@@ -105,10 +105,11 @@ public class MannsteinATSRCameraModel implements CameraModel {
 			aShifted[pos] = a[i];
 			epsShifted[pos] = eps[i];
 		}
-		double[] aShiftedSlice = new double[minPos - maxPos];
-		double[] epsShiftedSlice = new double[minPos - maxPos];
-		System.arraycopy(aShifted, 0, aShiftedSlice, 0, minPos - maxPos);
-		System.arraycopy(epsShifted, 0, epsShiftedSlice, 0, minPos - maxPos);
+		int length = Math.abs(maxPos - minPos);
+        double[] aShiftedSlice = new double[length];
+		double[] epsShiftedSlice = new double[length];
+		System.arraycopy(aShifted, 0, aShiftedSlice, 0, length);
+		System.arraycopy(epsShifted, 0, epsShiftedSlice, 0, length);
 		
 		for (int i = 0; i < epsShiftedSlice.length; ++i){
 			if (epsShiftedSlice[i] > Math.PI){
@@ -124,7 +125,7 @@ public class MannsteinATSRCameraModel implements CameraModel {
 		}
 		
 		// compute forward angles
-		int sizeForward = minPos +1 - maxPos;
+		int sizeForward = Math.abs(maxPos+1 - minPos);
 		double[] aF = new double[sizeForward];
 		double[] espF = new double[sizeForward];
 		

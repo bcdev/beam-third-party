@@ -14,88 +14,73 @@
     <dependency>
         <module>beam-envisat-reader</module>
     </dependency>
+    <dependency>
+        <module>beam-visat</module>
+        <optional>true</optional>
+    </dependency>
     
     <extension point="beam-visat:actions">
+        <action>
+            <id>mssl</id>
+            <class>org.esa.beam.visat.actions.ActionGroup</class>
+            <text>MSSL ATSR Tools</text>
+            <mnemonic>3</mnemonic>
+        </action>    
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.imaging.normalise</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.imaging.NormaliserAction</class>
-        	<text>MSSL Image Normaliser...</text>
+        	<text>Image Normaliser...</text>
         	<shortDescr>Normalises ATSR data for stereo matching</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.m5</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.M5StereoMatcherAction</class>
-        	<text>MSSL M5 Stereo Matcher...</text>
+        	<text>M5 Stereo Matcher...</text>
         	<shortDescr>Stereo matches two bands using the M5 algorithm</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.m4</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.M4StereoMatcherAction</class>
-        	<text>MSSL M4 Stereo Matcher...</text>
+        	<text>M4 Stereo Matcher...</text>
         	<shortDescr>Stereo matches two bands using the M4 algorithm</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.mannsteincameramodel</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.MannsteinCameraModelAction</class>
-        	<text>MSSL Mannstein Camera Model...</text>
+        	<text>Mannstein Camera Model...</text>
         	<shortDescr>Translates parallax into geometric height using Mannstein Camera Model</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.atsr.sunelevationdatafilter</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.atsr.SunElevationDataFilterAction</class>
-        	<text>MSSL Filter Sun Elevation...</text>
+        	<text>Filter Sun Elevation...</text>
         	<shortDescr>Filters data on sun elevation</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.atsr.clearlandfilter</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.atsr.ClearLandFilterAction</class>
-        	<text>MSSL Filter Clear Land...</text>
+        	<text>Filter Clear Land...</text>
         	<shortDescr>Filters data for clear land areas</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.atsr.expecteddisparities</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.atsr.ExpectedDisparitiesAction</class>
-        	<text>MSSL Expected Disparities...</text>
+        	<text>Expected Disparities...</text>
         	<shortDescr>Disparities expected by elevation</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
-	</extension>
-
-    <extension point="beam-visat:actions">
     	<action>
         	<id>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.imagecoregistration</id>
         	<class>uk.ac.ucl.mssl.climatephysics.beam.stereomatcher.ImageCoregistrationAction</class>
-        	<text>MSSL Image Coregistration...</text>
+        	<text>Image Coregistration...</text>
         	<shortDescr>Nadir/forward Coregistration</shortDescr>
-        	<parent>tools</parent>
+        	<parent>mssl</parent>
     	</action>
 	</extension>
-
-
 </module>
-

@@ -45,8 +45,8 @@ public class M4StereoMatcher extends M5StereoMatcher
 	protected synchronized List<Point2D.Float> generateDisparitySet(Rectangle targetRectangle){
 
 		System.out.println("Generating disp set for " + targetRectangle);
-		RenderedImage referenceImage = referenceBand.getImage();
-		RenderedImage comparisonImage = comparisonBand.getImage();
+		RenderedImage referenceImage = referenceBand.getSourceImage();
+		RenderedImage comparisonImage = comparisonBand.getSourceImage();
 
 		// TODO remove hardcoding of 512
 		float tiledimension = 512.0f;

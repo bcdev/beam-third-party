@@ -227,8 +227,8 @@ public class M5StereoMatcher extends Operator {
 		// getting to the image tile in JAI accessible format means getting
 		// the image and then cropping to the desired location
 
-		RenderedImage referenceImage = referenceBand.getImage();
-		RenderedImage comparisonImage = comparisonBand.getImage();
+		RenderedImage referenceImage = referenceBand.getSourceImage();
+		RenderedImage comparisonImage = comparisonBand.getSourceImage();
 
 		ParameterBlock pbCropReference = new ParameterBlock();
 		pbCropReference.addSource(referenceImage);

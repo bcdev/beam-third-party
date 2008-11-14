@@ -121,7 +121,7 @@ public class Normaliser extends Operator {
 		boolean test = false;
 		Tile inputTile = getSourceTile(inputBand, targetRectangle, pm);		
 
-        RenderedImage inputImage = inputBand.getImage();
+        RenderedImage inputImage = inputBand.getSourceImage();
                    
         ParameterBlock pbCrop = new ParameterBlock();
         pbCrop.addSource(inputImage);

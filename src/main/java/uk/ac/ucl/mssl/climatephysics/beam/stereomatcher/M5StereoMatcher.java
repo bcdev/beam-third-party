@@ -45,10 +45,10 @@ public class M5StereoMatcher extends Operator {
 	@TargetProduct
 	protected Product targetProduct;
 
-	@Parameter(alias="applyFilter", defaultValue="false", description="apply filter")
+	@Parameter(alias="applyFilter", defaultValue="false", description="Apply filter")
 	protected boolean applyFilter;
 	
-	@Parameter(alias="filterBandName", defaultValue="filter", description="name of filter band")
+	@Parameter(alias="filterBandName", defaultValue="filter", description="Name of filter band")
 	protected String filterBandName;
 
 	@Parameter(alias="referenceBandName", defaultValue="referenceNormalised", description="Name of reference band")
@@ -57,19 +57,19 @@ public class M5StereoMatcher extends Operator {
 	@Parameter(alias="comparisonBandName", defaultValue="comparisonNormalised", description="Name of comparison band")
 	protected String comparisonBandName;
 
-	@Parameter(alias="searchWindowMinX", defaultValue="-15", description="minimum value for search window horizontally")
+	@Parameter(alias="searchWindowMinX", defaultValue="-15", description="Minimum value for search window horizontally")
 	protected int searchWindowMinX;
 
-	@Parameter(alias="searchWindowMaxX", defaultValue="15", description="maximum value for search window horizontally")
+	@Parameter(alias="searchWindowMaxX", defaultValue="15", description="Maximum value for search window horizontally")
 	protected int searchWindowMaxX;
 
-	@Parameter(alias="searchWindowMinY", defaultValue="-30", description="minimum value for search window vertically")
+	@Parameter(alias="searchWindowMinY", defaultValue="-30", description="Minimum value for search window vertically")
 	protected int searchWindowMinY;
 
-	@Parameter(alias="searchWindowMaxY", defaultValue="30", description="maximum value for search window vertically")
+	@Parameter(alias="searchWindowMaxY", defaultValue="30", description="Maximum value for search window vertically")
 	protected int searchWindowMaxY;
 
-	@Parameter(alias="noDataValue", defaultValue="-999d", description="no data value to embed in images")
+	@Parameter(alias="noDataValue", defaultValue="-999d", description="No data value to embed in images")
 	protected double noDataValue;
 
 	// TODO consider whether there is a point to use
@@ -89,9 +89,9 @@ public class M5StereoMatcher extends Operator {
 	private Band xDisparities;
 	private Band quality;
 
-	private int borderWidth = 11;
+	private static final int BORDER_WIDTH = 11;
 	// TODO compute value
-	private int edgeAffected = 31;
+	private static final int EDGE_AFFECTED = 31;
 
 	public M5StereoMatcher(){
 		super();
@@ -136,25 +136,22 @@ public class M5StereoMatcher extends Operator {
 		ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
 		ProductUtils.copyMetadata(sourceProduct, targetProduct);
 
-		yDisparities = new Band("YDisparities", ProductData.TYPE_FLOAT32, 
-				rasterWidth, rasterHeight);
+		yDisparities = targetProduct.addBand("YDisparities", ProductData.TYPE_FLOAT32);
 		yDisparities.setUnit("px");
 		yDisparities.setNoDataValue(noDataValue);
+		yDisparities.setNoDataValueUsed(true);
 		yDisparities.setDescription("Along-track Disparities");
-		targetProduct.addBand(yDisparities);
 
-		xDisparities = new Band("XDisparities", ProductData.TYPE_FLOAT32, 
-				rasterWidth, rasterHeight);
+		xDisparities = targetProduct.addBand("XDisparities", ProductData.TYPE_FLOAT32); 
 		xDisparities.setUnit("px");
 		xDisparities.setNoDataValue(noDataValue);
+		xDisparities.setNoDataValueUsed(true);
 		xDisparities.setDescription("Across-track Disparities");
-		targetProduct.addBand(xDisparities);
 
-		quality = new Band("Quality", ProductData.TYPE_FLOAT64, 
-				rasterWidth, rasterHeight);
+		quality = targetProduct.addBand("Quality", ProductData.TYPE_FLOAT64); 
 		quality.setNoDataValue(noDataValue);
+		quality.setNoDataValueUsed(true);
 		quality.setDescription("Match Quality Indicator");
-		targetProduct.addBand(quality);
 
 		// no point trying to do the sides, but we need overlapping
 		// on the tiles when doing an orbit
@@ -166,12 +163,10 @@ public class M5StereoMatcher extends Operator {
 	
 
 	protected synchronized List<Point2D.Float> generateDisparitySet(Rectangle targetRectangle){
-
 		DisparitySetGenerator generator = new DenseDisparitySetGenerator(
 				(float) searchWindowMinX, (float)searchWindowMaxX, 
 				(float)searchWindowMinY, (float)searchWindowMaxY);
 		return generator.generate();
-
 	}
 
 
@@ -183,7 +178,6 @@ public class M5StereoMatcher extends Operator {
 				}
 			}
 		}
-		System.out.println("Tile filtered out, continuing with next.");
 		return true;
 	}
 
@@ -199,7 +193,6 @@ public class M5StereoMatcher extends Operator {
 	public void computeTileStack(Map<Band, Tile> targetTiles,
 			Rectangle targetRectangle,
 			ProgressMonitor pm) throws OperatorException {
-		System.out.println("Computing tile stack for " + targetRectangle);
 
 		//TODO leave these in, somehow it all fails when they are taken out.
 		//TODO must be some side effect -- maybe pulling on JAI images
@@ -233,18 +226,17 @@ public class M5StereoMatcher extends Operator {
 
 		ParameterBlock pbCropReference = new ParameterBlock();
 		pbCropReference.addSource(referenceImage);
-		float minX = (float)Math.max(targetRectangle.getMinX() - borderWidth, referenceImage.getMinX());
-		float minY = (float)Math.max(targetRectangle.getMinY() - borderWidth - Math.abs(searchWindowMinY), referenceImage.getMinY());
-		float width = (float)Math.min(targetRectangle.getWidth() + borderWidth * 2,
+		float minX = (float)Math.max(targetRectangle.getMinX() - BORDER_WIDTH, referenceImage.getMinX());
+		float minY = (float)Math.max(targetRectangle.getMinY() - BORDER_WIDTH - Math.abs(searchWindowMinY), referenceImage.getMinY());
+		float width = (float)Math.min(targetRectangle.getWidth() + BORDER_WIDTH * 2,
 				referenceImage.getMinX() + referenceImage.getWidth() - minX);
-		float height = (float)Math.min(targetRectangle.getHeight() + borderWidth*2 + searchWindowYSize, 
+		float height = (float)Math.min(targetRectangle.getHeight() + BORDER_WIDTH*2 + searchWindowYSize, 
 				referenceImage.getMinY() + referenceImage.getHeight() - minY);
 
 		pbCropReference.add(minX);
 		pbCropReference.add(minY);
 		pbCropReference.add(width);
 		pbCropReference.add(height);
-		System.out.format("Cropping %f %f %f %f\n", minX, minY, width, height);
 		RenderedOp croppedReferenceImage = JAI.create("Crop", pbCropReference, null);
 		ParameterBlock pbCropComparison = new ParameterBlock();
 		pbCropComparison.addSource(comparisonImage);
@@ -269,7 +261,7 @@ public class M5StereoMatcher extends Operator {
 			}
 
 			if (Math.abs(disparity.y) >= targetRectangle.getHeight()){
-				System.out.println("Not enough data for disparity x/y" + disparity.x + " " + disparity.y);
+				//System.out.println("Not enough data for disparity x/y" + disparity.x + " " + disparity.y);
 				continue;
 			}
 			ParameterBlock pb = new ParameterBlock();
@@ -300,7 +292,7 @@ public class M5StereoMatcher extends Operator {
 
 			for (int y = (qualityTile.getMinY()); y <= qualityTile.getMaxY(); y++) {
 				for(int x = qualityTile.getMinX(); x <= qualityTile.getMaxX(); x++) {				
-					if (x < edgeAffected || (qualityTile.getMaxX() - x) < edgeAffected || 
+					if (x < EDGE_AFFECTED || (qualityTile.getMaxX() - x) < EDGE_AFFECTED || 
 						(filterTile != null && filterTile.getSampleInt(x, y) == filterBand.getNoDataValue())){
 						// areas affected by edge effects or filtered out => set to null
 						qualityTile.setSample(x, y, noDataValue);

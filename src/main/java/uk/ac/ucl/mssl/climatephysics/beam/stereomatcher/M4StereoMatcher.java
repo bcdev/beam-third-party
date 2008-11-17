@@ -45,7 +45,6 @@ public class M4StereoMatcher extends M5StereoMatcher {
 	@Override
     protected synchronized List<Point2D.Float> generateDisparitySet(Rectangle targetRectangle){
 
-		System.out.println("Generating disp set for " + targetRectangle);
 		RenderedImage referenceImage = referenceBand.getSourceImage();
 		RenderedImage comparisonImage = comparisonBand.getSourceImage();
 
@@ -66,8 +65,6 @@ public class M4StereoMatcher extends M5StereoMatcher {
 		if ((minY + tiledimension) > referenceImage.getHeight()){
 			minY = referenceImage.getHeight() - tiledimension;
 		}
-
-		System.out.println("Cropping for disp " + minX + " " + minY);
 
 		// crop to rectangle for the scene investigated
 		ParameterBlock pbCropReference = new ParameterBlock();

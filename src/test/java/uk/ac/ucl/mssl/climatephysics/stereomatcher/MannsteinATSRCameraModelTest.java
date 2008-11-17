@@ -47,6 +47,5 @@ public class MannsteinATSRCameraModelTest extends TestCase {
 	public void testComputeAngles(){
 		MannsteinATSRCameraModel model = new MannsteinATSRCameraModel(23.627d*Math.PI/180.0d);
 		double[] eps = model.parameterisedRotationAngle();
-		model.computeAngles();
 	}
 }

@@ -36,19 +36,19 @@ public class MannsteinCameraModel extends Operator {
 	@Parameter(alias="yDisparityBandName", defaultValue="YDisparities", description="Name of band containing along-track disparities")
 	protected String yDisparityBandName;
 
-	@Parameter(alias="minimumCloudHeight", defaultValue="1000f", description="minimum cloud height to extract")
+	@Parameter(alias="minimumCloudHeight", defaultValue="1000f", description="Minimum cloud height to extract")
 	protected float minimumCloudHeight;
 
-	@Parameter(alias="maximumCloudHeight", defaultValue="20000f", description="maximum cloud height to extract")
+	@Parameter(alias="maximumCloudHeight", defaultValue="20000f", description="Maximum cloud height to extract")
 	protected float maximumCloudHeight;
 
-	@Parameter(alias="disparityOffset", defaultValue="-2.0d", description="shift disparities to compensate for image registration errors")
+	@Parameter(alias="disparityOffset", defaultValue="-2.0d", description="Shift disparities to compensate for image registration errors")
 	protected double disparityOffset;
 
-	@Parameter(alias="noDataValue", defaultValue="-999d", description="no data value to embed in images")
+	@Parameter(alias="noDataValue", defaultValue="-999d", description="No data value to embed in images")
 	protected double noDataValue;
 
-	@Parameter(alias="coneHalfAngle", defaultValue="0.40913952", description="half angle of the ATSR scanning cone")
+	@Parameter(alias="coneHalfAngle", defaultValue="0.40913952", description="Half angle of the ATSR scanning cone")
 	protected double coneHalfAngle;
 	
 	

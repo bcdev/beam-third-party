@@ -9,8 +9,8 @@ package uk.ac.ucl.mssl.climatephysics.utilities;
  * 
  */
 public class Interpolation {
-	private double[] x;
-	private double[] y;
+	private final double[] x;
+	private final double[] y;
 
 	public Interpolation(final double[] x,final double[] y) {
 		this.x = x;

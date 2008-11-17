@@ -29,10 +29,10 @@ public class ClearLandFilter extends Operator {
 	@TargetProduct
 	private Product targetProduct;
 
-	@Parameter(alias="filterBandName", defaultValue="filter", description="name of output filter band")
+	@Parameter(alias="filterBandName", defaultValue="filter", description="Name of output filter band")
 	private String filterBandName;
 
-	@Parameter(alias="cloudyRadius", defaultValue="5", description="radius to be clear of clouds around pixel")
+	@Parameter(alias="cloudyRadius", defaultValue="5", description="Radius to be clear of clouds around pixel")
 	private int cloudRadius;
 
 	private static final String NADIR_CLOUD_FLAG_NAME = "cloud_flags_nadir";

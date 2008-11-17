@@ -30,16 +30,16 @@ public class SunElevationDataFilter extends Operator {
 	@TargetProduct
 	private Product targetProduct;
 
-	@Parameter(alias="inputBandName", defaultValue="btemp_nadir_1100", description="input band for filter")
+	@Parameter(alias="inputBandName", defaultValue="btemp_nadir_1100", description="Input band for filter")
 	private String inputBandName;
 
-	@Parameter(alias="filterBandName", defaultValue="filter", description="name of output filter band")
+	@Parameter(alias="filterBandName", defaultValue="filter", description="Name of output filter band")
 	private String filterBandName;
 
-	@Parameter(alias="sunElevation", defaultValue="10d", description="minimum sun elevation for valid data")
+	@Parameter(alias="sunElevation", defaultValue="10d", description="Minimum sun elevation for valid data")
 	private double sunElevation;
 
-	@Parameter(alias="noDataValue", defaultValue="0", description="no data value to embed in images")
+	@Parameter(alias="noDataValue", defaultValue="0", description="No data value to embed in images")
 	private double noDataValue;
 
 	private static final String sunElevationNadirName = "sun_elev_nadir";

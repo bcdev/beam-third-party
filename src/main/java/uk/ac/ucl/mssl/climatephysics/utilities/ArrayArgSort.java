@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class ArrayArgSort {
-	private double[] data;
+	private final double[] data;
 
 	private class ArgSortComparator implements Comparator<Integer> {
 		private double[] comparatorData;

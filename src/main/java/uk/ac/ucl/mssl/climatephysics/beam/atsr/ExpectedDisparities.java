@@ -30,7 +30,7 @@ public class ExpectedDisparities extends Operator {
 	@TargetProduct
 	private Product targetProduct;
 
-	@Parameter(alias="outputBandName", defaultValue="expectedDisparities", description="name of output band")
+	@Parameter(alias="outputBandName", defaultValue="expectedDisparities", description="Name of output band")
 	private String outputBandName;
 
 	private static final double disparityStep = 800.0;

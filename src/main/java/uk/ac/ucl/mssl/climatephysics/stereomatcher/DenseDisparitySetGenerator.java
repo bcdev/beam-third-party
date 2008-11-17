@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DenseDisparitySetGenerator implements DisparitySetGenerator {
 
-    private List<Point2D.Float> disparitySet;
+    private final List<Point2D.Float> disparitySet;
 
     public DenseDisparitySetGenerator(float minX, float maxX, float minY, float maxY) {
         disparitySet = new ArrayList<Point2D.Float>();

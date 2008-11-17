@@ -18,15 +18,15 @@ import uk.ac.ucl.mssl.climatephysics.utilities.ArrayArgSort;
 public class CorrelationShiftDisparitySetGenerator implements
 		DisparitySetGenerator {
 
-	private RenderedImage reference;
-	private RenderedImage comparison;
+	private final RenderedImage reference;
+	private final RenderedImage comparison;
 
 	// disparity set properties
-	private int maximumDisparities;
-	private float minX;
-	private float maxX;
-	private float minY;
-	private float maxY;
+	private final int maximumDisparities;
+	private final float minX;
+	private final float maxX;
+	private final float minY;
+	private final float maxY;
 	
 	public CorrelationShiftDisparitySetGenerator(RenderedImage reference, 
 			RenderedImage comparison, float minX, float maxX, float minY,
@@ -45,9 +45,7 @@ public class CorrelationShiftDisparitySetGenerator implements
 	@Override
 	public List<Float> generate() {
 
-		System.out.println("reference " + this.reference.getData().getSampleDouble(255, 255, 0));
-		
-		System.out.println("Generating disparity set with max " + maximumDisparities);
+		//System.out.println("Generating disparity set with max " + maximumDisparities);
 		ParameterBlock pbDft1 = new ParameterBlock();
 		pbDft1.addSource(this.reference);
 		pbDft1.set(DFTDescriptor.SCALING_NONE,0);
@@ -93,8 +91,6 @@ public class CorrelationShiftDisparitySetGenerator implements
 
 		Integer[] sorted = new ArrayArgSort(buffer).indicesReversed();
 		
-		System.out.println("sorted " + sorted);
-		
 		List<Point2D.Float> disparities = new ArrayList<Point2D.Float>();
 		
 		// TODO compute 95 percentile
@@ -120,10 +116,7 @@ public class CorrelationShiftDisparitySetGenerator implements
 			// this will eliminate spurious matches that are too far out to be 
 			// considered true
 			if (minX <= x && x <= maxX && minY <= y && y <= maxY){
-				System.out.println(i + " Adding disparity " + x + " " + y);
 				disparities.add(new Point2D.Float(x, y));
-			} else {
-				System.out.println(i + " Discarding disparity " + x + " " + y);
 			}
 			++i;
 		}	
@@ -132,7 +125,6 @@ public class CorrelationShiftDisparitySetGenerator implements
 	
 	private void validateInputImage(RenderedImage image){
 		if (image.getHeight() != 512 || image.getWidth() != 512) {
-			System.out.println("input image wrong size" + image.getHeight() + image.getWidth());
 			throw new IllegalArgumentException("Image not of size 512 * 512");
 		}
 	}

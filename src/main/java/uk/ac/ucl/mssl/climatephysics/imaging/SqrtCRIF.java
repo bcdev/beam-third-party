@@ -74,13 +74,11 @@ public class SqrtCRIF implements ContextualRenderedImageFactory {
      */
     public RenderedImage create(ParameterBlock paramBlock,
                                 RenderingHints renderHints) {
-    	System.out.println("rendered image create");
     	
         RenderedImage source = paramBlock.getRenderedSource(0);
         
         ImageLayout layout = new ImageLayout();
         ComponentSampleModel sourceModel = (ComponentSampleModel)source.getSampleModel();
-        System.out.println(sourceModel);
         
         SampleModel doubleModel = new ComponentSampleModel(DataBuffer.TYPE_DOUBLE,sourceModel.getWidth(),sourceModel.getHeight(),sourceModel.getPixelStride(), sourceModel.getScanlineStride(), sourceModel.getBandOffsets());
         layout.setSampleModel(doubleModel);
@@ -96,7 +94,6 @@ public class SqrtCRIF implements ContextualRenderedImageFactory {
      */
     public RenderedImage create(RenderContext renderContext,
                                 ParameterBlock paramBlock) {
-    	System.out.println("rendered image create 2");
         return paramBlock.getRenderedSource(0);
     }
 
@@ -113,13 +110,9 @@ public class SqrtCRIF implements ContextualRenderedImageFactory {
      */
     public RenderContext mapRenderContext(int sourceIndex,
                                           RenderContext renderContext,
-					  ParameterBlock paramBlock,
-					  RenderableImage image) {
-    	System.out.println("maprendercontext");
-
-        RenderContext RC = (RenderContext)renderContext.clone();
-
-        return RC;
+                                          ParameterBlock paramBlock,
+                                          RenderableImage image) {
+        return (RenderContext)renderContext.clone();
     }
 
     /**
@@ -127,7 +120,6 @@ public class SqrtCRIF implements ContextualRenderedImageFactory {
      * This method satisfies the implementation of CRIF.
      */
     public Rectangle2D getBounds2D(ParameterBlock paramBlock) {
-    	System.out.println("get bounds");
 	        // Get the source.
 	        RenderableImage source = paramBlock.getRenderableSource(0);
 	        return new Rectangle2D.Float(source.getMinX(), source.getMinY(), source.getWidth(), source.getHeight());
@@ -147,8 +139,7 @@ public class SqrtCRIF implements ContextualRenderedImageFactory {
      * @return An <code>Object</code> representing the value of the
      *         named property.
      */
-    public Object getProperty(ParameterBlock paramBlock,
-                              String name) {
+    public Object getProperty(ParameterBlock paramBlock, String name) {
         return null;
     }
 

@@ -36,26 +36,26 @@ public class ImageCoregistration extends Operator {
 	@TargetProduct
 	private Product targetProduct;
 
-	@Parameter(alias="viewFilterBandName", defaultValue="filter", description="filter band containing mask")
+	@Parameter(alias="viewFilterBandName", defaultValue="filter", description="Filter band containing mask")
 	private String filterBandName;
 
-	@Parameter(alias="xDispBandName", defaultValue="XDisparities", description="band containing x disparities")
+	@Parameter(alias="xDispBandName", defaultValue="XDisparities", description="Band containing x disparities")
 	private String xDispBandName;
 
-	@Parameter(alias="yDispBandName", defaultValue="YDisparities", description="band containing y disparities")
+	@Parameter(alias="yDispBandName", defaultValue="YDisparities", description="Band containing y disparities")
 	private String yDispBandName;
 
-	@Parameter(alias="expectedDispBandName", defaultValue="expectedDisparities", description="band containing expected disparities caused by elevation")
+	@Parameter(alias="expectedDispBandName", defaultValue="expectedDisparities", description="Band containing expected disparities caused by elevation")
 	private String expectedDispBandName;
 
-	@Parameter(alias="yShiftBandName", defaultValue="yShift", description="output band containing y Shift")
+	@Parameter(alias="yShiftBandName", defaultValue="yShift", description="Output band containing y Shift")
 	private String yShiftBandName;
 
-	@Parameter(alias="xShiftBandName", defaultValue="xShift", description="output band containing x Shift")
+	@Parameter(alias="xShiftBandName", defaultValue="xShift", description="Output band containing x Shift")
 	private String xShiftBandName;
 
 
-	@Parameter(alias="noDataValue", defaultValue="-999", description="no data value to embed in images")
+	@Parameter(alias="noDataValue", defaultValue="-999", description="No data value to embed in images")
 	private int noDataValue;
 
 

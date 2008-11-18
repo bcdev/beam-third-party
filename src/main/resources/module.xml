@@ -14,7 +14,14 @@
     <copyright>(C) 2008 by Mullard Space Science Laboratory</copyright>
     <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
     
-    <activator>uk.ac.ucl.mssl.climatephysics.beam.imaging.ModuleActivator</activator>
+    <changelog>
+        <![CDATA[
+        Changes in version 0.9:<br/>
+        - Ported to BEAM-4.5 API<br/>
+        - Added help pages<br/>
+        ]]>
+    </changelog>
+    
     
     <dependency>
         <module>beam-gpf</module>
@@ -27,6 +34,8 @@
         <optional>true</optional>
     </dependency>
     
+    <activator>uk.ac.ucl.mssl.climatephysics.beam.imaging.ModuleActivator</activator>
+
     <extension point="beam-visat:actions">
         <action>
             <id>mssl-stereomatcher</id>

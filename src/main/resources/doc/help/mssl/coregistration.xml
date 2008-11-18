@@ -46,7 +46,6 @@
 			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
 		</sources>
 		<parameters>
-			<noDataValue>-999</noDataValue>
 			<outputBandName>expectedDisparities</outputBandName>
 		</parameters>
 	</node>
@@ -56,7 +55,6 @@
 			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
 		</sources>
 		<parameters>
-			<noDataValue>0</noDataValue>
 			<filterBandName>filter</filterBandName>
 			<cloudyRadius>5</cloudyRadius>
 		</parameters>

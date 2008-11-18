@@ -8,7 +8,7 @@
 		<parameters>
 			<filterBandName>filter</filterBandName>
 			<noDataValue>0</noDataValue>
-			<inputBandName>reflec_nadir_1100</inputBandName>
+			<inputBandName>btemp_nadir_1100</inputBandName>
 			<sunElevation>10.0</sunElevation>
 		</parameters>
 	</node>

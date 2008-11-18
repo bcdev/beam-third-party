@@ -1,0 +1,68 @@
+<html>
+<head>
+    <title>Stereo-Photogrammetric ATSR Data Analysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+        Stereo-Photogrammetric ATSR Data Analysis</td>
+    <td class="header" align="right" vspace=3 hspace=3><img src="../images/BeamHeader.jpg" border=0></td>
+    </tr>
+</table>
+
+<h1>Photogrammetric Cloud Top Height Retrieval</h1>
+
+<p>The complete chain for the retrieval of cloud-top height from ATSR data is combinded of four
+operator:</p>
+<ul>
+  <li>Image Normalisation</li>
+  <li>Creation of a spatial filter (optional)</li>
+  <li>Stereo Matching using M4 or M5</li>
+  <li>Translation into geometric height using the Mannstein camera model</li>
+</ul>
+
+<h2>Interactive Use</h2>
+<ul>
+  <li>First an ATSR source product must be normalised with the Image Normaliser.
+Open the tool from the Tools menu and select an ATSR input file. By default the band
+processed are the 12&micro;m band, but this can be changed in the processing parameters
+panel. In the target product will be eight bands that will serve as input data for the
+stereo-matcher. The following figure shows the regional mean:
+<p align="center"><img src="images/image_normalizer2.png"></p>
+<p align="center"><b>BEAM showing Image Normaliser operator and result image.</b></p> <br>
+</li>
+  <li>The optionally a filter can be created. In this example we use for exposition only a filter
+value of 65 to mask out some areas. The result:
+<p align="center"><img src="images/sun_elevation.png"></p>
+<p align="center"><b>BEAM showing Sun Elevation operator and result image.</b></p> <br>
+</li>
+  <li>The next step applies the stereo matcher to the scene. To apply the filter the Apply
+filter box must be ticked. The result, with the filter applied:
+<p align="center"><img src="images/m4_stereomatcher2.png"></p>
+<p align="center"><b>BEAM showing M4 Stereo Matcher operator with filter and result image.</b></p> <br>
+</li>
+<li>The data resulting from the stereo-matcher and the filter is then processed into cloudtop
+height with the MSSL Mannstein Camera Model.The result, with the filter applied,
+is shown in the following figure:
+<p align="center"><img src="images/ctp_result.png"></p>
+<p align="center"><b>BEAM showing Mannstein Camera Model operator with filter and result image.</b></p> <br>
+</li>
+</ul>
+
+<h2>Batch Use</h2>
+<p>Batch use requires an XML graph description for the processing chain, such as in this example: <a href="ctp.xml">ctp.xml</a></p>
+
+<p>Here the node with <span class="code">id Mannstein Model</span> will force the computation of its source product,
+which is the output from node <span class="code">StereoMatching</span>, which in turn will require the computation
+of the nodes <span class="code">Normalisation</span> and <span class="code">SunElevationDataFilter</span>. The processing parameters
+for each node are given and can easily be adapted.</p>
+<p>The processing chain can then simply be executed by a call to the BEAM gpt command
+with an ATSR data source file. The <span class="code">-t</span> parameter specifies the name of the output file, the
+<span class="code">-SatsrToaL1b</span> parameter the ATSR input file:</p>
+<p class="code">gpt.sh ctp.xml -t output.dim -SatsrToaL1b=ATS_TOA_1POLRA20030401_024113_000062202015_00103_05668_0591.N1</p>
+</body>
+</html>

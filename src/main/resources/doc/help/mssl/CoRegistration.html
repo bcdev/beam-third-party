@@ -1,0 +1,58 @@
+<html>
+<head>
+    <title>Stereo-Photogrammetric ATSR Data Analysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+        Stereo-Photogrammetric ATSR Data Analysis</td>
+    <td class="header" align="right" vspace=3 hspace=3><img src="../images/BeamHeader.jpg" border=0></td>
+    </tr>
+</table>
+
+<h1>Co-Registration Shift Assessment</h1>
+
+<p>The assessment of the co-registration shift of ATSR data follows the ideas laid out in Moroney
+et al. (2002) for MISR. The workflow is as follows:</p>
+<ul>
+  <li>Image Normalisation</li>
+  <li>Creation of a spatial filter (optional)</li>
+  <li>Stereo Matching using M4 or M5</li>
+  <li>Computation of expected disparities</li>
+  <li>Creation of a clear land mask</li>
+  <li>Computation of residual registration shift</li>
+</ul>
+
+<h2>Interactive Use</h2>
+<p>The initial steps are identical to the computation of cloud-top height and are not repeated
+here.</p>
+
+<ul>
+  <li>Expected disparities are computed from elevation data contained in the ATSR product.
+A sample result, this time showing the Red Sea (The usual test-scene does not have enough
+ variation in elevation to demonstrate the operator), is shown in the following figure:</li>
+<p align="center"><img src="images/expected_disparities.png"></p>
+<p align="center"><b>BEAM showing Expected Disparities result image.</b></p> <br>
+  <li>A clear land mask is computed by the Clear Land Mask operator.</li>
+  <li>The results from the previous operations are then combined to calculate the residual
+disparity which should give an indication of the co-registration shift using the operator
+<span class="code">Image Coregistration</span>. This is illustrated here:</li>
+<p align="center"><img src="images/coregistration.png"></p>
+<p align="center"><b>BEAM showing Image Coregistration operator and a result image, with
+constrast stretched.</b></p> <br>  
+</ul>
+
+
+<h2>Batch Use</h2>
+<p>As for the cloud-top height retrieval the image registration can also be computed in batch
+mode with the GPT command. The graph description file will need to be similar to this: <a href="coregistration.xml">coregistration.xml</a></p>
+
+<p>The batch processing is called with parameters as before:</p>
+
+<p class="code">gpt.sh coregistration.xml -t output.dim -SatsrToaL1b=ATS_TOA_1POLRA20030401_024113_000062202015_00103_05668_0591.N1</p>
+</body>
+</html>

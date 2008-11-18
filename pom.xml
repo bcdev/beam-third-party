@@ -5,8 +5,8 @@
 
     <groupId>uk.ac.ucl.mssl</groupId>
     <artifactId>mssl-stereomatcher</artifactId>
-    <name>FOO</name>
-    <version>1.0</version>
+    <name>ATSR Cloud Stereo Matcher</name>
+    <version>0.9</version>
 
     <packaging>jar</packaging>
 

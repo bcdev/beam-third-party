@@ -1,0 +1,94 @@
+<html>
+<head>
+    <title>Stereo-Photogrammetric ATSR Data Analysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+        Stereo-Photogrammetric ATSR Data Analysis</td>
+    <td class="header" align="right" vspace=3 hspace=3><img src="../images/BeamHeader.jpg" border=0></td>
+    </tr>
+</table>
+
+<h1>Operators</h1>
+
+<p>The functionality of the MSSL stereo-matcher is broken down into several operators that
+must be chained together to either retrieve geometric cloud-top height or to determine the
+co-registration shift in ATSR data. The chain begins with an ATSR data file to produce
+intermediate target products that serve as source products for the next step.</p>
+<p>This section briefly introduces the available operators:</p>
+
+<h3>Image Normaliser</h3>
+<p>The image normaliser operator implements the normalisation
+function described in Muller et al. (2007). It takes two input bands, which can be set as
+processing parameters, and maps these into a three target bands each: a normalised
+view of the data, a regional standard deviation and a regional mean. For convenience
+the input bands are copied into the target product.</p>
+<p align="center"><img src="images/image_normalizer.png"></p>
+<p align="center"><b>BEAM showing Image Normaliser operator and result image.</b></p> <br>
+
+
+<h3>Filter Sun Elevation</h3>
+<p>This operator implements a spatial filter to reduce the
+dataset that will be processed by the stereo-matcher based on the sun-elevation data
+contained in the ATSR file. If it is desired to process only day-light data, the sun elevation
+processing parameter could be set to 10.0. This will produce a target product
+containing a band with the name <span class="code">filter</span> where only values with a higher sun elevation
+are set to 1. The stereo matching module will ignore data where the value is set to
+any other value. The use of this operator is not required.</p>
+
+<h3>M4 Stereo Matcher</h3>
+<p>The M4 stereo matcher implements the fast M4 stereo
+matcher based on phase correlation shift (Muller et al. 2007). It takes as source products
+the output of the image normaliser and optionally a filter. A filter source product
+must always be set (a limitation in the BEAM GUI), but is only activated if the
+<span class="code">Apply filter</span> box is ticked. Other processing parameters include the size of the search window
+and the value for no data. The target product contains three output bands: YDisparities,
+containing the disparity in the along-track direction, XDisparities, containing
+the disparity in the across-track direction, and the match quality. The stereo-matching
+is the most time consuming task and processing an entire orbit can take as long as one
+hour on a current personal computer.</p>
+<p align="center"><img src="images/m4_stereomatcher.png"></p>
+<p align="center"><b>BEAM showing M4 Stereo Matcher operator and result image.</b></p> <br>
+
+
+<h3>M5 Stereo Matcher</h3>
+<p>The M5 stereo matcher implements a stereo-matcher very
+similar to M4, but with an exhaustive search within the search window. The same
+processing parameters as with M4 apply.</p>
+
+<h3>Mannstein Camera Model</h3>
+<p>This operator translates along-track disparities into
+geometric cloud-top height using the Mannstein camera model (Denis et al. 2007). Processing
+parameters are minimum and maximum cloud-top height, a disparity offset
+to compensate for a shift in co-registration, and the instrument half-cone angle.</p>
+<p align="center"><img src="images/mannstein_camera.png"></p>
+<p align="center"><b>BEAM showing Mannstein Camera Model operator and result image.</b></p> <br>
+
+<h3>Filter Clear Land</h3>
+<p>This operator assists in the detection of the co-registration shift
+by masking out all areas that are either over sea or cloudy. As the stereo-matching process
+is affected by clouds in the vicinity of the pixel analysed the processing parameter 
+<span class="code">cloud radius</span> gives the radius of cloud-free pixels required to classify a pixel as clear.</p>
+<p align="center"><img src="images/clear_land.png"></p>
+<p align="center"><b>BEAM showing Clear Land operator and result image.</b></p> <br>
+
+
+<h3>Expected Disparities</h3>
+<p>When determining the co-registration shift expected disparities
+or parallax arising from terrain must be taken into account. This operator computes
+the expected parallax based on the assumption that every 800m of elevation will
+result in a one pixel disparity.</p>
+
+<h3>Image Coregistration</h3>
+<p>This operator takes three source products: disparities resulting from one of the stereo matchers (M4 or M5), a viewfilter (e.g. clear land filter)
+and expected disparities and computes an output band of elevation corrected disparities,
+which should give an indication of the image shift present between nadir and
+forward view.</p>
+
+</body>
+</html>

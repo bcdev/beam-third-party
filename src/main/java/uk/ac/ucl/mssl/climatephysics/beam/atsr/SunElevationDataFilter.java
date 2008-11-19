@@ -4,6 +4,7 @@ package uk.ac.ucl.mssl.climatephysics.beam.atsr;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.datamodel.RasterDataNode;
 import org.esa.beam.framework.datamodel.TiePointGrid;
 import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
@@ -13,9 +14,13 @@ import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
+import org.esa.beam.framework.gpf.internal.OperatorImage;
+import org.esa.beam.framework.gpf.internal.TileImpl;
 import org.esa.beam.util.ProductUtils;
 
 import java.awt.Rectangle;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
 
 import com.bc.ceres.core.ProgressMonitor;
 import com.bc.ceres.core.SubProgressMonitor;
@@ -48,9 +53,6 @@ public class SunElevationDataFilter extends Operator {
 	private Band referenceBand;
 	private TiePointGrid sunElevationBand;
 
-    private double sourceNoDataValue;
-    private boolean sourceNoDataValueUsed;
-
 
 	@Override
 	public void initialize() throws OperatorException {
@@ -62,9 +64,6 @@ public class SunElevationDataFilter extends Operator {
 		if (sunElevationBand == null) {
             throw new OperatorException("sun-Elevation Tie-Point-Grid not found: " + sunElevationNadirName);
         }
-		
-		sourceNoDataValue = referenceBand.getNoDataValue();
-		sourceNoDataValueUsed = referenceBand.isNoDataValueUsed();
 		
 		int rasterWidth = sourceProduct.getSceneRasterWidth();
 		int rasterHeight = sourceProduct.getSceneRasterHeight();
@@ -83,21 +82,23 @@ public class SunElevationDataFilter extends Operator {
 	@Override
 	public void computeTile(Band targetBand, Tile targetTile, ProgressMonitor pm) throws OperatorException {
 	    Rectangle targetRect = targetTile.getRectangle();
-        pm.beginTask("Computing filter", targetRect.height+8);
+        pm.beginTask("Computing filter", targetRect.height + 4 + (referenceBand.isValidMaskUsed()?4:0));
         try {
-            Tile referenceTile = getSourceTile(referenceBand, targetRect, SubProgressMonitor.create(pm, 4));
             Tile sunElevationTile = getSourceTile(sunElevationBand, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile validTile = null;
+            if (referenceBand.isValidMaskUsed()) {
+                validTile = getValidTile(referenceBand, targetRect, SubProgressMonitor.create(pm, 4));
+            }
 
             for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
                 for(int x = targetRect.x; x < targetRect.x + targetRect.width; x++) {
                     if (sunElevationTile.getSampleDouble(x, y) < sunElevation){
                         targetTile.setSample(x, y, noDataValue);	
                     } else {
-                        double sample = referenceTile.getSampleDouble(x, y);
-                        if (sourceNoDataValueUsed && sample == sourceNoDataValue){
-                        	targetTile.setSample(x, y, noDataValue);
-                        } else {
+                        if (validTile != null && validTile.getSampleBoolean(x, y)){
                         	targetTile.setSample(x, y, 1);
+                        } else {
+                            targetTile.setSample(x, y, noDataValue);
                         }
                     }
                 }
@@ -108,6 +109,23 @@ public class SunElevationDataFilter extends Operator {
             }
         } finally {
             pm.done();
+        }
+	}
+	
+	private Tile getValidTile(RasterDataNode rasterDataNode, Rectangle rectangle, ProgressMonitor pm) throws OperatorException {
+	    RenderedImage image = rasterDataNode.getValidMaskImage();
+        ProgressMonitor oldPm = OperatorImage.setProgressMonitor(image, pm);
+        try {
+            /////////////////////////////////////////////////////////////////////
+            //
+            // Note: GPF pull-processing is triggered here!
+            //
+            Raster awtRaster = image.getData(rectangle); // Note: copyData is NOT faster!
+            //
+            /////////////////////////////////////////////////////////////////////
+            return new TileImpl(rasterDataNode, awtRaster);
+        } finally {
+            OperatorImage.setProgressMonitor(image, oldPm);
         }
 	}
 

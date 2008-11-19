@@ -55,8 +55,14 @@ public class SunElevationDataFilter extends Operator {
 	@Override
 	public void initialize() throws OperatorException {
 		referenceBand = sourceProduct.getBand(inputBandName);
+		if (referenceBand == null) {
+            throw new OperatorException("Input band not found: " + inputBandName);
+        }
 		sunElevationBand = sourceProduct.getTiePointGrid(sunElevationNadirName);
-
+		if (sunElevationBand == null) {
+            throw new OperatorException("sun-Elevation Tie-Point-Grid not found: " + sunElevationNadirName);
+        }
+		
 		sourceNoDataValue = referenceBand.getNoDataValue();
 		sourceNoDataValueUsed = referenceBand.isNoDataValueUsed();
 		

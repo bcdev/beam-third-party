@@ -64,13 +64,15 @@ public class MannsteinCameraModel extends Operator {
 		int rasterHeight = sourceProduct.getSceneRasterHeight();
 
 		yDisparityBand = sourceProduct.getBand(yDisparityBandName);
-		
 		if (null == yDisparityBand){
-			throw new IllegalArgumentException("Band " + yDisparityBandName + " missing in source product");
+			throw new OperatorException("Band " + yDisparityBandName + " missing in source product");
 		}
 		
 		elevationTiePointGrid = sourceProduct.getTiePointGrid("altitude");
-
+		if (elevationTiePointGrid == null) {
+            throw new OperatorException("Altitude Tie-Point-Grid not found.");
+        }
+		
 		targetProduct = new Product("MSSL_StereoCloudHeights", "MSSL_StereoCloudHeights",
 				rasterWidth, rasterHeight);	
 		ProductUtils.copyTiePointGrids(sourceProduct, targetProduct);

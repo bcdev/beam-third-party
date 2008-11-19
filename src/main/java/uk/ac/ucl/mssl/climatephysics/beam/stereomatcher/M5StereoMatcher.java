@@ -116,7 +116,7 @@ public class M5StereoMatcher extends Operator {
 		if (applyFilter == true && null != filterProduct) {
 			filterBand = filterProduct.getBand(filterBandName);
 			if (null == filterBand){
-				throw new IllegalArgumentException("Filter band " + filterBandName + " missing in filter source product");
+				throw new OperatorException("Filter band " + filterBandName + " missing in filter source product");
 			}
 		} else {
 			filterBand = null;
@@ -124,11 +124,11 @@ public class M5StereoMatcher extends Operator {
 		
 		referenceBand = sourceProduct.getBand(referenceBandName);
 		if (null == referenceBand){
-			throw new IllegalArgumentException("Reference band " + referenceBandName + " missing in source product");
+			throw new OperatorException("Reference band " + referenceBandName + " missing in source product");
 		}
 		comparisonBand = sourceProduct.getBand(comparisonBandName);
 		if (null == comparisonBand){
-			throw new IllegalArgumentException("Comparison band " + comparisonBandName + " missing in source product");
+			throw new OperatorException("Comparison band " + comparisonBandName + " missing in source product");
 		}
 		targetProduct = new Product("MSSL_StereoMatched", "MSSL_StereoMatched",
 				rasterWidth, rasterHeight);	

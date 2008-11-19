@@ -41,7 +41,10 @@ public class ExpectedDisparities extends Operator {
 	@Override
 	public void initialize() throws OperatorException {
 		elevationTiePointGrid = sourceProduct.getTiePointGrid("altitude");
-
+		if (elevationTiePointGrid == null) {
+            throw new OperatorException("Altitude Tie-Point-Grid not found.");
+        }
+		
 		int rasterWidth = sourceProduct.getSceneRasterWidth();
 		int rasterHeight = sourceProduct.getSceneRasterHeight();
 		targetProduct = new Product("MSSL_DataFilter", "MSSL_DataFilter",

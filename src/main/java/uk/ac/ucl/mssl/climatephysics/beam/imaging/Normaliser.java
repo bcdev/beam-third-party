@@ -69,12 +69,18 @@ public class Normaliser extends Operator {
 			ModuleActivator activator = new ModuleActivator();
 			activator.start(null);
 		} catch (Throwable e) {
-			System.out.println("Module already activated.");
+			//System.out.println("Module already activated.");
 		}
 		
 		referenceBand = sourceProduct.getBand(referenceBandName);
+		if (referenceBand == null) {
+            throw new OperatorException("Reference band not found: " + referenceBandName);
+        }
 		comparisonBand = sourceProduct.getBand(comparisonBandName);
-
+		if (comparisonBand == null) {
+            throw new OperatorException("Comparison band not found: " + comparisonBandName);
+        }
+		
 		int rasterWidth = sourceProduct.getSceneRasterWidth();
         int rasterHeight = sourceProduct.getSceneRasterHeight();
 		targetProduct = new Product("MSSL_Normalised", "MSSL_Normalised",

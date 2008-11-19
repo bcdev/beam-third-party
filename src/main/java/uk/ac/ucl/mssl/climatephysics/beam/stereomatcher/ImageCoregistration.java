@@ -73,22 +73,22 @@ public class ImageCoregistration extends Operator {
 	public void initialize() throws OperatorException {
 		xDispBand = disparitiesProduct.getBand(xDispBandName);
 		if (null == xDispBand){
-			throw new IllegalArgumentException("Band " + xDispBandName + " missing in source product");
+			throw new OperatorException("Band " + xDispBandName + " missing in source product");
 		}
 
 		yDispBand = disparitiesProduct.getBand(yDispBandName);
 		if (null == yDispBand){
-			throw new IllegalArgumentException("Band " + yDispBandName + " missing in source product");
+			throw new OperatorException("Band " + yDispBandName + " missing in source product");
 		}
 
 		expectedDispBand = expectedDisparitiesProduct.getBand(expectedDispBandName);
 		if (null == expectedDispBand){
-			throw new IllegalArgumentException("Band " + expectedDispBandName + " missing in source product");
+			throw new OperatorException("Band " + expectedDispBandName + " missing in source product");
 		}
 
 		filterBand = filterProduct.getBand(filterBandName);
 		if (null == filterBand){
-			throw new IllegalArgumentException("Band " + filterBandName + " missing in source product");
+			throw new OperatorException("Band " + filterBandName + " missing in source product");
 		}
 
 		int rasterWidth = disparitiesProduct.getSceneRasterWidth();

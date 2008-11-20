@@ -45,7 +45,7 @@ public class MannsteinCameraModel extends Operator {
 	@Parameter(alias="disparityOffset", defaultValue="-2.0d", description="Shift disparities to compensate for image registration errors")
 	protected double disparityOffset;
 
-	@Parameter(alias="noDataValue", defaultValue="-999d", description="No data value to embed in images")
+	@Parameter(alias="noDataValue", defaultValue="-999d", interval = "[-32768,32767]", description="No data value to embed in images")
 	protected double noDataValue;
 
 	@Parameter(alias="coneHalfAngle", defaultValue="0.40913952", description="Half angle of the ATSR scanning cone")

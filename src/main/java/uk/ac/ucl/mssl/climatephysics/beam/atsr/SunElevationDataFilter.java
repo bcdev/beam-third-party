@@ -44,8 +44,8 @@ public class SunElevationDataFilter extends Operator {
 	@Parameter(alias="sunElevation", defaultValue="10d", description="Minimum sun elevation for valid data")
 	private double sunElevation;
 
-	@Parameter(alias="noDataValue", defaultValue="0", description="No data value to embed in images")
-	private double noDataValue;
+	@Parameter(alias="noDataValue", defaultValue="0", interval = "[0,255]", description="No data value to embed in images")
+	private short noDataValue;
 
 	private static final String sunElevationNadirName = "sun_elev_nadir";
 	
@@ -72,7 +72,7 @@ public class SunElevationDataFilter extends Operator {
 		ProductUtils.copyTiePointGrids(sourceProduct, targetProduct);
 		ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
 
-		Band filterBand = targetProduct.addBand(filterBandName, ProductData.TYPE_UINT16);
+		Band filterBand = targetProduct.addBand(filterBandName, ProductData.TYPE_UINT8);
 		filterBand.setNoDataValue(noDataValue);
 		filterBand.setNoDataValueUsed(true);
 		

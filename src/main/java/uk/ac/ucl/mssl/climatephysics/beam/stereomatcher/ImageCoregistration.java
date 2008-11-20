@@ -55,7 +55,7 @@ public class ImageCoregistration extends Operator {
 	private String xShiftBandName;
 
 
-	@Parameter(alias="noDataValue", defaultValue="-999", description="No data value to embed in images")
+	@Parameter(alias="noDataValue", defaultValue="-999", interval = "[-32768,32767]", description="No data value to embed in images")
 	private int noDataValue;
 
 

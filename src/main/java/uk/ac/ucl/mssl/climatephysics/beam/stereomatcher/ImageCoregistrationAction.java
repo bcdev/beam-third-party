@@ -13,7 +13,7 @@ public class ImageCoregistrationAction extends AbstractVisatAction {
             dialog = new DefaultSingleTargetProductDialog("ImageCoregistration", 
                                                           getAppContext(),
                                                           "MSSL Image Coregistration", 
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_ImageCoregistration");
         }
         dialog.show();

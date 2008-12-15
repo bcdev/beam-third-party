@@ -13,7 +13,7 @@ public class ClearLandFilterAction extends AbstractVisatAction {
             dialog = new DefaultSingleTargetProductDialog("ClearLandFilter", 
                                                           getAppContext(), 
                                                           "MSSL Filter Clear Land",
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_ClearLandFilter");
         }
         dialog.show();

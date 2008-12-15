@@ -13,7 +13,7 @@ public class M5StereoMatcherAction extends AbstractVisatAction {
             dialog = new DefaultSingleTargetProductDialog("M5StereoMatcher", 
                                                           getAppContext(), 
                                                           "MSSL M5 Stereo Matcher",
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_M5StereoMatcher");
         }
         dialog.show();

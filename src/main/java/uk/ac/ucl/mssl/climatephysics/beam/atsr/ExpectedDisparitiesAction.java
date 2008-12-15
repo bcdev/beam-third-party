@@ -14,7 +14,7 @@ public class ExpectedDisparitiesAction extends AbstractVisatAction {
 			dialog = new DefaultSingleTargetProductDialog("ExpectedDisparities",
 			                                              getAppContext(),
                                                           "MSSL Expected Disparities", 
-                                                          null);
+                                                          "stereoMatcher");
 			dialog.setTargetProductNameSuffix("_ExpectedDisparities");
 		}
 		dialog.show();

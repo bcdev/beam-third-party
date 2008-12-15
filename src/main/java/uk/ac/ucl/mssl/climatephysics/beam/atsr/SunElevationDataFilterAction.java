@@ -13,7 +13,7 @@ public class SunElevationDataFilterAction extends AbstractVisatAction {
             dialog = new DefaultSingleTargetProductDialog("SunElevationDataFilter",
                                                           getAppContext(),
                                                           "MSSL Filter Sun Elevation", 
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_SunElevationDataFilter");
         }
         dialog.show();

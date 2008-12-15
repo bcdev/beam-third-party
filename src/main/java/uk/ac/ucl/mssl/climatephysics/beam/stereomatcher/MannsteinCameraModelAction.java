@@ -13,7 +13,7 @@ public class MannsteinCameraModelAction extends AbstractVisatAction {
             dialog = new DefaultSingleTargetProductDialog("MannsteinCameraModel", 
                                                           getAppContext(),
                                                           "MSSL Mannstein Camera Model", 
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_MannsteinCameraModel");
         }
         dialog.show();

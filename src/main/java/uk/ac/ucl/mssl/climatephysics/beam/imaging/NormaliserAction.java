@@ -13,7 +13,7 @@ public class NormaliserAction extends AbstractVisatAction {
             dialog = new DefaultSingleTargetProductDialog("Normaliser", 
                                                           getAppContext(), 
                                                           "MSSL Image Normaliser", 
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_Normaliser");
         }
         dialog.show();

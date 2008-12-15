@@ -12,7 +12,7 @@ public class M4StereoMatcherAction extends M5StereoMatcherAction {
             dialog = new DefaultSingleTargetProductDialog("M4StereoMatcher",
                                                           getAppContext(), 
                                                           "MSSL M4 Stereo Matcher",
-                                                          null);
+                                                          "stereoMatcher");
             dialog.setTargetProductNameSuffix("_M4StereoMatcher");
         }
         dialog.show();

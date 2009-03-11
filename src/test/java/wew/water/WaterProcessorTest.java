@@ -12,6 +12,22 @@ import org.junit.Test;
 public class WaterProcessorTest {
 
     @Test
+    public void testOutputProductTypeGeneration() {
+        assertEquals("MER_RR_MLP_WATER2P",
+                     WaterProcessor.createOutputProductType(EnvisatConstants.MERIS_RR_L1B_PRODUCT_TYPE_NAME));
+        assertEquals("MER_FR_MLP_WATER2P",
+                     WaterProcessor.createOutputProductType(EnvisatConstants.MERIS_FR_L1B_PRODUCT_TYPE_NAME));
+        assertEquals("MER_FRS_MLP_WATER2P",
+                     WaterProcessor.createOutputProductType(EnvisatConstants.MERIS_FRS_L1B_PRODUCT_TYPE_NAME));
+        assertEquals("MER_FRG_MLP_WATER2P",
+                     WaterProcessor.createOutputProductType(EnvisatConstants.MERIS_FRG_L1B_PRODUCT_TYPE_NAME));
+        assertEquals("MER_FSG_MLP_WATER2P",
+                     WaterProcessor.createOutputProductType(EnvisatConstants.MERIS_FSG_L1B_PRODUCT_TYPE_NAME));
+        assertEquals("MER_RR_MLP_WATER2P",
+                     WaterProcessor.createOutputProductType("MER_RR__1N")); // ICOL
+    }
+
+    @Test
     public void testProductTypeAccaptanceWithValids() {
         String[] validTypes = {
                 EnvisatConstants.MERIS_RR_L1B_PRODUCT_TYPE_NAME,

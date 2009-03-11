@@ -19,7 +19,14 @@ import org.esa.beam.dataio.dimap.DimapProductConstants;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.dataio.ProductIO;
 import org.esa.beam.framework.dataio.ProductWriter;
-import org.esa.beam.framework.datamodel.*;
+import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.BitmaskDef;
+import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.MetadataAttribute;
+import org.esa.beam.framework.datamodel.MetadataElement;
+import org.esa.beam.framework.datamodel.Product;
+import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.datamodel.TiePointGrid;
 import org.esa.beam.framework.processor.Processor;
 import org.esa.beam.framework.processor.ProcessorConstants;
 import org.esa.beam.framework.processor.ProcessorException;
@@ -38,6 +45,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,51 +65,54 @@ public class WaterProcessor extends Processor {
     public static final String LOGGER_NAME = "beam.processor.water";
     public static final String DEFAULT_LOG_PREFIX = "water";
 
-    public final static String DEFAULT_OUTPUT_DIR_NAME = "OUTPUT_WATER";
-    public final static String DEFAULT_OUTPUT_FORMAT = DimapProductConstants.DIMAP_FORMAT_NAME;
+    public static final String DEFAULT_OUTPUT_DIR_NAME = "OUTPUT_WATER";
+    public static final String DEFAULT_OUTPUT_FORMAT = DimapProductConstants.DIMAP_FORMAT_NAME;
     public static final String DEFAULT_OUTPUT_PRODUCT_NAME = "water";
 
-    public final static boolean CHECKBOX1_DEFAULT = false;
-    public final static String CHECKBOX1_LABEL_TEXT = "normal output";
-    public final static String CHECKBOX1_DESCRIPTION = "select/unselect";
-    public final static String CHECKBOX1_PARAM_NAME = "Normout";
+    public static final boolean CHECKBOX1_DEFAULT = false;
+    public static final String CHECKBOX1_LABEL_TEXT = "normal output";
+    public static final String CHECKBOX1_DESCRIPTION = "select/unselect";
+    public static final String CHECKBOX1_PARAM_NAME = "Normout";
     private boolean normout = CHECKBOX1_DEFAULT;
 
-    public final static boolean CHECKBOX2_DEFAULT = true;
-    public final static String CHECKBOX2_LABEL_TEXT = "two-step inversion";
-    public final static String CHECKBOX2_DESCRIPTION = "select/unselect";
-    public final static String CHECKBOX2_PARAM_NAME = "Extout";
+    public static final boolean CHECKBOX2_DEFAULT = true;
+    public static final String CHECKBOX2_LABEL_TEXT = "two-step inversion";
+    public static final String CHECKBOX2_DESCRIPTION = "select/unselect";
+    public static final String CHECKBOX2_PARAM_NAME = "Extout";
     private boolean extout = CHECKBOX2_DEFAULT;
 
-    public final static boolean CHECKBOX3_DEFAULT = false;
-    public final static String CHECKBOX3_LABEL_TEXT = "case I water";
-    public final static String CHECKBOX3_DESCRIPTION = "select/unselect";
-    public final static String CHECKBOX3_PARAM_NAME = "caseI";
+    public static final boolean CHECKBOX3_DEFAULT = false;
+    public static final String CHECKBOX3_LABEL_TEXT = "case I water";
+    public static final String CHECKBOX3_DESCRIPTION = "select/unselect";
+    public static final String CHECKBOX3_PARAM_NAME = "caseI";
     private boolean caseI = CHECKBOX3_DEFAULT;
 
-    public final static boolean CHECKBOX4_DEFAULT = true;
-    public final static String CHECKBOX4_LABEL_TEXT = "case II water";
-    public final static String CHECKBOX4_DESCRIPTION = "select/unselect";
-    public final static String CHECKBOX4_PARAM_NAME = "caseII";
+    public static final boolean CHECKBOX4_DEFAULT = true;
+    public static final String CHECKBOX4_LABEL_TEXT = "case II water";
+    public static final String CHECKBOX4_DESCRIPTION = "select/unselect";
+    public static final String CHECKBOX4_PARAM_NAME = "caseII";
     private boolean caseII = CHECKBOX4_DEFAULT;
 
-    public final static boolean CHECKBOX5_DEFAULT = true;
-    public final static String CHECKBOX5_LABEL_TEXT = "TOA Ozone normalization";
-    public final static String CHECKBOX5_DESCRIPTION = "select/unselect";
-    public final static String CHECKBOX5_PARAM_NAME = "ozone_norm";
+    public static final boolean CHECKBOX5_DEFAULT = true;
+    public static final String CHECKBOX5_LABEL_TEXT = "TOA Ozone normalization";
+    public static final String CHECKBOX5_DESCRIPTION = "select/unselect";
+    public static final String CHECKBOX5_PARAM_NAME = "ozone_norm";
     private boolean ozone_norm = CHECKBOX5_DEFAULT;
 
-    public final static boolean CHECKBOX6_DEFAULT = false;
-    public final static String CHECKBOX6_LABEL_TEXT = "Rayleigh pre-processing";
-    public final static String CHECKBOX6_DESCRIPTION = "Select/unselect";
-    public final static String CHECKBOX6_PARAM_NAME = "ray_corr";
+    public static final boolean CHECKBOX6_DEFAULT = false;
+    public static final String CHECKBOX6_LABEL_TEXT = "Rayleigh pre-processing";
+    public static final String CHECKBOX6_DESCRIPTION = "Select/unselect";
+    public static final String CHECKBOX6_PARAM_NAME = "ray_corr";
     private boolean ray_corr = CHECKBOX6_DEFAULT;
 
     public static final String REQUEST_TYPE = "WATER";
 
     public static final String RESULT_PRODUCT_TYPE = "MER_MLP_WATER2P";
 
-    // In createOutputProduct() watch out for 
+    private static final Logger LOGGER = Logger.getLogger(LOGGER_NAME);
+
+
+    // In createOutputProduct() watch out for
     // _resultFlagsOutputBand = new Band(RESULT_FLAGS_NAME, ProductData.TYPE_UINT16, sceneWidth, sceneHeight);
     // Here : Adapt he ProductData type length. Now : 16 Bit !!
 
@@ -148,14 +159,30 @@ public class WaterProcessor extends Processor {
 
     public static final String L1FLAGS_INPUT_BAND_NAME = "l1_flags";
 
-    public int COSMETIC = 0x00000001;
-    public int DUPLICATED = 0x00000002;
-    public int GLINT_RISK = 0x00000004;
-    public int SUSPECT = 0x00000008;
-    public int LAND_OCEAN = 0x00000010;
-    public int BRIGHT = 0x00000020;
-    public int COASTLINE = 0x00000040;
-    public int INVALID = 0x00000080;
+    private static final int COSMETIC = 0x00000001;
+    private static final int DUPLICATED = 0x00000002;
+    private static final int GLINT_RISK = 0x00000004;
+    private static final int SUSPECT = 0x00000008;
+    private static final int LAND_OCEAN = 0x00000010;
+    private static final int BRIGHT = 0x00000020;
+    private static final int COASTLINE = 0x00000040;
+    private static final int INVALID = 0x00000080;
+
+    private static final String LAT_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[0];
+    private static final String LON_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[1];
+    private static final String ELEV_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[2];
+    private static final String LATCORR_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[4];
+    private static final String LONCORR_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[5];
+    private static final String SZA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[6];
+    private static final String SAA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[7];
+    private static final String VZA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[8];
+    private static final String VAA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[9];
+    private static final String ZW_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[10];
+    private static final String MW_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[11];
+    private static final String PRESS_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12];
+    private static final String O3_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13];
+    private static final String WV_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[14];
+
 
     // Fields
     private ArrayList<Band> _inputBandList;
@@ -164,23 +191,16 @@ public class WaterProcessor extends Processor {
     private Band _l1FlagsInputBand;
     private Band _l1FlagsOutputBand;
     private Band _resultFlagsOutputBand;
-    private Logger _logger;
     private float[] solarFlux;
     private Band[] _inputBand = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
 
-    // This product string does so far (061103) not exist in 
-    // org.esa.beam.dataio.envisat.EnvisatConstants. This is the reason
-    // why Thomas Lankester experienced a failure of our plug in
-    // when he tried to use a MERIS data set named 
-    // MER_FRS_1PNUPA20051005_073634_000000702041_00221_18812_0082.N1.
-    //
-    // This is now fixed
-    String MERIS_FRS_L1B_PRODUCT_TYPE_NAME = "MER_FRS_1P";
+    // The input type pattern for ICOL products
+    static final String ICOL_PATTERN = "MER_.*1N";
 
     // - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS  
 
     // the ozone concentration used in the MOMO simulation in Dobson units (1 DU = 1/1000. cm)
-    public final static double TOTAL_OZONE_DU_MOMO = 344.0;
+    public static final double TOTAL_OZONE_DU_MOMO = 344.0;
 
     private static int num_toa_caseII = 12;
     private int num_toa;
@@ -200,11 +220,11 @@ public class WaterProcessor extends Processor {
     private static int num_rho_w_extout = 8;
     private int num_rho_w;
 
-    private int MASK_TO_BE_USED = (GLINT_RISK | BRIGHT | INVALID);
+    private static final int MASK_TO_BE_USED = (GLINT_RISK | BRIGHT | INVALID);
 //    private int MASK_TO_BE_USED = (0);
 
     // ID strings for all possible output bands
-    private static String _outputBandName[] = {
+    private static String[] _outputBandName = {
             "algal_2",
             "yellow_subs",
             "total_susp",
@@ -223,7 +243,7 @@ public class WaterProcessor extends Processor {
     };
 
     // Descriptive strings for all possible output bands
-    private static String _outputBandDescription[] = {
+    private static String[] _outputBandDescription = {
             "Chlorophyll 2 content",
             "Yellow substance",
             "Total suspended matter",
@@ -242,7 +262,7 @@ public class WaterProcessor extends Processor {
     };
 
     // Unit strings for all possible output bands
-    private static String _outputBandUnit[] = {
+    private static String[] _outputBandUnit = {
             "log10(mg/m^3)",
             "log10(1/m)",
             "log10(g/m^3)",
@@ -261,34 +281,29 @@ public class WaterProcessor extends Processor {
     };
 
     // Wavelengths for the water leaving reflectances rho_w
-    private static float tau_lambda[] = {
+    private static float[] tau_lambda = {
             440.00f, 550.00f, 670.00f, 870.00f
     };
 
     // Wavelengths for the water leaving reflectances rho_w
-    private static float rho_w_lambda[] = {
+    private static float[] rho_w_lambda = {
             412.50f, 442.50f, 490.00f, 510.00f,
             560.00f, 620.00f, 665.00f, 708.75f
     };
 
     // Bandwidth for the water leaving reflectances rho_w
-    private static float rho_w_bandw[] = {
+    private static float[] rho_w_bandw = {
             10.00f, 10.00f, 10.00f, 10.00f,
             10.00f, 10.00f, 10.00f, 10.00f
     };
 
     // Mask value to be written if inversion fails 
-    private float RESULT_MASK_VALUE = +5.0f;    // constant
+    private static final float RESULT_MASK_VALUE = +5.0f;
 
     // - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS  
 
     private int output_planes;
     private Band[] _outputBand;
-    private static final String ICOL_PATTERN = "MER_.*1N";
-
-    public WaterProcessor() {
-        _logger = Logger.getLogger(LOGGER_NAME);
-    }
 
     @Override
     public void initProcessor() throws ProcessorException {
@@ -311,6 +326,7 @@ public class WaterProcessor extends Processor {
     /*
      * Worker method invoked by framework to process a single request.
      */
+    @Override
     public void process(ProgressMonitor pm) throws ProcessorException {
 
         try {
@@ -319,7 +335,7 @@ public class WaterProcessor extends Processor {
             ProcessorUtils.setProcessorLoggingHandler(DEFAULT_LOG_PREFIX, request,
                                                       getName(), getVersion(), getCopyrightInformation());
 
-            _logger.info("Started processing ...");
+            LOGGER.info("Started processing ...");
 
             pm.beginTask("FUB WeW Water processing...", 100);
 
@@ -349,7 +365,7 @@ public class WaterProcessor extends Processor {
             // Missing this results in a corrupted HDF5 files !!
             closeProducts();
 
-            _logger.info(ProcessorConstants.LOG_MSG_SUCCESS);
+            LOGGER.info(ProcessorConstants.LOG_MSG_SUCCESS);
         }
         catch (IOException e) {
             // catch all exceptions expect ProcessorException and throw ProcessorException
@@ -375,6 +391,7 @@ public class WaterProcessor extends Processor {
     /*
      * Retrieves the name of the processor
      */
+    @Override
     public String getName() {
         return PROCESSOR_NAME;
     }
@@ -382,6 +399,7 @@ public class WaterProcessor extends Processor {
     /*
      * Retrieves a version string of the processor
      */
+    @Override
     public String getVersion() {
         return PROCESSOR_VERSION;
     }
@@ -389,6 +407,7 @@ public class WaterProcessor extends Processor {
     /*
      * Retrieves copyright information of the processor
      */
+    @Override
     public String getCopyrightInformation() {
         return PROCESSOR_COPYRIGHT;
     }
@@ -397,6 +416,7 @@ public class WaterProcessor extends Processor {
      * Creates the UI for the processor. Override to perform processor specific
      * UI initializations.
      */
+    @Override
     public ProcessorUI createUI() throws ProcessorException {
         return new WaterProcessorUI();
     }
@@ -422,12 +442,8 @@ public class WaterProcessor extends Processor {
 
         // Allow MERIS only !!
         //
-        if (!EnvisatConstants.MERIS_RR_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
-            && !EnvisatConstants.MERIS_FR_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
-            && !EnvisatConstants.MERIS_FSG_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
-            && !EnvisatConstants.MERIS_FRG_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
-            && !MERIS_FRS_L1B_PRODUCT_TYPE_NAME.equals(_inputProduct.getProductType())
-                && !_inputProduct.getProductType().matches(ICOL_PATTERN)) {
+        String inputType = _inputProduct.getProductType();
+        if (!isAcceptedInputType(inputType)) {
             throw new ProcessorException("Invalid product type: MERIS Level 1b or MERIS Level 1N (icol) required.");
         }
 
@@ -438,13 +454,15 @@ public class WaterProcessor extends Processor {
             Band band = _inputProduct.getBand(bandName);
 
             if (band == null) {
-                _logger.warning("The requested band '" + bandName + "' is not contained in the input product!");
+                String msg = String.format("The requested band '%s' is not contained in the input product!",bandName);
+                LOGGER.warning(msg);
             } else {
                 if (band.getSpectralBandIndex() != -1) {
                     _inputBandList.add(band);
                 } else {
-                    _logger.warning(
-                            "The requested band '" + bandName + "' is not a spectral band! It is excluded from processing");
+                    String msg = String.format("The requested band '%s' is not a spectral band! It is excluded from processing", bandName);
+                    LOGGER.warning(
+                            msg);
                 }
             }
         }
@@ -455,14 +473,19 @@ public class WaterProcessor extends Processor {
 
         _l1FlagsInputBand = _inputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
         if (_l1FlagsInputBand == null) {
-            throw new ProcessorException("Can not load band " + L1FLAGS_INPUT_BAND_NAME);
+            throw new ProcessorException(String.format("Can not load band %s", L1FLAGS_INPUT_BAND_NAME));
         }
-        _logger.info(ProcessorConstants.LOG_MSG_LOADED_BAND + L1FLAGS_INPUT_BAND_NAME);
+        LOGGER.info(String.format("%s%s", ProcessorConstants.LOG_MSG_LOADED_BAND, L1FLAGS_INPUT_BAND_NAME));
 
         /*
        * Finally read solar flux for all MERIS L1b bands.
        */
         solarFlux = getSolarFlux(_inputProduct, _inputBandList);
+    }
+
+    static boolean isAcceptedInputType(String inputType) {
+        Matcher matcher = EnvisatConstants.MERIS_L1_TYPE_PATTERN.matcher(inputType);
+        return matcher.matches() || inputType.matches(ICOL_PATTERN);
     }
 
     /*
@@ -479,8 +502,8 @@ public class WaterProcessor extends Processor {
         // todo - try also to get solar flux from bands
 
         if (dsf == null) {
-            _logger.log(Level.WARNING, "No solar flux values found. Using some default values");
-            double defsol[] = {
+            LOGGER.log(Level.WARNING, "No solar flux values found. Using some default values");
+            double[] defsol = {
                     1670.5964, 1824.1444, 1874.9883,
                     1877.6682, 1754.7749, 1606.6401,
                     1490.0026, 1431.8726, 1369.2035,
@@ -625,68 +648,69 @@ public class WaterProcessor extends Processor {
         // create and add the RESULT flags coding
         //
         FlagCoding resultFlagCoding = createResultFlagCoding();
-        _outputProduct.addFlagCoding(resultFlagCoding);
+        _outputProduct.getFlagCodingGroup().add(resultFlagCoding);
 
         // create and add the RESULT flags band
         //
         _resultFlagsOutputBand = new Band(RESULT_FLAGS_NAME, ProductData.TYPE_UINT16, sceneWidth, sceneHeight);
         _resultFlagsOutputBand.setDescription("FUB/WeW WATER plugin specific flags");
-        _resultFlagsOutputBand.setFlagCoding(resultFlagCoding);
+        _resultFlagsOutputBand.setSampleCoding(resultFlagCoding);
         _outputProduct.addBand(_resultFlagsOutputBand);
 
         // Copy predefined bitmask definitions
         ProductUtils.copyBitmaskDefs(_inputProduct, _outputProduct);
 
+        String falgNamePrefix = RESULT_FLAGS_NAME + ".";
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[0].toLowerCase(),
                                                     RESULT_ERROR_TEXT[0],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[0],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[0],
                                                     Color.cyan, 0.0f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[1].toLowerCase(),
                                                     RESULT_ERROR_TEXT[1],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[1],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[1],
                                                     Color.green, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[2].toLowerCase(),
                                                     RESULT_ERROR_TEXT[2],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[2],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[2],
                                                     Color.green, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[3].toLowerCase(),
                                                     RESULT_ERROR_TEXT[3],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[3],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[3],
                                                     Color.yellow, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[4].toLowerCase(),
                                                     RESULT_ERROR_TEXT[4],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[4],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[4],
                                                     Color.yellow, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[5].toLowerCase(),
                                                     RESULT_ERROR_TEXT[5],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[5],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[5],
                                                     Color.orange, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[6].toLowerCase(),
                                                     RESULT_ERROR_TEXT[6],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[6],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[6],
                                                     Color.orange, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[7].toLowerCase(),
                                                     RESULT_ERROR_TEXT[7],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[7],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[7],
                                                     Color.blue, 0.5f));
 
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[8].toLowerCase(),
                                                     RESULT_ERROR_TEXT[8],
-                                                    RESULT_FLAGS_NAME + "." + RESULT_ERROR_NAME[8],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[8],
                                                     Color.blue, 0.5f));
 
         // Initialize the disk representation
         //
         writer.writeProductNodes(_outputProduct, new File(outputRef.getFilePath()));
 
-        _logger.info("Output product successfully created");
+        LOGGER.info("Output product successfully created");
     }
 
     public static FlagCoding createResultFlagCoding() {
@@ -694,10 +718,9 @@ public class WaterProcessor extends Processor {
         FlagCoding resultFlagCoding = new FlagCoding("result_flags");
         resultFlagCoding.setDescription("RESULT Flag Coding");
 
-        MetadataAttribute attribute;
 
         for (int i = 0; i < RESULT_ERROR_NUM; i++) {
-            attribute = new MetadataAttribute(RESULT_ERROR_NAME[i], ProductData.TYPE_INT32);
+            MetadataAttribute attribute = new MetadataAttribute(RESULT_ERROR_NAME[i], ProductData.TYPE_INT32);
             attribute.getData().setElemInt(RESULT_ERROR_VALUE[i]);
             attribute.setDescription(RESULT_ERROR_TEXT[i]);
             resultFlagCoding.addAttribute(attribute);
@@ -764,47 +787,6 @@ public class WaterProcessor extends Processor {
 
         int i;
 
-        int _merisLatIndex = 0;
-        TiePointGrid _latBand;
-
-        int _merisLonIndex = 1;
-        TiePointGrid _lonBand;
-
-        int _merisElevIndex = 2;
-        TiePointGrid _elevBand;
-
-        int _merisLatcorrIndex = 4;
-        TiePointGrid _latcorrBand;
-
-        int _merisLoncorrIndex = 5;
-        TiePointGrid _loncorrBand;
-
-        int _merisSzaIndex = 6;
-        TiePointGrid _szaBand;
-
-        int _merisSaaIndex = 7;
-        TiePointGrid _saaBand;
-
-        int _merisVzaIndex = 8;
-        TiePointGrid _vzaBand;
-
-        int _merisVaaIndex = 9;
-        TiePointGrid _vaaBand;
-
-        int _merisZwIndex = 10;
-        TiePointGrid _zwBand;
-
-        int _merisMwIndex = 11;
-        TiePointGrid _mwBand;
-
-        int _merisPressIndex = 12;
-        TiePointGrid _pressBand;
-
-        int _merisO3Index = 13;
-        TiePointGrid _o3Band;
-
-        int _merisWvIndex = 14;
-        TiePointGrid _wvBand;
 
         // If set to -1.0f : NN input and output ranges are checked
         // If set to +1.0f : NN input and output ranges are NOT checked
@@ -859,27 +841,7 @@ public class WaterProcessor extends Processor {
         float[][] opixel = new float[2][1];
 
         RecallBCK recallBCK = new RecallBCK();
-/*
-	// ----- ASCII Output ------ 
-	FileOutputStream vector=null,    vectoro=null,   toav=null;
-    	FileOutputStream outlat=null,    outlon=null;
-    	FileOutputStream outc=null,      outy=null,      outs=null;
-    	FileOutputStream outt440=null,   outt550=null,   outt670=null,   outt870=null;
-    	FileOutputStream outr412=null,   outr442=null,   outr490=null,   outr510=null;
-    	FileOutputStream outr560=null,   outr620=null,   outr665=null,   outr708=null;
-	FileOutputStream outtoa885=null, outm1=null,     outm2=null;
 
-	PrintStream      vectorps=null,  vectorops=null, toavps=null;
-	PrintStream      outlatps=null,  outlonps=null;
-	PrintStream      outcps=null,    outyps=null,    outsps=null;
-    	PrintStream      outtps440=null, outtps550=null, outtps670=null, outtps870=null;
-    	PrintStream      outrps412=null, outrps442=null, outrps490=null, outrps510=null;
-    	PrintStream      outrps560=null, outrps620=null, outrps665=null, outrps708=null;
-	PrintStream      outtoaps885=null, outmps1=null, outmps2=null;
-
-	DecimalFormat    SciForm  = new DecimalFormat("0.00000000E000#");
-	DecimalFormat    SciForm0 = new DecimalFormat("0");
-*/
         // Load the wavelengths and ozone spectral extinction coefficients
         //
         for (i = 0; i < nbands; i++) {
@@ -889,76 +851,20 @@ public class WaterProcessor extends Processor {
 
         // Load the auxiliary data
         //
-
-        // latitude
-        _latBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLatIndex]);
-        checkParamNotNull(_latBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLatIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLatIndex]);
-
-        // longitude
-        _lonBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLonIndex]);
-        checkParamNotNull(_lonBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLonIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLonIndex]);
-
-        // latitude correction factors
-        _latcorrBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLatcorrIndex]);
-        checkParamNotNull(_latcorrBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLatcorrIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLatcorrIndex]);
-
-        // longitude correction factors
-        _loncorrBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLoncorrIndex]);
-        checkParamNotNull(_loncorrBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLoncorrIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisLoncorrIndex]);
-
-        // digital elevation
-        _elevBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisElevIndex]);
-        checkParamNotNull(_elevBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisElevIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisElevIndex]);
-
-        // sun zenith angle
-        _szaBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisSzaIndex]);
-        checkParamNotNull(_szaBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisSzaIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisSzaIndex]);
-
-        // sun azimuth angle
-        _saaBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisSaaIndex]);
-        checkParamNotNull(_saaBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisSaaIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisSaaIndex]);
-
-        // view zenith angle
-        _vzaBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisVzaIndex]);
-        checkParamNotNull(_vzaBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisVzaIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisVzaIndex]);
-
-        // view azimuth angle
-        _vaaBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisVaaIndex]);
-        checkParamNotNull(_vaaBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisVaaIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisVaaIndex]);
-
-        // zonal wind
-        _zwBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisZwIndex]);
-        checkParamNotNull(_zwBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisZwIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisZwIndex]);
-
-        // merid wind
-        _mwBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisMwIndex]);
-        checkParamNotNull(_mwBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisMwIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisMwIndex]);
-
-        // atmospheric pressure
-        _pressBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisPressIndex]);
-        checkParamNotNull(_pressBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisPressIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisPressIndex]);
-
-        // ozone
-        _o3Band = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisO3Index]);
-        checkParamNotNull(_o3Band, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisO3Index]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisO3Index]);
-
-        // waterVapour
-        _wvBand = _inputProduct.getTiePointGrid(EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisWvIndex]);
-        checkParamNotNull(_wvBand, EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisWvIndex]);
-        _logger.fine(SmacConstants.LOG_MSG_LOADED + EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[_merisWvIndex]);
+        TiePointGrid latGrid = getTiePointGrid(LAT_GRID_NAME);
+        TiePointGrid lonGrid = getTiePointGrid(LON_GRID_NAME);
+        TiePointGrid latcorrGrid = getTiePointGrid(LATCORR_GRID_NAME);
+        TiePointGrid loncorrGrid = getTiePointGrid(LONCORR_GRID_NAME);
+        TiePointGrid elevGrid = getTiePointGrid(ELEV_GRID_NAME);
+        TiePointGrid szaGrid = getTiePointGrid(SZA_GRID_NAME);
+        TiePointGrid saaGrid = getTiePointGrid(SAA_GRID_NAME);
+        TiePointGrid vzaGrid = getTiePointGrid(VZA_GRID_NAME);
+        TiePointGrid vaaGrid = getTiePointGrid(VAA_GRID_NAME);
+        TiePointGrid zwGrid = getTiePointGrid(ZW_GRID_NAME);
+        TiePointGrid mwGrid = getTiePointGrid(MW_GRID_NAME);
+        TiePointGrid pressGrid = getTiePointGrid(PRESS_GRID_NAME);
+        TiePointGrid o3Grid = getTiePointGrid(O3_GRID_NAME);
+        TiePointGrid wvGrid = getTiePointGrid(WV_GRID_NAME);
 
         d2r = Math.acos(-1.0) / 180.0;
         float fd2r = (float) d2r;
@@ -1036,20 +942,20 @@ public class WaterProcessor extends Processor {
                 _l1FlagsInputBand.readPixels(0, y, width, 1, l1Flags);
 
                 // Third the auxiliary data
-                _latBand.readPixels(0, y, width, 1, lat);
-                _lonBand.readPixels(0, y, width, 1, lon);
-                _latcorrBand.readPixels(0, y, width, 1, latc);
-                _loncorrBand.readPixels(0, y, width, 1, lonc);
-                _elevBand.readPixels(0, y, width, 1, elev);
-                _szaBand.readPixels(0, y, width, 1, sza);
-                _saaBand.readPixels(0, y, width, 1, saa);
-                _vzaBand.readPixels(0, y, width, 1, vza);
-                _vaaBand.readPixels(0, y, width, 1, vaa);
-                _zwBand.readPixels(0, y, width, 1, zw);
-                _mwBand.readPixels(0, y, width, 1, mw);
-                _pressBand.readPixels(0, y, width, 1, press);
-                _o3Band.readPixels(0, y, width, 1, o3);
-                _wvBand.readPixels(0, y, width, 1, wv);
+                latGrid.readPixels(0, y, width, 1, lat);
+                lonGrid.readPixels(0, y, width, 1, lon);
+                latcorrGrid.readPixels(0, y, width, 1, latc);
+                loncorrGrid.readPixels(0, y, width, 1, lonc);
+                elevGrid.readPixels(0, y, width, 1, elev);
+                szaGrid.readPixels(0, y, width, 1, sza);
+                saaGrid.readPixels(0, y, width, 1, saa);
+                vzaGrid.readPixels(0, y, width, 1, vza);
+                vaaGrid.readPixels(0, y, width, 1, vaa);
+                zwGrid.readPixels(0, y, width, 1, zw);
+                mwGrid.readPixels(0, y, width, 1, mw);
+                pressGrid.readPixels(0, y, width, 1, press);
+                o3Grid.readPixels(0, y, width, 1, o3);
+                wvGrid.readPixels(0, y, width, 1, wv);
 
                 // process the complete scanline
                 //
@@ -1108,7 +1014,7 @@ public class WaterProcessor extends Processor {
                     // Get the wind speed
                     aux[0][x] = (float) Math.sqrt((double) (zw[x] * zw[x] + mw[x] * mw[x]));
                     // Get the pressure
-                    aux[1][x] = (float) press[x];
+                    aux[1][x] = press[x];
 
                     // Adjust the azimuth difference
                     dazi = vaa[x] - saa[x];
@@ -1331,6 +1237,13 @@ public class WaterProcessor extends Processor {
         }
 
     } // processWater
+
+    private TiePointGrid getTiePointGrid(String latGridName) throws ProcessorException {
+        TiePointGrid latGrid = _inputProduct.getTiePointGrid(latGridName);
+        checkParamNotNull(latGrid, latGridName);
+        LOGGER.fine(SmacConstants.LOG_MSG_LOADED + latGridName);
+        return latGrid;
+    }
 
 } // Processor
 

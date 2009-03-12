@@ -59,7 +59,7 @@ public class WaterProcessor extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
-    public static final String PROCESSOR_VERSION = "1.3-SNAPSHOT";        // PROCESS
+    public static final String PROCESSOR_VERSION = "1.2.2";        // PROCESS
     public static final String PROCESSOR_COPYRIGHT = "Copyright (C) 2005/7 by WeW (michael.schaale@wew.fu-berlin.de)";
 
     public static final String LOGGER_NAME = "beam.processor.water";
@@ -107,14 +107,20 @@ public class WaterProcessor extends Processor {
 
     public static final String REQUEST_TYPE = "WATER";
 
-    private static final String RESULT_PRODUCT_TYPE_PATTERN = "MER_%s_MLP_WATER2P";
+    public static final String RESULT_PRODUCT_TYPE = "MER_MLP_WATER2P";
 
     private static final Logger LOGGER = Logger.getLogger(LOGGER_NAME);
 
 
-    private static final String RESULT_FLAGS_NAME = "result_flags";
+    // In createOutputProduct() watch out for
+    // _resultFlagsOutputBand = new Band(RESULT_FLAGS_NAME, ProductData.TYPE_UINT16, sceneWidth, sceneHeight);
+    // Here : Adapt he ProductData type length. Now : 16 Bit !!
 
-    private static final String[] RESULT_ERROR_TEXT = {
+    public static final String RESULT_FLAGS_NAME = "result_flags";
+
+    public static final int RESULT_ERROR_NUM = 9;
+
+    public static final String[] RESULT_ERROR_TEXT = {
             "Pixel was a priori masked out",
             "CHL retrieval failure (input)",
             "CHL retrieval failure (output)",
@@ -123,12 +129,10 @@ public class WaterProcessor extends Processor {
             "TSM retrieval failure (input)",
             "TSM retrieval failure (output)",
             "Atmospheric correction failure (input)",
-            "Atmospheric correction failure (output)",
-            "Pixels classified as land",
-            "Pixels classified as cloud or ice"
+            "Atmospheric correction failure (output)"
     };
 
-    private static final String[] RESULT_ERROR_NAME = {
+    public static final String[] RESULT_ERROR_NAME = {
             "LEVEL1b_MASKED",
             "CHL_IN",
             "CHL_OUT",
@@ -137,13 +141,11 @@ public class WaterProcessor extends Processor {
             "TSM_IN",
             "TSM_OUT",
             "ATM_IN",
-            "ATM_OUT",
-            "WEW_LAND",
-            "CLOUD_ICE"
+            "ATM_OUT"
     };
 
 
-    private static final int[] RESULT_ERROR_VALUE = {
+    public static final int[] RESULT_ERROR_VALUE = {
             0x00000001,
             0x00000002,
             0x00000004,
@@ -153,11 +155,9 @@ public class WaterProcessor extends Processor {
             0x00000040,
             0x00000080,
             0x00000100,
-            0x00000200,
-            0x00000400,
     };
 
-    private static final String L1FLAGS_INPUT_BAND_NAME = "l1_flags";
+    public static final String L1FLAGS_INPUT_BAND_NAME = "l1_flags";
 
     private static final int COSMETIC = 0x00000001;
     private static final int DUPLICATED = 0x00000002;
@@ -185,22 +185,22 @@ public class WaterProcessor extends Processor {
 
 
     // Fields
-    private ArrayList<Band> inputBandList;
-    private Product inputProduct;
-    private Product outputProduct;
-    private Band l1FlagsInputBand;
-    private Band l1FlagsOutputBand;
-    private Band resultFlagsOutputBand;
+    private ArrayList<Band> _inputBandList;
+    private Product _inputProduct;
+    private Product _outputProduct;
+    private Band _l1FlagsInputBand;
+    private Band _l1FlagsOutputBand;
+    private Band _resultFlagsOutputBand;
     private float[] solarFlux;
-    private Band[] inputBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
+    private Band[] _inputBand = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
 
     // The input type pattern for ICOL products
-    private static final String ICOL_PATTERN = "MER_.*1N";
+    static final String ICOL_PATTERN = "MER_.*1N";
 
     // - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS  
 
     // the ozone concentration used in the MOMO simulation in Dobson units (1 DU = 1/1000. cm)
-    private static final double TOTAL_OZONE_DU_MOMO = 344.0;
+    public static final double TOTAL_OZONE_DU_MOMO = 344.0;
 
     private static int num_toa_caseII = 12;
     private int num_toa;
@@ -209,7 +209,7 @@ public class WaterProcessor extends Processor {
     private int num_msl;
 
     // # of concentration bands
-    private static int num_c_caseII = 6;
+    private static int num_c_caseII = 3;
     private int num_c;
 
     // # of spectral aerosol optical depths
@@ -221,15 +221,13 @@ public class WaterProcessor extends Processor {
     private int num_rho_w;
 
     private static final int MASK_TO_BE_USED = (GLINT_RISK | BRIGHT | INVALID);
+//    private int MASK_TO_BE_USED = (0);
 
     // ID strings for all possible output bands
-    private static String[] outputBandNames = {
+    private static String[] _outputBandName = {
             "algal_2",
-            "algal_2_conc",
             "yellow_subs",
-            "yellow_subs_conc",
             "total_susp",
-            "total_susp_conc",
             "aero_opt_thick_440",
             "aero_opt_thick_550",
             "aero_opt_thick_670",
@@ -245,13 +243,10 @@ public class WaterProcessor extends Processor {
     };
 
     // Descriptive strings for all possible output bands
-    private static String[] outputBandDescriptions = {
+    private static String[] _outputBandDescription = {
             "Chlorophyll 2 content",
-            "Chlorophyll 2 content concentration",
             "Yellow substance",
-            "Yellow substance concentration",
             "Total suspended matter",
-            "Total suspended matter concentration",
             "Aerosol optical thickness",
             "Aerosol optical thickness",
             "Aerosol optical thickness",
@@ -267,13 +262,10 @@ public class WaterProcessor extends Processor {
     };
 
     // Unit strings for all possible output bands
-    private static String[] outputBandUnits = {
+    private static String[] _outputBandUnit = {
             "log10(mg/m^3)",
-            "mg/m^3",
             "log10(1/m)",
-            "1/m",
             "log10(g/m^3)",
-            "g/m^3",
             "/",
             "/",
             "/",
@@ -306,12 +298,12 @@ public class WaterProcessor extends Processor {
     };
 
     // Mask value to be written if inversion fails 
-    private static final float RESULT_NODATA_VALUE = +5.0f;
+    private static final float RESULT_MASK_VALUE = +5.0f;
 
     // - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS  
 
     private int output_planes;
-    private Band[] outputBands;
+    private Band[] _outputBand;
 
     @Override
     public void initProcessor() throws ProcessorException {
@@ -388,11 +380,11 @@ public class WaterProcessor extends Processor {
      */
 
     public void closeProducts() throws IOException {
-        if (inputProduct != null) {
-            inputProduct.closeProductReader();
+        if (_inputProduct != null) {
+            _inputProduct.closeProductReader();
         }
-        if (outputProduct != null) {
-            outputProduct.closeProductWriter();
+        if (_outputProduct != null) {
+            _outputProduct.closeProductWriter();
         }
     }
 
@@ -438,35 +430,35 @@ public class WaterProcessor extends Processor {
      */
 
     private void loadInputProduct() throws ProcessorException, IOException {
-        inputBandList = new ArrayList<Band>();
+        _inputBandList = new ArrayList<Band>();
 
         // clear vector of bands
         // ---------------------
-        inputBandList.clear();
+        _inputBandList.clear();
 
         // only the first product - there might be more but these will be ignored
         // ----------------------------------------------------------------------
-        inputProduct = loadInputProduct(0);
+        _inputProduct = loadInputProduct(0);
 
         // Allow MERIS only !!
         //
-        String inputType = inputProduct.getProductType();
+        String inputType = _inputProduct.getProductType();
         if (!isAcceptedInputType(inputType)) {
             throw new ProcessorException("Invalid product type: MERIS Level 1b or MERIS Level 1N (icol) required.");
         }
 
 
-        String[] bandNames = inputProduct.getBandNames();
+        String[] bandNames = _inputProduct.getBandNames();
 
         for (String bandName : bandNames) {
-            Band band = inputProduct.getBand(bandName);
+            Band band = _inputProduct.getBand(bandName);
 
             if (band == null) {
                 String msg = String.format("The requested band '%s' is not contained in the input product!", bandName);
                 LOGGER.warning(msg);
             } else {
                 if (band.getSpectralBandIndex() != -1) {
-                    inputBandList.add(band);
+                    _inputBandList.add(band);
                 } else {
                     String msg = String.format(
                             "The requested band '%s' is not a spectral band! It is excluded from processing", bandName);
@@ -476,12 +468,12 @@ public class WaterProcessor extends Processor {
             }
         }
 
-        for (int i = 0; i < inputBandList.size(); i++) {
-            inputBands[i] = inputProduct.getBand(bandNames[i]);
+        for (int i = 0; i < _inputBandList.size(); i++) {
+            _inputBand[i] = _inputProduct.getBand(bandNames[i]);
         }
 
-        l1FlagsInputBand = inputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
-        if (l1FlagsInputBand == null) {
+        _l1FlagsInputBand = _inputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
+        if (_l1FlagsInputBand == null) {
             throw new ProcessorException(String.format("Can not load band %s", L1FLAGS_INPUT_BAND_NAME));
         }
         LOGGER.info(String.format("%s%s", ProcessorConstants.LOG_MSG_LOADED_BAND, L1FLAGS_INPUT_BAND_NAME));
@@ -489,7 +481,12 @@ public class WaterProcessor extends Processor {
         /*
        * Finally read solar flux for all MERIS L1b bands.
        */
-        solarFlux = getSolarFlux(inputProduct, inputBandList);
+        solarFlux = getSolarFlux(_inputProduct, _inputBandList);
+    }
+
+    static boolean isAcceptedInputType(String inputType) {
+        Matcher matcher = EnvisatConstants.MERIS_L1_TYPE_PATTERN.matcher(inputType);
+        return matcher.matches() || inputType.matches(ICOL_PATTERN);
     }
 
     /*
@@ -499,7 +496,7 @@ public class WaterProcessor extends Processor {
      * show heavy variations over the year or for slight wavelength
      * shifts we do use some defaults if necessary.  
      */
-    private float[] getSolarFlux(Product product, ArrayList<Band> bandList) {
+    private float[] getSolarFlux(Product product, ArrayList<Band> numbands) {
         // Try to grab the solar fluxes
         float[] dsf = getSolarFluxFromMetadata(product);
 
@@ -516,8 +513,8 @@ public class WaterProcessor extends Processor {
             };
 
             // Prepare the defaults
-            dsf = new float[bandList.size()];
-            for (int i = 0; i < bandList.size(); i++) {
+            dsf = new float[numbands.size()];
+            for (int i = 0; i < numbands.size(); i++) {
                 dsf[i] = (float) 1.0;
                 if (i < defsol.length) {
                     dsf[i] = (float) defsol[i];
@@ -545,7 +542,9 @@ public class WaterProcessor extends Processor {
      */
     private void createOutputProduct() throws ProcessorException, IOException {
 
-        String productType = createOutputProductType(inputProduct.getProductType());
+        //ProductRef prod;
+        //prod = getOutputProductSafe();
+        String productType = getOutputProductTypeSafe();
         String productName = getOutputProductNameSafe();
 
         // get the request from the base class
@@ -554,8 +553,8 @@ public class WaterProcessor extends Processor {
 
         // get the scene size from the input product
         // -----------------------------------------
-        int sceneWidth = inputProduct.getSceneRasterWidth();
-        int sceneHeight = inputProduct.getSceneRasterHeight();
+        int sceneWidth = _inputProduct.getSceneRasterWidth();
+        int sceneHeight = _inputProduct.getSceneRasterHeight();
 
         // get the output product from the request. The request holds objects of
         // type ProductRef which contain all the information needed here
@@ -571,13 +570,13 @@ public class WaterProcessor extends Processor {
         // create the in-memory representation of the output product
         // ---------------------------------------------------------
         // the product itself
-        outputProduct = new Product(productName, productType, sceneWidth, sceneHeight);
+        _outputProduct = new Product(productName, productType, sceneWidth, sceneHeight);
 
         // outputRef.getFileFormat() is either "BEAM-DIMAP" or "HDF5"
         ProductWriter writer = ProductIO.getProductWriter(outputRef.getFileFormat());
 
         // Attach to the writer to the output product
-        outputProduct.setProductWriter(writer);
+        _outputProduct.setProductWriter(writer);
 
         // adapt process parameters according to the request
         // -------------------------------------------------
@@ -602,125 +601,115 @@ public class WaterProcessor extends Processor {
         output_planes += num_rho_w;    // water-leaving reflectances
         output_planes += num_c;        // log(c)
 
-        outputBands = new Band[output_planes];
+        _outputBand = new Band[output_planes];
 
         // create and add the output bands
         //
         int j = 0;
         for (int i = 0; i < output_planes; i++) {
-            outputBands[i] = new Band(outputBandNames[j], ProductData.TYPE_FLOAT32, sceneWidth, sceneHeight);
-            outputBands[i].setScalingOffset(0.0);
-            outputBands[i].setScalingFactor(1.0);
-            outputBands[i].setSpectralBandIndex(-1);    // The Spectrum Tool in VISAT needs it !!
-            outputBands[i].setDescription(outputBandDescriptions[j]);
-            outputBands[i].setUnit(outputBandUnits[j]);
-            outputBands[i].setNoDataValue(RESULT_NODATA_VALUE);
-            outputBands[i].setValidPixelExpression(
-                    "!result_flags.WEW_LAND && !result_flags.CLOUD_ICE && !result_flags.LEVEL1b_MASKED");
-            outputBands[i].setNoDataValueUsed(true);
-            outputProduct.addBand(outputBands[i]);
+            _outputBand[i] = new Band(_outputBandName[j], ProductData.TYPE_FLOAT32, sceneWidth, sceneHeight);
+            _outputBand[i].setScalingOffset(0.0);
+            _outputBand[i].setScalingFactor(1.0);
+            _outputBand[i].setSpectralBandIndex(0);    // The Spectrum Tool in VISAT needs it !!
+            _outputBand[i].setDescription(_outputBandDescription[j]);
+            _outputBand[i].setUnit(_outputBandUnit[j]);
+            _outputProduct.addBand(_outputBand[i]);
             j++;
         }
 
+        for (int i = 0; i < num_c; i++) {
+//    	    _outputBand[i].setSpectralWavelength((float) i);
+            _outputBand[i].setSpectralWavelength((float) (i + 1));
+        }
+
         for (int i = 0; i < num_tau; i++) {
-            outputBands[i + num_c].setSpectralWavelength(tau_lambda[i]);
+            _outputBand[i + num_c].setSpectralWavelength(tau_lambda[i]);
         }
 
         if (extout) {
             for (int i = 0; i < num_rho_w; i++) {
-                outputBands[num_tau + num_c + i].setSpectralWavelength(rho_w_lambda[i]);
-                outputBands[num_tau + num_c + i].setSpectralBandwidth(rho_w_bandw[i]);
-                outputBands[num_tau + num_c + i].setSpectralBandIndex(i);
+                _outputBand[num_tau + num_c + i].setSpectralWavelength(rho_w_lambda[i]);
+                _outputBand[num_tau + num_c + i].setSpectralBandwidth(rho_w_bandw[i]);
             }
         }
 
         // copy all tie point grids to output product
         //
-        ProductUtils.copyTiePointGrids(inputProduct, outputProduct);
+        ProductUtils.copyTiePointGrids(_inputProduct, _outputProduct);
 
         // copy geo-coding and the lat/lon tiepoints to the output product
         //
-        ProductUtils.copyGeoCoding(inputProduct, outputProduct);
+        ProductUtils.copyGeoCoding(_inputProduct, _outputProduct);
 
         // copy L1b flag band
         //
-        ProductUtils.copyFlagBands(inputProduct, outputProduct);
-        l1FlagsOutputBand = outputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
+        ProductUtils.copyFlagBands(_inputProduct, _outputProduct);
+        _l1FlagsOutputBand = _outputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
 
         // create and add the RESULT flags coding
         //
         FlagCoding resultFlagCoding = createResultFlagCoding();
-        outputProduct.getFlagCodingGroup().add(resultFlagCoding);
+        _outputProduct.getFlagCodingGroup().add(resultFlagCoding);
 
         // create and add the RESULT flags band
         //
-        resultFlagsOutputBand = new Band(RESULT_FLAGS_NAME, ProductData.TYPE_UINT16, sceneWidth, sceneHeight);
-        resultFlagsOutputBand.setDescription("FUB/WeW WATER plugin specific flags");
-        resultFlagsOutputBand.setSampleCoding(resultFlagCoding);
-        outputProduct.addBand(resultFlagsOutputBand);
+        _resultFlagsOutputBand = new Band(RESULT_FLAGS_NAME, ProductData.TYPE_UINT16, sceneWidth, sceneHeight);
+        _resultFlagsOutputBand.setDescription("FUB/WeW WATER plugin specific flags");
+        _resultFlagsOutputBand.setSampleCoding(resultFlagCoding);
+        _outputProduct.addBand(_resultFlagsOutputBand);
 
         // Copy predefined bitmask definitions
-        ProductUtils.copyBitmaskDefs(inputProduct, outputProduct);
+        ProductUtils.copyBitmaskDefs(_inputProduct, _outputProduct);
 
         String falgNamePrefix = RESULT_FLAGS_NAME + ".";
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[0].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[0],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[0],
-                                                   Color.cyan, 0.0f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[0].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[0],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[0],
+                                                    Color.cyan, 0.0f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[1].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[1],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[1],
-                                                   Color.green, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[1].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[1],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[1],
+                                                    Color.green, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[2].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[2],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[2],
-                                                   Color.green, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[2].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[2],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[2],
+                                                    Color.green, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[3].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[3],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[3],
-                                                   Color.yellow, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[3].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[3],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[3],
+                                                    Color.yellow, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[4].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[4],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[4],
-                                                   Color.yellow, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[4].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[4],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[4],
+                                                    Color.yellow, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[5].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[5],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[5],
-                                                   Color.orange, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[5].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[5],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[5],
+                                                    Color.orange, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[6].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[6],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[6],
-                                                   Color.orange, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[6].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[6],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[6],
+                                                    Color.orange, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[7].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[7],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[7],
-                                                   Color.blue, 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[7].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[7],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[7],
+                                                    Color.blue, 0.5f));
 
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[8].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[8],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[8],
-                                                   Color.blue, 0.5f));
-
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[9].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[9],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[9],
-                                                   Color.GREEN.darker(), 0.5f));
-
-        outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[10].toLowerCase(),
-                                                   RESULT_ERROR_TEXT[10],
-                                                   falgNamePrefix + RESULT_ERROR_NAME[10],
-                                                   Color.ORANGE.brighter(), 0.5f));
+        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[8].toLowerCase(),
+                                                    RESULT_ERROR_TEXT[8],
+                                                    falgNamePrefix + RESULT_ERROR_NAME[8],
+                                                    Color.blue, 0.5f));
 
         // Initialize the disk representation
         //
-        writer.writeProductNodes(outputProduct, new File(outputRef.getFilePath()));
+        writer.writeProductNodes(_outputProduct, new File(outputRef.getFilePath()));
 
         LOGGER.info("Output product successfully created");
     }
@@ -731,7 +720,7 @@ public class WaterProcessor extends Processor {
         resultFlagCoding.setDescription("RESULT Flag Coding");
 
 
-        for (int i = 0; i < RESULT_ERROR_NAME.length; i++) {
+        for (int i = 0; i < RESULT_ERROR_NUM; i++) {
             MetadataAttribute attribute = new MetadataAttribute(RESULT_ERROR_NAME[i], ProductData.TYPE_INT32);
             attribute.getData().setElemInt(RESULT_ERROR_VALUE[i]);
             attribute.setDescription(RESULT_ERROR_TEXT[i]);
@@ -741,6 +730,12 @@ public class WaterProcessor extends Processor {
         return resultFlagCoding;
     }
 
+    /*
+     * Retrieves the output product name from the input product name by appending "_FLH_MCI" to the name string.
+     *
+     * @throws org.esa.beam.framework.processor.ProcessorException
+     *          when an error occurs
+     */
     private String getOutputProductNameSafe() throws ProcessorException {
         Request request = getRequest();
         ProductRef prod = request.getOutputProductAt(0);
@@ -752,11 +747,19 @@ public class WaterProcessor extends Processor {
         return FileUtils.getFilenameWithoutExtension(prodFile);
     }
 
-    static String createOutputProductType(String inputProductType) {
-        int firstIndex = inputProductType.indexOf('_') + 1;
-        int secondIndex = inputProductType.indexOf('_', firstIndex);
-        String extractedResolution = inputProductType.substring(firstIndex, secondIndex);
-        return String.format(RESULT_PRODUCT_TYPE_PATTERN, extractedResolution);
+    /*
+     * Retrieves the output product type from the input product type by appending "_FLH_MCI" to the type string.
+     *
+     * @throws org.esa.beam.framework.processor.ProcessorException
+     *          when an error occurs
+     */
+    private String getOutputProductTypeSafe() throws ProcessorException {
+        String productType = _inputProduct.getProductType();
+        if (productType == null) {
+            throw new ProcessorException(ProcessorConstants.LOG_MSG_NO_INPUT_TYPE);
+        }
+
+        return productType + "_FLH_MCI";
     }
 
     /* ***********************************************************************
@@ -790,9 +793,9 @@ public class WaterProcessor extends Processor {
         // If set to +1.0f : NN input and output ranges are NOT checked
         float aset = -1.0f;
 
-        int width = inputProduct.getSceneRasterWidth();
-        int height = inputProduct.getSceneRasterHeight();
-        int nbands = inputBandList.size();
+        int width = _inputProduct.getSceneRasterWidth();
+        int height = _inputProduct.getSceneRasterHeight();
+        int nbands = _inputBandList.size();
 
         float[] lat = new float[width];
         float[] lon = new float[width];
@@ -843,7 +846,7 @@ public class WaterProcessor extends Processor {
         // Load the wavelengths and ozone spectral extinction coefficients
         //
         for (i = 0; i < nbands; i++) {
-            wavelength[i] = inputBands[i].getSpectralWavelength();
+            wavelength[i] = _inputBand[i].getSpectralWavelength();
             exO3[i] = WaterProcessorOzone.O3excoeff(wavelength[i]);
         }
 
@@ -891,8 +894,8 @@ public class WaterProcessor extends Processor {
         // in the mask MASK_TO_BE_USED.
 
         // Grab a line in the middle of the scene
-        l1FlagsInputBand.readPixels(0, height / 2, width, 1, l1Flags);
-        boolean icolMode = inputProduct.getProductType().matches(ICOL_PATTERN);
+        _l1FlagsInputBand.readPixels(0, height / 2, width, 1, l1Flags);
+        boolean icolMode = _inputProduct.getProductType().matches(ICOL_PATTERN);
         if (icolMode) {
             mask_to_be_used = MASK_TO_BE_USED;
             System.out.println("--- Input product is of type icol ---");
@@ -932,12 +935,12 @@ public class WaterProcessor extends Processor {
                 //
 
                 // First the TOA radiances
-                for (n = 0; n < inputBandList.size(); n++) {
-                    inputBands[n].readPixels(0, y, width, 1, toa[n]);
+                for (n = 0; n < _inputBandList.size(); n++) {
+                    _inputBand[n].readPixels(0, y, width, 1, toa[n]);
                 } // n
 
                 // Second the flags
-                l1FlagsInputBand.readPixels(0, y, width, 1, l1Flags);
+                _l1FlagsInputBand.readPixels(0, y, width, 1, l1Flags);
 
                 // Third the auxiliary data
                 latGrid.readPixels(0, y, width, 1, lat);
@@ -975,41 +978,36 @@ public class WaterProcessor extends Processor {
                     // and normalize ozone (ozone_norm is fixed to TRUE)
                     //
                     l = 0;
-                    double factor = 1.0 / Math.cos((double) vza[x] * d2r) + 1.0 / Math.cos((double) sza[x] * d2r);
-                    for (n = 0; n <= 13; n++) {
-                        if (n == 7 || n == 10) {
-                            continue;
-                        }
+                    for (n = 0; n <= 6; n++, l++) {
                         tops[l][x] = toa[n][x];
                         sof[l][x] = solarFlux[n];
                         top[l][x] = toa[n][x] / solarFlux[n];
                         if (ozone_norm) {
-                            o3f[l][x] = Math.exp(((-(TOTAL_OZONE_DU_MOMO - o3[x]) * exO3[n]) / 1000.0) * factor);
+                            o3f[l][x] = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3[x]) * exO3[n] / 1000.0 * (1.0 / Math.cos(
+                                    (double) vza[x] * d2r) + 1.0 / Math.cos((double) sza[x] * d2r)));
                             top[l][x] *= o3f[l][x];
                         }
-                        l++;
                     }
-
-
-                    // We have the TOA reflectance, now we can do Land and Cloud/Ice detection
-
-                    // Land detection: toa_reflec_10 > toa_reflec_6 AND toa_reflec_13 > 0.0475
-                    // top[8] == toa_reflec_10
-                    // top[5] == toa_reflec_6
-                    // top[11] == toa_reflec_13
-                    if (top[9][x] > top[5][x] && top[11][x] > 0.0475) {
-                        resultFlags[x] |= RESULT_ERROR_VALUE[9];    // LAND flag value
+                    for (n = 8; n <= 9; n++, l++) {
+                        tops[l][x] = toa[n][x];
+                        sof[l][x] = solarFlux[n];
+                        top[l][x] = toa[n][x] / solarFlux[n];
+                        if (ozone_norm) {
+                            o3f[l][x] = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3[x]) * exO3[n] / 1000.0 * (1.0 / Math.cos(
+                                    (double) vza[x] * d2r) + 1.0 / Math.cos((double) sza[x] * d2r)));
+                            top[l][x] *= o3f[l][x];
+                        }
                     }
-
-                    // additionally compute toaRefl_14 for Cloud/Ice check
-                    float toaRefl_14 = toa[13][x] / solarFlux[13];
-                    double o3Factor = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3[x]) * exO3[13] / 1000.0 * factor);
-                    toaRefl_14 *= o3Factor;
-                    // Cloud/Ice detection: toa_reflec_14 > 0.2
-                    if (toaRefl_14 > 0.2) {
-                        resultFlags[x] |= RESULT_ERROR_VALUE[10];    // CLOUD/ICE flag value
+                    for (n = 11; n <= 13; n++, l++) {
+                        tops[l][x] = toa[n][x];
+                        sof[l][x] = solarFlux[n];
+                        top[l][x] = toa[n][x] / solarFlux[n];
+                        if (ozone_norm) {
+                            o3f[l][x] = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3[x]) * exO3[n] / 1000.0 * (1.0 / Math.cos(
+                                    (double) vza[x] * d2r) + 1.0 / Math.cos((double) sza[x] * d2r)));
+                            top[l][x] *= o3f[l][x];
+                        }
                     }
-
 
                     // Prepare some auxiliary vectors
                     //
@@ -1105,7 +1103,6 @@ public class WaterProcessor extends Processor {
                         resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
                     }
                     result[0][x] = opixel[0][x];
-                    result[1][x] = (float) Math.pow(10.0, opixel[0][x]);
                 }
 
                 // Run the 1-step yellow substance network;
@@ -1132,8 +1129,7 @@ public class WaterProcessor extends Processor {
                         resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
                         resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
                     }
-                    result[2][x] = opixel[0][x];
-                    result[3][x] = (float) Math.pow(10.0, opixel[0][x]);
+                    result[1][x] = opixel[0][x];
                 }
                 // Run the 1-step total suspended matter network;
                 stage = 3;
@@ -1159,9 +1155,7 @@ public class WaterProcessor extends Processor {
                         resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
                         resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
                     }
-                    result[4][x] = opixel[0][x];
-                    result[5][x] = (float) Math.pow(10.0, opixel[0][x]);
-
+                    result[2][x] = opixel[0][x];
                 }
 
                 // Run part 1 of the 2-step atm.corr. network;
@@ -1210,7 +1204,7 @@ public class WaterProcessor extends Processor {
                 for (x = 0; x < width; x++) {
                     if (resultFlags[x] != 0) {
                         for (n = 0; n < output_planes; n++) {
-                            result[n][x] = RESULT_NODATA_VALUE;
+                            result[n][x] = RESULT_MASK_VALUE;
                         }
                     }
                     // Combine result flags
@@ -1220,19 +1214,19 @@ public class WaterProcessor extends Processor {
                 // Write the result planes
                 //
                 for (n = 0; n < output_planes; n++) {
-                    outputBands[n].writePixels(0, y, width, 1, result[n]);
+                    _outputBand[n].writePixels(0, y, width, 1, result[n]);
                 }
 
                 // write the flag planes
                 //
-                resultFlagsOutputBand.writePixels(0, y, width, 1, resultFlags);
-                l1FlagsOutputBand.writePixels(0, y, width, 1, l1Flags);
+                _resultFlagsOutputBand.writePixels(0, y, width, 1, resultFlags);
+                _l1FlagsOutputBand.writePixels(0, y, width, 1, l1Flags);
 
                 pm.worked(1);
                 if (pm.isCanceled()) {
                     // 'Cancel' was pressed, processing will be terminated now !
                     // --> Completely remove output product
-                    outputProduct.getProductWriter().deleteOutput();
+                    _outputProduct.getProductWriter().deleteOutput();
                     // Immediately terminate now
                     return;
                 } // if
@@ -1246,15 +1240,10 @@ public class WaterProcessor extends Processor {
     } // processWater
 
     private TiePointGrid getTiePointGrid(String latGridName) throws ProcessorException {
-        TiePointGrid latGrid = inputProduct.getTiePointGrid(latGridName);
+        TiePointGrid latGrid = _inputProduct.getTiePointGrid(latGridName);
         checkParamNotNull(latGrid, latGridName);
         LOGGER.fine(SmacConstants.LOG_MSG_LOADED + latGridName);
         return latGrid;
-    }
-
-    static boolean isAcceptedInputType(String inputType) {
-        Matcher matcher = EnvisatConstants.MERIS_L1_TYPE_PATTERN.matcher(inputType);
-        return matcher.matches() || inputType.matches(ICOL_PATTERN);
     }
 
 } // Processor

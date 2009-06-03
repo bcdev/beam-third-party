@@ -15,17 +15,17 @@
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-core</artifactId>
-            <version>[4.5,4.5.999]</version>
+            <version>[4.6,4.6.999]</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-processing</artifactId>
-            <version>[4.5,4.5.999]</version>
+            <version>[4.6,4.6.999]</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-visat</artifactId>
-            <version>[4.5,4.5.999]</version>
+            <version>[4.6,4.6.999]</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -48,6 +48,15 @@
         </repository>
     </distributionManagement>
 
+    <!--
+    In version 3 of Maven the sourceEncoding property will be embedded in the
+    build tag. For now the convention is to that it as property.
+    TODO: Move the sourceEncoding property to the build tag if version 3 is released
+    -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -57,24 +66,22 @@
                     <target>1.6</target>
                     <debug>true</debug>
                     <fork>false</fork>
-                    <encoding>ISO-8859-1</encoding>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.bc.maven.plugins</groupId>
+                <artifactId>maven-javahelp-plugin</artifactId>
+                <version>1.0</version>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
-                        <configuration>
-                            <tasks>
-                                <property file="../build.properties"/>
-                                <property name="helpdir" value="${project.build.outputDirectory}/doc/help"/>
-                                <ant antfile="../build.xml" target="create-jh-search-db"/>
-                            </tasks>
-                        </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>javahelp-indexer</goal>
                         </goals>
                     </execution>
                 </executions>

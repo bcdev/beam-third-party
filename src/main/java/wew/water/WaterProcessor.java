@@ -59,7 +59,7 @@ public class WaterProcessor extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
-    public static final String PROCESSOR_VERSION = "1.2.2";        // PROCESS
+    public static final String PROCESSOR_VERSION = "1.2.3";        // PROCESS
     public static final String PROCESSOR_COPYRIGHT = "Copyright (C) 2005/7 by WeW (michael.schaale@wew.fu-berlin.de)";
 
     public static final String LOGGER_NAME = "beam.processor.water";
@@ -637,14 +637,14 @@ public class WaterProcessor extends Processor {
         //
         ProductUtils.copyTiePointGrids(_inputProduct, _outputProduct);
 
+        // copy L1b flag band
+        //
+        copyFlagBands(_inputProduct, _outputProduct);
+        _l1FlagsOutputBand = _outputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
         // copy geo-coding and the lat/lon tiepoints to the output product
         //
         ProductUtils.copyGeoCoding(_inputProduct, _outputProduct);
 
-        // copy L1b flag band
-        //
-        ProductUtils.copyFlagBands(_inputProduct, _outputProduct);
-        _l1FlagsOutputBand = _outputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
 
         // create and add the RESULT flags coding
         //

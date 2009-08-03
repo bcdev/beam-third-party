@@ -633,18 +633,16 @@ public class WaterProcessor extends Processor {
             }
         }
 
-        // copy all tie point grids to output product
-        //
+
         ProductUtils.copyTiePointGrids(_inputProduct, _outputProduct);
-
-        // copy L1b flag band
-        //
         copyFlagBands(_inputProduct, _outputProduct);
-        _l1FlagsOutputBand = _outputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
-        // copy geo-coding and the lat/lon tiepoints to the output product
-        //
-        ProductUtils.copyGeoCoding(_inputProduct, _outputProduct);
+        copyBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LATITUDE_BAND_NAME, _inputProduct, _outputProduct);
+        copyBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME, _inputProduct, _outputProduct);
+        copyBand(EnvisatConstants.MERIS_AMORGOS_L1B_ALTIUDE_BAND_NAME, _inputProduct, _outputProduct);
 
+        copyGeoCoding(_inputProduct, _outputProduct);
+
+        _l1FlagsOutputBand = _outputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
 
         // create and add the RESULT flags coding
         //

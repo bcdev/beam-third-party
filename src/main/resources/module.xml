@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2.301</version>
+    <version>1.2.3</version>
     <name>WeW Water Processor</name>
     <description>
         The WeW Water Processor calculates a
@@ -22,7 +22,7 @@
 
     <changelog>
         <![CDATA[
-        From 1.2.2 to 1.2.301<br/>
+        From 1.2.2 to 1.2.3<br/>
         [BEAM-1006] MER_FSG pixel geocoding not used<br/>
         From 1.2.1 to 1.2.2<br/>
         [BEAM-894] Adapt check for valid ICOL product type<br/>

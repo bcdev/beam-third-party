@@ -2,7 +2,7 @@
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-meris-veg</symbolicName>
     <name>MERIS Vegetation Processors</name>
-    <version>2.0.201</version>
+    <version>2.0.2</version>
 
     <description>
         This module contains the BAER, TOC-VEG and TOA-VEG processors for MERIS L1B products.
@@ -83,7 +83,7 @@
 Meris TOA-VEG Changelog<br>
 =========================================================<br>
 <br>
-    Changes in 1.1.201<br>
+    Changes in 1.1.2<br>
      * [BEAM-1006] MER_FSG pixel geocoding not used<br>
 <br>
     Changes in 1.1.1<br>

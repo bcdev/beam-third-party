@@ -434,8 +434,8 @@ public class TocVegProcessor extends Processor {
 
         // copy geocoding and flags
         // ------------------------
-        ProductUtils.copyGeoCoding(_inputProduct, _outputProduct);
-        ProductUtils.copyFlagBands(_inputProduct, _outputProduct);
+        copyFlagBands(_inputProduct, _outputProduct);
+        copyGeoCoding(_inputProduct, _outputProduct);
 
         // write the processing request as metadata
         copyRequestMetaData(_outputProduct);
@@ -454,6 +454,7 @@ public class TocVegProcessor extends Processor {
         // initialize the disk represenation
         // ---------------------------------
         writer.writeProductNodes(_outputProduct, new File(prod.getFilePath()));
+        copyBandData(getBandNamesToCopy(), _inputProduct, _outputProduct, ProgressMonitor.NULL);
     }
 
     /**

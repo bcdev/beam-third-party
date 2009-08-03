@@ -51,6 +51,7 @@ import org.esa.beam.processor.toa.utils.ToaVegProcessorConfigurationParser;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.ResourceInstaller;
 import org.esa.beam.util.io.FileUtils;
+import org.esa.beam.dataio.envisat.EnvisatConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -439,17 +440,18 @@ public class ToaVegProcessor extends Processor {
         writer = ProcessorUtils.createProductWriter(prod);
         _outputProduct.setProductWriter(writer);
 
-        // copy the tie point raster
+        // copy stuff from input to output
         // -------------------------
         ProductUtils.copyTiePointGrids(_inputProduct, _outputProduct);
-
-        // copy geocoding and flags
-        // ------------------------
-        ProductUtils.copyGeoCoding(_inputProduct, _outputProduct);
-        ProductUtils.copyFlagBands(_inputProduct, _outputProduct);
-
-        // write the processing request as metadata
         copyRequestMetaData(_outputProduct);
+        copyFlagBands(_inputProduct, _outputProduct);
+
+        // for MERIS FSG / FRG products
+        copyBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LATITUDE_BAND_NAME, _inputProduct, _outputProduct);
+        copyBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME, _inputProduct, _outputProduct);
+        copyBand(EnvisatConstants.MERIS_AMORGOS_L1B_ALTIUDE_BAND_NAME, _inputProduct, _outputProduct);
+
+        copyGeoCoding(_inputProduct, _outputProduct);
 
         // add the target bands
         // --------------------
@@ -466,6 +468,7 @@ public class ToaVegProcessor extends Processor {
         // initialize the disk represenation
         // ---------------------------------
         writer.writeProductNodes(_outputProduct, new File(prod.getFilePath()));
+        copyBandData(getBandNamesToCopy(), _inputProduct, _outputProduct, ProgressMonitor.NULL);
     }
 
     /**

@@ -545,21 +545,15 @@ public class BaerProcessor extends Processor {
         writer = ProcessorUtils.createProductWriter(prod);
         _outputProduct.setProductWriter(writer);
 
-        // flags stuff
-        _outputProduct.addFlagCoding(FlagsManager.getFlagCoding());
-        FlagsManager.addBitmaskDefsToProduct(_outputProduct);
-
-        // copy the tie point raster
+        // copy stuff from input to output
         // -------------------------
         ProductUtils.copyTiePointGrids(_inputProduct, _outputProduct);
-
-        // copy geocoding and flags
-        // ------------------------
-        ProductUtils.copyGeoCoding(_inputProduct, _outputProduct);
-        ProductUtils.copyFlagBands(_inputProduct, _outputProduct);
-
-        // write the processing request as metadata
         copyRequestMetaData(_outputProduct);
+        copyFlagBands(_inputProduct, _outputProduct);
+
+        copyGeoCoding(_inputProduct, _outputProduct);
+
+        FlagsManager.addBitmaskDefsToProduct(_outputProduct);
 
         // add the target bands
         // --------------------
@@ -571,6 +565,7 @@ public class BaerProcessor extends Processor {
         // initialize the disk represenation
         // ---------------------------------
         writer.writeProductNodes(_outputProduct, new File(prod.getFilePath()));
+        copyBandData(getBandNamesToCopy(), _inputProduct, _outputProduct, ProgressMonitor.NULL);
     }
 
     /**

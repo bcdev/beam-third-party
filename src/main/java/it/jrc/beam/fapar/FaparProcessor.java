@@ -52,7 +52,6 @@ import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
-import org.esa.beam.framework.datamodel.TiePointGeoCoding;
 import org.esa.beam.framework.datamodel.TiePointGrid;
 import org.esa.beam.framework.processor.Processor;
 import org.esa.beam.framework.processor.ProcessorConstants;
@@ -419,15 +418,9 @@ public class FaparProcessor extends Processor {
 
         copyGeoCoding(_inputProduct, _outputProduct);
 
-
-        // Get the flags and add some
-        FlagCoding outputFlags = _outputProduct.getFlagCoding(_flagName);
-        if (outputFlags == null) {
-            _logger.info("Flag Coding not found");
-            outputFlags = new FlagCoding("l2_flags");
-            _outputProduct.addFlagCoding(outputFlags);
-        }
-        outputFlags.setName("l2_flags");
+        // and add l2 flags
+        FlagCoding outputFlags = new FlagCoding("l2_flags");
+        _outputProduct.addFlagCoding(outputFlags);
 
         // Add MGVI flags
         outputFlags.addFlag("MGVI_BAD_DATA", 0x100, "Bad pixel flagged by MGVI processing");
@@ -544,10 +537,6 @@ public class FaparProcessor extends Processor {
         _flag.setScalingFactor(1.0);
         _flag.setDescription("Classification and quality flags");
 
-        // copy the angles tiepoints to the output product
-        // ------------------------------------------------
-        copyAnglesToOutput();
-
         // copy the metadata to the output product
         // ------------------------------------------------
         copyMetadataToOutput();
@@ -565,128 +554,8 @@ public class FaparProcessor extends Processor {
         // and initialize the disk representation
         // -------------------------------------
         writer.writeProductNodes(_outputProduct, new File(outputRef.getFilePath()));
-
+        copyBandData(getBandNamesToCopy(), _inputProduct, _outputProduct, ProgressMonitor.NULL);
         _logger.info("Created output product");
-
-    }
-
-    /**
-     * Copies the tiepoint grids for latitude and longitude and the geocoding information from the input product to the
-     * output product.
-     */
-    private void copyGeolocationToOutput() throws ProcessorException {
-
-        TiePointGrid latTiePoint = null;
-        TiePointGrid lonTiePoint = null;
-
-        // get the "latitude" tie point grid from the input product,
-        // create a new tiepoint grid by duplicating the one received
-        // and attach the new one to the output product
-        // --------------------------------------------------------
-        TiePointGrid srcTiePoint = _inputProduct.getTiePointGrid(_latTiePointName);
-        //if (srcTiePoint==null) throw new ProcessorException("Cannot load Tie Point grid "+_latTiePointName);
-        if (srcTiePoint != null) {
-            latTiePoint = new TiePointGrid(srcTiePoint.getName(),
-                                           srcTiePoint.getRasterWidth(),
-                                           srcTiePoint.getRasterHeight(),
-                                           srcTiePoint.getOffsetX(),
-                                           srcTiePoint.getOffsetY(),
-                                           srcTiePoint.getSubSamplingX(),
-                                           srcTiePoint.getSubSamplingY(),
-                                           srcTiePoint.getTiePoints());
-            latTiePoint.setDescription(srcTiePoint.getDescription());
-            _outputProduct.addTiePointGrid(latTiePoint);
-        }
-
-        // do the same for the longitude tiepoints
-        // ---------------------------------------
-        srcTiePoint = _inputProduct.getTiePointGrid(_lonTiePointName);
-        //if (srcTiePoint==null) throw new ProcessorException("Cannot load Tie Point grid "+_lonTiePointName);
-        if (srcTiePoint != null) {
-            lonTiePoint = new TiePointGrid(srcTiePoint.getName(),
-                                           srcTiePoint.getRasterWidth(),
-                                           srcTiePoint.getRasterHeight(),
-                                           srcTiePoint.getOffsetX(),
-                                           srcTiePoint.getOffsetY(),
-                                           srcTiePoint.getSubSamplingX(),
-                                           srcTiePoint.getSubSamplingY(),
-                                           srcTiePoint.getTiePoints());
-            lonTiePoint.setDescription(srcTiePoint.getDescription());
-            _outputProduct.addTiePointGrid(lonTiePoint);
-        }
-
-        // copy the geocoding from input to output. The geocoding
-        // tells the product which tiepoint grids define the geolocation
-        // -------------------------------------------------------------
-        if (latTiePoint != null && lonTiePoint != null) {
-            _outputProduct.setGeoCoding(new TiePointGeoCoding(latTiePoint, lonTiePoint));
-        }
-    }
-
-    /**
-     * Copies the tiepoint grids for the angles information from the input product to the
-     * output product.
-     * The Angle attibute Bands must be inizialized.
-     */
-    private void copyAnglesToOutput() throws ProcessorException {
-
-        if (_szaBand == null || _saaBand == null || _vzaBand == null || _vaaBand == null) {
-            throw new ProcessorException(
-                    "Can not copy Angles from input product to output product: attributes not initialized");
-        }
-        // get the "sun_zenith_angle" tie point grid from the input product,
-        // create a new tiepoint grid by duplicating the one received
-        // and attach the new one to the output product
-        // --------------------------------------------------------
-        TiePointGrid sunZenTiePoint = new TiePointGrid(_szaBand.getName(),
-                                                       _szaBand.getRasterWidth(),
-                                                       _szaBand.getRasterHeight(),
-                                                       _szaBand.getOffsetX(),
-                                                       _szaBand.getOffsetY(),
-                                                       _szaBand.getSubSamplingX(),
-                                                       _szaBand.getSubSamplingY(),
-                                                       _szaBand.getTiePoints());
-        sunZenTiePoint.setDescription(_szaBand.getDescription());
-        _outputProduct.addTiePointGrid(sunZenTiePoint);
-
-        // do the same for the sun azimuth tiepoints
-        // ---------------------------------------
-        TiePointGrid sunAziTiePoint = new TiePointGrid(_saaBand.getName(),
-                                                       _saaBand.getRasterWidth(),
-                                                       _saaBand.getRasterHeight(),
-                                                       _saaBand.getOffsetX(),
-                                                       _saaBand.getOffsetY(),
-                                                       _saaBand.getSubSamplingX(),
-                                                       _saaBand.getSubSamplingY(),
-                                                       _saaBand.getTiePoints());
-        sunAziTiePoint.setDescription(_saaBand.getDescription());
-        _outputProduct.addTiePointGrid(sunAziTiePoint);
-
-        // do the same for the view zenith tiepoints
-        // ---------------------------------------
-        TiePointGrid vwZenTiePoint = new TiePointGrid(_vzaBand.getName(),
-                                                      _vzaBand.getRasterWidth(),
-                                                      _vzaBand.getRasterHeight(),
-                                                      _vzaBand.getOffsetX(),
-                                                      _vzaBand.getOffsetY(),
-                                                      _vzaBand.getSubSamplingX(),
-                                                      _vzaBand.getSubSamplingY(),
-                                                      _vzaBand.getTiePoints());
-        vwZenTiePoint.setDescription(_vzaBand.getDescription());
-        _outputProduct.addTiePointGrid(vwZenTiePoint);
-
-        // do the same for the view azimuth tiepoints
-        // ---------------------------------------
-        TiePointGrid vwAziTiePoint = new TiePointGrid(_vaaBand.getName(),
-                                                      _vaaBand.getRasterWidth(),
-                                                      _vaaBand.getRasterHeight(),
-                                                      _vaaBand.getOffsetX(),
-                                                      _vaaBand.getOffsetY(),
-                                                      _vaaBand.getSubSamplingX(),
-                                                      _vaaBand.getSubSamplingY(),
-                                                      _vaaBand.getTiePoints());
-        vwAziTiePoint.setDescription(_vaaBand.getDescription());
-        _outputProduct.addTiePointGrid(vwAziTiePoint);
 
     }
 

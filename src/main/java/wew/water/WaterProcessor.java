@@ -708,6 +708,7 @@ public class WaterProcessor extends Processor {
         // Initialize the disk representation
         //
         writer.writeProductNodes(_outputProduct, new File(outputRef.getFilePath()));
+        copyBandData(getBandNamesToCopy(), _inputProduct, _outputProduct, ProgressMonitor.NULL);
 
         LOGGER.info("Output product successfully created");
     }

@@ -1,0 +1,132 @@
+<html>
+
+<head>
+    <title>IBAER Algorithm</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<table class="header" width="100%">
+    <tr class="header">
+        <td class="header">&nbsp;
+            IBAER Algorithm
+        </td>
+        <td class="header" align="right">
+           <a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h4>Algorithm Specification</h4>
+<p>
+The IBAER method (Integrated Bremen AErosol Retrieval) is an algorithm for remote sensing of aerosols from MERIS data over land.
+The algorithm has been developed to monitor the aerosol optical thickness (proportional to the aerosol total loading),
+over most of part of the continents. The aerosol information is used in a second step to perform atmospheric
+corrections, using either the SMAC processor on a pixel-by-pixel basis or the UBAC processor, to derive the remotely
+sensed surface reflectance over the land.
+</p>
+
+<p>The actual MERIS Level-2 product provides reflectance data with an incomplete atmospheric correction over 
+land. The atmospheric correction is made for Rayleigh scattering only and the variable aerosol influence is 
+not considered. Thus, an additional step of atmospheric correction for Level-2 data over land is required, 
+considering the effect of the atmospheric aerosol.
+</p>
+
+
+<p>For the retrieval of the AOT, the BAER method is used and modified for the use with MERIS Level-2 data. 
+The original approach has been developed to retrieve AOT over land from SeaWiFS Level-1 data. It determines the 
+spectral aerosol optical thickness (AOT) from nadir looking multi-wavelength radiometers. The method is based 
+on the determination of the aerosol reflectance over <i>dark surfaces</i>, using the UV and short-wave-VIS range 
+below the red-edge of the vegetation spectrum. This requires a proper separation of the variable surface 
+effects, other atmospheric effects and aerosol effect. 
+</p>
+
+<p>For Level-2 data over land, the variability of the vegetation cover and the kind of the vegetation will be 
+considered dynamically by means of a surface reflectance model tuned from the satellite scene self by the NDVI.
+The aerosol reflectance is obtained by removing the estimation of the surface effect. Three look-up-tables of
+the relationship between AOT - aerosol reflectance and the use of constraints enable the determination of the
+AOT for 7 MERIS channels in a spectral range of 0.412 - 0.670 &mu;m. AOT is extrapolated, using Angstr&oslash;m power
+law with parameters estimated from the retrieved AOT. Others terms of radiative transfer (aerosol reflectance, 
+total transmittance and hemispheric reflectance) are computed once the AOT known to correct the Top Of Aerosol
+reflectance from aerosol effect. 
+</p>
+
+<p>The look-up-tables choices are:
+<ul>
+	<li><b>LACE-98</b>: Experimental phase function of the LACE-98 closure experiment with increased lateral 
+	scattering. It is the average phase function of the period of 8.-10. August 1998, measured at Lindenberg 
+	observatory, south-easterly of Berlin. For these cases, non-spherical particle scattering had to be used, 
+	described by the semi-empirical scattering theory of Pollack and Cuzzi (1980). Single scattering albedo in
+    this case is set to &omega;<sub>0</sub> = 0.98. The asymmetry parameter g of the experimental phase function used is found 
+    as g = 0.55. The aerosol data of the LACE-98 experiment are presented in von Hoyningen-Huene et al. 
+    (2003).
+    </li>
+	<li><b>OPAC-CC</b>: Phase function of the <i>clean continental</i> model, obtained with OPAC 3.1 and a 
+	single scattering albedo, &omega;<sub>0</sub> = 0.975, resulting from the volume mixing ratio of the 
+	components of the <i>clean continental</i> aerosol model. The relative humidity was 0.8. The asymmetry 
+	parameter of the phase function was g = 0.68.
+	</li>	
+	<li><b>OPAC-AC</b>: Phase function of the <i>average continental</i> model, obtained with OPAC 3.1 
+	and the corresponding single scattering albedo &omega;<sub>0</sub> = 0.928. The asymmetry parameter 
+	was g = 0.70.
+	</li>
+</ul>
+
+<p>Once the aerosol optical thickness estimated, it is used as input of the atmospheric correction method 
+(either SMAC or UBAC) to perform the aerosol correction and to provide the surface reflectance in the 13 
+MERIS channels.
+<ul>
+	<li><b>SMAC</b>: This method is a parameterisation of radiative transfer based on the 6S model. 
+	If this case, the AOT at 550 nm (required in input) is estimated using the angstrom law from the first 
+	MERIS channel. 
+    </li>
+	<li><b>UBAC</b>:Surface reflectances are estimated directly by the processor and saved at the last 
+	iteration of the AOT retrieval scheme. 
+	</li>
+</ul>
+
+<p>BAER requires as input in addition to the measured top of aerosol reflectances in the 13 MERIS bands, 
+the sun and view zenith angles, the relative azimuth and the atmospheric pressure.
+</p>
+
+<h4>Assumptions</h4>
+
+<p>It is important to take on considerations that the retrieval of aerosol optical thickness is not 
+validated in case of heavy aerosol loading. The accuracy of the retrieval is also dependant on the 
+presence of sub pixel clouds inside the pixel, which tends to decrease the spectral dependence of the 
+aerosol optical thickness. These clouds are difficult to detect, particularly on the 1km MERIS Reduced 
+resolution data.
+</p>
+<p>Concerning the choice of the method used to correct atmospheric effects, it is important to remind that 
+the radiative transfer is not solved in the same way in UBAC and SMAC method. UBAC does not consider 
+the term of multiple scattering, which allows to take into account the environment effect in the 
+modelling. This can lead in the case of very bright grounds, a slight underestimation of the surface 
+reflectance.
+</p>
+<p>Both methods require as input the aerosol characterisation as prior information of the retrieval. 
+SMAC parameters available in IBAER processor have been optimised for continental aerosol type. And 
+UBAC requires the choice of the aerosol type through the choice of the Aerosol phase function Look-Up 
+Table in the interface panel. In cases of non continental or assimilated as continental aerosols like 
+the three available LUT, the retrieval can be biased. 
+</p>
+
+
+<h4>Limitations</h4>
+<p>
+<ol>
+	<li>In cases of high surface reflectances (sparse vegetation in arid regions, desert ground, 
+	bright bare soil, or snow), the retrieval of the aerosol optical thickness fails. It is not 
+	recommended to plly the IBAER over such a region.
+	</li>
+	<li>The surface reflectance is related in both methods to an isotropically reflecting flat 
+	Lambert surface. Effects of bi-directional anisotropy and surface tilt are not considered.
+	</li>
+</ol>
+
+
+<hr>
+</body>
+
+</html>

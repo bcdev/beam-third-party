@@ -1,0 +1,62 @@
+<html>
+<head>
+    <title>BAER Processor Overview</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<table class="header" width="100%">
+    <tr class="header">
+        <td class="header">&nbsp;
+            BAER Processor Overview
+        </td>
+        <td class="header" align="right">
+           <a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h4>Introduction</h4>
+
+<p>
+The purpose of the BAER processor is to implement Integrated BAER algorithm (IBAER) which estimates the surface reflectances 
+and two parameters that allow to characterise the aerosols contained in the atmosphere from MERIS Level-2 data.
+The processor is applicable to both, MERIS Level-2 full and reduced resolution data. </p>
+<p>The parameters derived by the algorithm and variables estimated are:</p>
+    <ul>
+        <li><b>The Aerosol Optical thickness</b> (&tau;),
+            which is defined as the integrated extinction coefficient over a 
+            vertical column of unit cross section</li>
+        <li><b>The Angstrom coefficient,</b> 
+             which is an exponent that expresses the spectral dependence of aerosol 
+             optical thickness (&tau;) with the wavelength of incident light (&lambda;). 
+             The spectral dependence of aerosol optical thickness can be approximated 
+             by, &tau;<sub>&alpha;</sub> = &beta; &lambda;<sup>&alpha;</sup> where &alpha; is the Angstrom exponent and
+             &beta; is the aerosol optical thickness at 1 &mu;m. 
+             The Angstrom exponent provides additional information on the particle size
+             (larger the exponent, the smaller the particle size), aerosol phase function and the 
+             relative magnitude of aerosol radiances at different wavelengths.</li>
+        <li><b>The surface reflectances</b> in the MERIS channels, except channels 11 and 15.</li>
+    </ul>
+
+<h4>References</h4> 
+<p><i>Von Hoyningen-Huene, W., Kokhanovsky, Burrows, J.P., Berthelot, B., Regner, P., Baret, F.</i> (2005) 
+   Aerosol optical thickness retrieval over land: The atmospheric correction based on MERIS L2 reflectance. Proc. of MERIS/AATSR Workshop 2005, 
+   ESA ESRIN 26.-30. Sept. 2005, ESA SP-597, Dec. 2005.</p>
+<p>Documentation provided for the BAER processor on the <a href="http://www.brockmann-consult.de/beam/plugins.html">BEAM plug-ins</a> page.</p>
+
+<h4>More Information</h4>
+<p>
+More information about the MERIS BAER processor implementation can be found in these chapters:
+<ol>
+    <li><a href="BaerAlgorithm.html">IBAER Algorithm</a></li>
+    <li><a href="BaerProcessor.html">BAER Processor</a></li>
+</ol>
+
+<hr>
+
+</body>
+
+</html>

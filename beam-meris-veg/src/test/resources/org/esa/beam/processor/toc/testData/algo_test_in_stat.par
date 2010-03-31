@@ -1,0 +1,14 @@
+# Auxiliary data file for the VEG processor
+#
+# This file contains the mean and the standard deviation of the input data of the training database
+
+version=2.0
+description=First test implementation
+theta_s_mean=41.491
+theta_s_std=11.712
+theta_v_mean=22.172
+theta_v_std=10.55
+cos_phi_mean=0.022895
+cos_phi_std=0.77433
+r_mean=0.19841
+r_std=0.16899

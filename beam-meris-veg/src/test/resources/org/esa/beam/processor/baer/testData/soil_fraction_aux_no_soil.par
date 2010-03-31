@@ -1,0 +1,6 @@
+# Auxiliary data file for the BEAR processor
+#
+# This file contains the soil fraction factor
+
+version=11.3
+description=Test No Soil fraction factor

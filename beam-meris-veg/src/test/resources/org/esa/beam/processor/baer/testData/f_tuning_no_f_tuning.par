@@ -1,0 +1,6 @@
+# Auxiliary data file for the BEAR processor
+#
+# This file contains the F tuning factor
+
+version=1.98
+description=test file with missing parameter

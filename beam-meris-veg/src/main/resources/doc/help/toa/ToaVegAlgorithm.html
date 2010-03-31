@@ -1,0 +1,94 @@
+<html>
+
+<head>
+    <title>TOA-VEG Algorithm</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<table class="header" width="100%">
+    <tr class="header">
+        <td class="header">&nbsp;
+            TOA-VEG Algorithm
+        </td>
+        <td class="header" align="right">
+           <a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h4>Algorithm Specification</h4>
+
+<p>The proposed algorithm called here TOA_VEG is based on the training of neural
+networks over a data base simulated using radiative transfer models (RTM, Figure 1).
+The SAIL, PROSPECT and SMAC are coupled and used to simulate the reflectance in the 13 MERIS
+bands considered (412 nm, 442 nm, 490 nm, 510 nm, 560 nm, 620 nm, 665 nm, 681.25 nm, 708.75 nm, 753.75 nm, 778.75 nm, 865 nm, 885 nm).
+The oxygen and water absorption bands have not been used because they would convey significant uncertainties
+associated while providing only marginal information on the surface. The background optical properties are
+simulated using a collection of soil, water and snow typical reflectance spectra. A brightness factor is
+used to provide additional flexibility of the background reflectance. Finally, to account for the medium
+resolution of MERIS observations, mixed pixels are simulated with variable fractions of pure background and
+pure vegetation.</p>
+
+<p>The simulation of the top of atmosphere reflectance in the 13 MERIS bands requires 15 input variables.
+They were drawn randomly according to an experimental plan aiming at getting a more evenly populated space of
+canopy realization. To provide more robust performances of the network, the distributions of each input
+variable was close to the actual distributions and, when possible. Realistic co-distributions were also used.
+This was achieved by considering a representative distribution of targets over the earth surface that
+constrains the observation geometry, as well as possible vegetation amount. A total number of 73 728 cases
+were simulated. Half of this data set was used for training, one quarter to evaluate hyper-specialization,
+and the last quarter to quantify the theoretical performances.</p>
+
+
+<p>Back-propagation neural networks were
+trained for each variable considered. The architecture was optimized, resulting in
+2 hidden layers of tangent-sigmoid neurones corresponding to a total around 300 coefficients to adjust,
+and providing a good ratio (50-100) with the size of the training data base.</p>
+<br>
+
+<p align="center"><img src="images/image009.gif"></p>
+<p align="center"><b>Figure 1: Overview of the TOA-VEG algorithm</b></p> <br>
+
+<p>The theoretical performances were evaluated over the test simulated
+data set (Figure 2 ). It allowed providing estimates of uncertainties. They are close to 0.06 (absolute value)
+for fAPAR and fCover, and close to 25% (relative value) for LAI and LAI.C<sub>ab</sub> that shows some loss of sensitivity
+for the larger values of LAI and LAI.C<sub>ab</sub> due to saturation effects.</p>
+<br>
+
+<p align="center"><img src="images/image004.gif"></p>
+<p align="center"><b>Figure 2: Density plots of a) <i>fAPAR</i>, b) <i>fCover</i>, c) <i>LAI</i>,
+d) <i>LAI.C<sub>ab</sub></i>, ANN estimates vs. the true values from the test database. <br>
+The corresponding values of the Root Mean Square Errors (RMSE) and determination coefficients (R) are provided.</b></p>
+<br>
+
+<h4>Algorithm Validation</h4>
+
+<p>Various validation exercises have been performed on both full and reduced resolution images.
+In particular, the algorithm has been validated over ground measurements (VALERI, MODLAND, BigFoot and CCRS data)
+and inter-compared over 26 sites during the whole year 2003 with other products (MODIS, CYCLOPES, ECOCLIMAP).
+The main results are the following:</p>
+
+<ul>
+<li>The temporal consistency between the MERIS TOA-VEG, MODIS, CYCLOPES and ECOCLIMAP products is very good and the vegetation cycle is well detected.</li>
+<li>The MERIS products show a relatively good agreement with the MODIS products for LAI below 2.0. Above LAI of 2.0, MODIS LAI is systematically higher than that of MERIS</li>
+<li>A better agreement is observed between CYCLOPES and MERIS products for all the cover types as compared to CYCLOPES and MODIS.</li>
+<li>Concerning the consistency between products, TOA_VEG shows a relatively strong relationship between LAI and fAPAR.</li>
+<li>Figure 3 shows the results that were obtained on the comparison with LAI ground measurements, providing a root mean square error of 0.85.</li>
+<li>The quality of the results is not guaranteed when solar zenith angle is larger 
+than 60° due to the limitations in representativity of the canopy radiative
+transfer model used for training the neural network.</li>
+</ul>
+
+<p align="center"><img src="images/image006.jpg"></p>
+<p align="center"><b>Figure 3: Validation on TOA_VEG LAI product over VALERI ground measurements.</b></p>
+<br>
+<p>The conclusions of this validation exercise is that the TOA-VEG products show quite good results but that
+LAI over 2.0 might be underestimated by the processor. For more information, please refer to the validation
+document.</p>
+
+<hr>
+</body>
+
+</html>

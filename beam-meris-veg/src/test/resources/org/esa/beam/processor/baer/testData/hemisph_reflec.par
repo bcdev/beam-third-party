@@ -1,0 +1,11 @@
+# Auxiliary data file for the BEAR processor
+#
+# This file contains coefficients for the hemispherical reflectance
+
+version=6.4
+description=another set of test coefficients
+crhem.0 = 0.0
+crhem.1 = 1.0
+crhem.2 = 2.0
+crhem.3 = 3.0
+crhem.4 = 4.0

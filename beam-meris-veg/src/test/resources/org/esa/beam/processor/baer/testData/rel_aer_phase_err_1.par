@@ -1,0 +1,9 @@
+# Auxiliray data file for the BEAR processor
+#
+# This file contains coeficients for the relative aerosol phase
+# function
+
+version=1.6
+description=Polynominal coeffs. for the rel. aerosol phase function (LACE-98)
+a.0=0.107555
+a.2=0.0000054726475

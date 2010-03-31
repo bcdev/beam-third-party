@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='ISO-8859-1'  ?>
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
+        "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+
+<toc version="2.0" categoryclosedimage="folder" categoryopenimage="folder" topicimage="doc">
+
+    <tocitem text="Data Processors">
+        <tocitem text="MERIS Vegetation Processors">
+            <tocitem text="MERIS TOA-VEG Processor" target="ToaVegOverview">
+                <tocitem text="Overview" target="ToaVegOverview"/>
+                <tocitem text="Algorithm Specification" target="ToaVegAlgorithm"/>
+                <tocitem text="Processor Description" target="ToaVegProcessor"/>
+            </tocitem>
+            <tocitem text="MERIS TOC-VEG Processor" target="TocVegOverview">
+                <tocitem text="Overview" target="TocVegOverview" />
+                <tocitem text="Algorithm Specification" target="TocVegAlgorithm" />
+                <tocitem text="Processor Description" target="TocVegProcessor" />
+            </tocitem>
+        </tocitem>
+        <tocitem text="MERIS BAER Processor" target="BaerOverview">
+            <tocitem text="Overview" target="BaerOverview" />
+            <tocitem text="Algorithm Specification" target="BaerAlgorithm" />
+            <tocitem text="Processor Description" target="BaerProcessor" />
+        </tocitem>
+
+    </tocitem>
+
+</toc>

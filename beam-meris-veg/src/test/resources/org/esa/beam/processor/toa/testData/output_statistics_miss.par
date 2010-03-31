@@ -1,0 +1,13 @@
+#
+# Auxiliary data file for the VEG processor
+#
+# This file contains the mean, standard deviation, minimum and maximum values
+# of the output of the training database
+
+version=6.5
+description=unit level test file missing parameters
+fAPAR_max    = 2.0
+fCover_max   = 4.0
+LAI_max      = 6.0
+LAIxCab_max  = 8.0
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<ToaVegConfig>
+    <Parameter name="input_statistics" value="input_statistics.par"/>
+    <Parameter name="output_statistics" value="output_statistics.par"/>
+    <Parameter name="uncertainty" value="uncertainty.par"/>
+    <Parameter name="nn_LAI" value="nn_LAI.nna" />
+    <Parameter name="nn_fCover" value="nn_fCover.nna" />
+    <Parameter name="nn_fAPAR" value="nn_fAPAR.nna" />
+    <Parameter name="nn_LAIxCab" value="nn_LAIxCab.nna" />
+</ToaVegConfig>

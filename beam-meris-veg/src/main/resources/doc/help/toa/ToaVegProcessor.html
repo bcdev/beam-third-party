@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <title>TOA-VEG Processor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<table class="header" width="100%">
+    <tr class="header">
+        <td class="header">&nbsp;
+            TOA-VEG Processor
+        </td>
+        <td class="header" align="right">
+           <a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h4>The User Interface of the TOA-VEG Processor</h4>
+
+<p align=center><img src="images/image007.jpg"></p>
+<p><ol type=1>
+ <li><b>Input product file</b>:
+     Select the input product file by either typing the product path into the text filed or by pressing the file selection button
+     <img src="images/image008.jpg"> to invoke a standard file dialog.</li>
+ <li><b>Output product file</b>:
+ Select the output product file by either typing the product path into the text filed or by pressing
+ the file selection button <img src="images/image008.jpg">to invoke a standard file dialog.</li>
+ <li><b>Output product format</b>:
+ Select one of the available output product formats. Currently BEAM-DIMAP, HDF5 and GEOTIFF format are available.</li>
+ <li><b>Bitmask</b>:
+ Select the flags you want to apply to the MERIS image before applying the TOA-VEG processor.</li>
+</ol>
+
+
+
+<h3>The TOA-VEG Processing Request File</h3>
+<p>
+    The following table describes the <a href="TOA-REQ.xml">TOA-VEG specific processing request file</a> parameter.
+    For a detailed description of the processing request file concept and file specification please
+    look at the <a href="../general.html#ProcessingRequestConcept">general
+    description section</a>.
+</p>
+
+<table>
+  <tr> 
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Type</th>
+    <th>Example Value</th>
+  </tr>
+  <tr> 
+    <td>type</td>
+    <td>Request type. Mandatory attribute of the <code>Request</code> element</td>
+    <td>String</td>
+    <td>"TOA_VEG_PROCESS"</td>
+  </tr>
+  <tr> 
+    <td>bitmask</td>
+    <td>Bitmask expression which evaluates to a Boolean value. Pixel is used for processing only if the bitmask evaluates to <code>true</code>.</td>
+    <td>String</td>
+    <td>"l1_flags.LAND_OCEAN"</td> 
+  </tr>
+</table>
+<br>
+
+
+<hr>
+</body>
+
+</html>

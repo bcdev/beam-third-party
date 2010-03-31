@@ -1,0 +1,7 @@
+# Auxiliary data file for the BAER processor
+#
+# This file contains the F tuning factor
+
+version=1.0
+description=F tuning factor for surface reflectance calculation
+f_tuning=1.0

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<AerLutList version="1.0" description="The first sketch of the format - data from Veronique">
+    <AerLut name="LACE-98_MER" bands="15">
+        <Band name="1">
+            <Parameter name="a.0" value="4.74719"/>
+            <Parameter name="a.1" value="8.00068"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="2">
+            <Parameter name="a.0" value="3.93426"/>
+            <Parameter name="a.1" value="7.63055"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="3">
+            <Parameter name="a.0" value="3.03926"/>
+            <Parameter name="a.1" value="7.45182"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="4">
+            <Parameter name="a.0" value="3.0053"/>
+            <Parameter name="a.1" value="7.08633"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="5">
+            <Parameter name="a.0" value="2.52684"/>
+            <Parameter name="a.1" value="7.2632"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="6">
+            <Parameter name="a.0" value="2.52684"/>
+            <Parameter name="a.1" value="7.2632"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="7">
+            <Parameter name="a.0" value="-0.80874"/>
+            <Parameter name="a.1" value="9.73192"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="13">
+            <Parameter name="a.0" value="-1.08751"/>
+            <Parameter name="a.1" value="9.93349"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+    </AerLut>
+
+    <AerLut name="LACE-98_VE" bands="15">
+        <Band name="1">
+            <Parameter name="a.0" value="0.38684"/>
+            <Parameter name="a.1" value="8.27231"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="2">
+            <Parameter name="a.0" value="-0.59778"/>
+            <Parameter name="a.1" value="7.94249"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="3">
+            <Parameter name="a.0" value="-0.21354"/>
+            <Parameter name="a.1" value="7.58766"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="4">
+            <Parameter name="a.0" value="0.03718"/>
+            <Parameter name="a.1" value="7.14438"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="5">
+            <Parameter name="a.0" value="-1.53111"/>
+            <Parameter name="a.1" value="7.36166"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="6">
+            <Parameter name="a.0" value="-3.83648"/>
+            <Parameter name="a.1" value="7.92626"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="7">
+            <Parameter name="a.0" value="-12.6448"/>
+            <Parameter name="a.1" value="10.067"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="13">
+            <Parameter name="a.0" value="-15.6883"/>
+            <Parameter name="a.1" value="10.4705"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+    </AerLut>
+
+    <AerLut name="DESERT" bands="15">
+        <Band name="1">
+            <Parameter name="a.0" value="-26.3297"/>
+            <Parameter name="a.1" value="21.8507"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="2">
+            <Parameter name="a.0" value="-33.1053"/>
+            <Parameter name="a.1" value="22.7264"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="3">
+            <Parameter name="a.0" value="-47.3754"/>
+            <Parameter name="a.1" value="25.2412"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="4">
+            <Parameter name="a.0" value="-59.5858"/>
+            <Parameter name="a.1" value="27.3133"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="5">
+            <Parameter name="a.0" value="-105.201"/>
+            <Parameter name="a.1" value="34.3876"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="6">
+            <Parameter name="a.0" value="-230.833"/>
+            <Parameter name="a.1" value="49.1206"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="7">
+            <Parameter name="a.0" value="-309.865"/>
+            <Parameter name="a.1" value="56.5919"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+        <Band name="13">
+            <Parameter name="a.0" value="-246.734"/>
+            <Parameter name="a.1" value="50.4165"/>
+            <Parameter name="a.2" value="0.0"/>
+        </Band>
+    </AerLut>
+</AerLutList>

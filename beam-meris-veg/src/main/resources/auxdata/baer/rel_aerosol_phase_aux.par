@@ -1,0 +1,10 @@
+# Auxiliray data file for the BAER processor
+#
+# This file contains coeficients for the relative aerosol phase
+# function
+
+version=1.0
+description=Polynominal coeffs. for the rel. aerosol phase function (LACE-98)
+a.0=0.0000054726475
+a.1=-0.001342602
+a.2=0.107555

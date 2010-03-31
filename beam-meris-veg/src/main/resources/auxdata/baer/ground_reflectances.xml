@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<GndReflList version="1.0" description="First test data">
+    <GndRefl name="CAMELEO" description="CAMELEO modified for MERIS" ground="VEG">
+        <Band index="1" reflec="0.0260"/>
+        <Band index="2" reflec="0.0320"/>
+        <Band index="3" reflec="0.0510"/>
+        <Band index="4" reflec="0.0580"/>
+        <Band index="5" reflec="0.0970"/>
+	<Band index="6" reflec="0.0800"/>
+        <Band index="7" reflec="0.0700"/>
+	<Band index="8" reflec="0.120"/>
+	<Band index="9" reflec="0.430"/>
+	<Band index="10" reflec="0.445"/>
+        <Band index="12" reflec="0.450"/>
+        <Band index="13" reflec="0.470"/>
+	<Band index="14" reflec="0.475"/>
+    </GndRefl>
+    <GndRefl name="CASI_2" description="CASI adapted to GOME level (MERIS)" ground="SOIL">
+        <Band index="1" reflec="0.043"/>
+        <Band index="2" reflec="0.049"/>
+        <Band index="3" reflec="0.063"/>
+        <Band index="4" reflec="0.075"/>
+        <Band index="5" reflec="0.140"/>
+	<Band index="6" reflec="0.200"/>
+        <Band index="7" reflec="0.220"/>
+	<Band index="8" reflec="0.233"/>
+	<Band index="9" reflec="0.255"/>
+	<Band index="10" reflec="0.275"/>
+        <Band index="12" reflec="0.285"/>
+        <Band index="13" reflec="0.310"/>
+	<Band index="14" reflec="0.320"/>
+    </GndRefl>
+    <GndRefl name="KARNIELI2" description="Desert Karnieli2" ground="SOIL">
+        <Band index="1" reflec="0.087"/>
+        <Band index="2" reflec="0.099"/>
+        <Band index="3" reflec="0.115"/>
+        <Band index="4" reflec="0.123"/>
+        <Band index="5" reflec="0.151"/>
+	<Band index="6" reflec="0.176"/>
+        <Band index="7" reflec="0.195"/>
+	<Band index="8" reflec="0.200"/>
+	<Band index="9" reflec="0.208"/>
+	<Band index="10" reflec="0.225"/>
+        <Band index="12" reflec="0.231"/>
+        <Band index="13" reflec="0.261"/>
+	<Band index="14" reflec="0.268"/>
+    </GndRefl></GndReflList>

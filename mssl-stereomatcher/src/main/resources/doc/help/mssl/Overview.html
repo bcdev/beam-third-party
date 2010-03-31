@@ -1,0 +1,58 @@
+<html>
+<head>
+    <title>Stereo-Photogrammetric ATSR Data Analysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+        Stereo-Photogrammetric ATSR Data Analysis</td>
+    <td class="header" align="right" vspace=3 hspace=3><img src="../images/BeamHeader.jpg" border=0></td>
+    </tr>
+</table>
+
+<h1>Overview</h1>
+
+<p>The mssl-stereomatcher extension module for BEAM can be used for the stereo-photogrammetric analysis of ATSR data.</p>
+<p>This module supports two application cases: the retrieval of geometric cloud-top height
+and the assessment of the co-registration error in ATSR data. The first utilizes the
+Mannstein camera model to translate parallax into height, while the second uses clear
+views of land as ground control points to determine the presence and size of any shift between
+the nadir and the forward view.</p>
+
+<a href="Operators.html"><h1>Operators</h1></a>
+
+<h1>Applications</h1>
+<p>This section describes the workflow for cloud-top height and co-registration shift retrieval.</p>
+<p>While the previous brief introduction to the operators gave only instructions for the interactive
+use, here also the use within the BEAM Graph Processing Framework GPF is described.
+The GPF is built upon the concept of a workflow of data through a directed, acyclic
+network of processing nodes driven by a desired target product. The BEAM GPT tool reads
+a graph in XML format which contains descriptions of nodes, implemented by the operators
+described above. The nodes are chained together by their respective source and target
+products.</p>
+<ul>
+<li><a href="CTPRetrieval.html">Photogrammetric Cloud Top Height Retrieval</a></li>
+<li><a href="CoRegistration.html">Co-Registration Shift Assessment</a></li>
+</ul>
+
+
+
+<h3>References</h3>
+<p>The scientific background to the functionality is covered following references:</p>
+<ul>
+  <li>Marie-Ange Denis, Jan-Peter Muller, and Hermann Mannstein. ATSR-2 camera models
+for the automated stereo photogrammetric retrieval of cloud-top heights: 
+Initial assessments. International Journal of Remote Sensing, 9:1939-1955, 2007.</li>
+  <li>Catherine Moroney, &Aacute;kos Horv&aacute;th, and Roger Davies. Use of stereo-matching to coregister
+multiangle data from MISR. IEEE Transactions On Geoscience And Remote Sensing, 40 (7):1541-1546, July 2002.</li>
+<li>J.-P. Muller, M.-A. Denis, R. D. Dundas, K. L. Mitchell, C. M. Naud, and H. Mannstein.
+Stereo cloud-top heights and cloud fraction retrieval from ATSR2. International Journal
+of Remote Sensing, 9:1921-1938, 2007.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE map
+        PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN"
+        "http://java.sun.com/products/javahelp/map_2_0.dtd">
+
+<map version="2.0">
+
+    <mapID target="stereoMatcher" url="mssl/Overview.html"/>
+    <mapID target="stereoOperators" url="mssl/Operators.html"/>
+    <mapID target="stereoCTP" url="mssl/CTPRetrieval.html"/>
+    <mapID target="stereoCoreg" url="mssl/CoRegistration.html"/>
+
+</map>

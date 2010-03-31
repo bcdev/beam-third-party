@@ -1,0 +1,79 @@
+<graph id="ImageCoregistration">
+    <version>1.0</version>
+	<node id="SunElevationDataFilter">
+		<operator>SunElevationDataFilter</operator>
+		<sources>
+			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
+		</sources>
+		<parameters>
+			<filterBandName>filter</filterBandName>
+			<noDataValue>0</noDataValue>
+			<inputBandName>btemp_nadir_1100</inputBandName>
+			<sunElevation>10.0</sunElevation>
+		</parameters>
+	</node>
+	<node id="Normalisation">
+		<operator>Normaliser</operator>
+		<sources>
+			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
+		</sources>
+		<parameters>
+			<referenceBandName>btemp_nadir_1100</referenceBandName>
+			<comparisonBandName>btemp_fward_1100</comparisonBandName>
+		</parameters>
+	</node>
+	<node id="StereoMatching">
+		<operator>M5StereoMatcher</operator>
+		<sources>
+			<source refid="Normalisation"/>
+			<filter refid="SunElevationDataFilter"/>
+		</sources>
+		<parameters>
+			<searchWindowMaxX>30</searchWindowMaxX>
+			<searchWindowMaxY>30</searchWindowMaxY>
+			<referenceBandName>referenceNormalised</referenceBandName>
+			<noDataValue>-999.0</noDataValue>
+			<searchWindowMinY>-20</searchWindowMinY>
+			<searchWindowMinX>-20</searchWindowMinX>
+			<comparisonBandName>comparisonNormalised</comparisonBandName>
+			<applyFilter>false</applyFilter>
+			<filterBandName>filter</filterBandName>
+		</parameters>
+	</node>
+	<node id="ExpectedDisparities">
+		<operator>ExpectedDisparities</operator>
+		<sources>
+			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
+		</sources>
+		<parameters>
+			<outputBandName>expectedDisparities</outputBandName>
+		</parameters>
+	</node>
+	<node id="ClearLandFilter">
+		<operator>ClearLandFilter</operator>
+		<sources>
+			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
+		</sources>
+		<parameters>
+			<filterBandName>filter</filterBandName>
+			<cloudyRadius>5</cloudyRadius>
+		</parameters>
+	</node>
+	<node id="ImageCoregistration">
+		<operator>ImageCoregistration</operator>
+		<sources>
+			<viewFilter refid="ClearLandFilter"/>
+			<disparities refid="StereoMatching"/>
+			<expectedDisparities refid="ExpectedDisparities"/>
+		</sources>
+		<parameters>
+			<yShiftBandName>yShift</yShiftBandName>
+			<noDataValue>-999</noDataValue>
+			<yDispBandName>YDisparities</yDispBandName>
+			<xDispBandName>XDisparities</xDispBandName>
+			<xShiftBandName>xShift</xShiftBandName>
+			<expectedDispBandName>expectedDisparities</expectedDispBandName>
+			<viewFilterBandName>filter</viewFilterBandName>
+		</parameters>
+	</node>
+</graph>

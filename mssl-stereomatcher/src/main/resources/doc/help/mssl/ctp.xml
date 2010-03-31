@@ -1,0 +1,56 @@
+<graph id="StereoMatcher">
+    <version>1.0</version>
+	<node id="SunElevationDataFilter">
+		<operator>SunElevationDataFilter</operator>
+		<sources>
+			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
+		</sources>
+		<parameters>
+			<filterBandName>filter</filterBandName>
+			<noDataValue>0</noDataValue>
+			<inputBandName>btemp_nadir_1100</inputBandName>
+			<sunElevation>10.0</sunElevation>
+		</parameters>
+	</node>
+	<node id="Normalisation">
+		<operator>Normaliser</operator>
+		<sources>
+			<atsrToaL1b>${atsrToaL1b}</atsrToaL1b>
+		</sources>
+		<parameters>
+			<referenceBandName>btemp_nadir_1100</referenceBandName>
+			<comparisonBandName>btemp_fward_1100</comparisonBandName>
+		</parameters>
+	</node>
+	<node id="StereoMatching">
+		<operator>M4StereoMatcher</operator>
+		<sources>
+			<source refid="Normalisation"/>
+			<filter refid="SunElevationDataFilter"/>
+		</sources>
+		<parameters>
+			<searchWindowMaxX>15</searchWindowMaxX>
+			<searchWindowMaxY>30</searchWindowMaxY>
+			<referenceBandName>referenceNormalised</referenceBandName>
+			<noDataValue>-999.0</noDataValue>
+			<searchWindowMinY>-30</searchWindowMinY>
+			<searchWindowMinX>-15</searchWindowMinX>
+			<comparisonBandName>comparisonNormalised</comparisonBandName>
+			<applyFilter>true</applyFilter>
+			<filterBandName>filter</filterBandName>
+		</parameters>
+	</node>
+	<node id="MannsteinModel">
+		<operator>MannsteinCameraModel</operator>
+		<sources>
+			<source refid="StereoMatching"/>
+		</sources>
+		<parameters>
+			<yDisparityBandName>YDisparities</yDisparityBandName>
+			<disparityOffset>-2</disparityOffset>
+			<maximumCloudHeight>20000.0</maximumCloudHeight>
+			<noDataValue>999.0</noDataValue>
+			<minimumCloudHeight>1000.0</minimumCloudHeight>
+		</parameters>
+	</node>
+</graph>

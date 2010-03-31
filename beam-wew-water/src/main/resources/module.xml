@@ -1,0 +1,79 @@
+<module>
+    <manifestVersion>1.0.0</manifestVersion>
+    <symbolicName>beam-wew-water</symbolicName>
+    <version>1.2.3</version>
+    <name>WeW Water Processor</name>
+    <description>
+        The WeW Water Processor calculates a
+        Level 2 water product from MERIS Level 1b and MERIS Level 1N (ICOL) data.
+    </description>
+
+    <vendor>Freie Universitaet Berlin (FUB)</vendor>
+    <contactAddress>
+        michael.schaale@wew.fu-berlin.de /
+        Department of Earth Sciences /
+        Institute for Space Sciences /
+        Carl-Heinrich-Becker-Weg 6-10 /
+        D-12165 Berlin
+    </contactAddress>
+    <url>http://www.userpage.fu-berlin.de/~geoiss/en/home.html</url>
+    <copyright>Copyright (C) 2005/7 by WeW</copyright>
+    <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
+
+    <changelog>
+        <![CDATA[
+        From 1.2.2 to 1.2.3<br/>
+        [BEAM-1006] MER_FSG pixel geocoding not used<br/>
+        From 1.2.1 to 1.2.2<br/>
+        [BEAM-894] Adapt check for valid ICOL product type<br/>
+        From 1.2 to 1.2.1<br/>
+        [BEAM-886] Meris L1N data products are not accepted<br/>
+        <br/>
+        From 1.1 to 1.2<br/>
+        [BEAM-877] Improve compatibility with icol products<br/>
+        <br/>
+        From 1.0 to 1.1<br/>
+        [BEAM-668] Port FUB WeW Water Processor.<br/>
+        [BEAM-669] Improve performance of FUB/WeW Water Processor.<br/>
+        <br/>
+        ]]>
+    </changelog>
+
+    <dependency>
+        <module>beam-core</module>
+    </dependency>
+    <dependency>
+        <module>beam-ui</module>
+    </dependency>
+    <dependency>
+        <module>beam-meris-smac</module>
+    </dependency>
+    <dependency>
+        <module>beam-processing</module>
+        <version>4.6.2</version>
+    </dependency>
+    <dependency>
+        <module>beam-visat</module>
+        <optional>true</optional>
+    </dependency>
+    <dependency>
+        <module>beam-envisat-reader</module>
+        <version>1.3.1</version>
+    </dependency>
+
+    <categories>Visat,Processor,Water,Case 2</categories>
+
+    <extension point="beam-ui:actions">
+        <action>
+            <id>WATERProcessorPlugIn</id>
+            <class>org.esa.beam.visat.actions.ProcessorAction</class>
+            <processor>wew.water.WaterProcessor</processor>
+            <text>FUB/WeW WATER Processor (MERIS)...</text>
+            <shortDescr>Invoke the FUB/WeW WATER Processor Plugin.</shortDescr>
+            <mnemonic>X</mnemonic>
+            <parent>tools</parent>
+            <helpID>WATERProcessorPlugIn</helpID>
+        </action>
+    </extension>
+
+</module>

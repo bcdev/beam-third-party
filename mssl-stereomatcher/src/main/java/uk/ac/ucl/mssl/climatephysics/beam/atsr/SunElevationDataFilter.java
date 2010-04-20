@@ -1,6 +1,8 @@
 package uk.ac.ucl.mssl.climatephysics.beam.atsr;
 
 
+import com.bc.ceres.core.ProgressMonitor;
+import com.bc.ceres.core.SubProgressMonitor;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
@@ -14,16 +16,12 @@ import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
-import org.esa.beam.framework.gpf.internal.OperatorImage;
 import org.esa.beam.framework.gpf.internal.TileImpl;
 import org.esa.beam.util.ProductUtils;
 
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
-
-import com.bc.ceres.core.ProgressMonitor;
-import com.bc.ceres.core.SubProgressMonitor;
 
 @OperatorMetadata(alias="SunElevationDataFilter", 
                   description="Filters input data based on sun elevation")
@@ -87,7 +85,7 @@ public class SunElevationDataFilter extends Operator {
             Tile sunElevationTile = getSourceTile(sunElevationBand, targetRect, SubProgressMonitor.create(pm, 4));
             Tile validTile = null;
             if (referenceBand.isValidMaskUsed()) {
-                validTile = getValidTile(referenceBand, targetRect, SubProgressMonitor.create(pm, 4));
+                validTile = getValidTile(referenceBand, targetRect);
             }
 
             for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
@@ -111,23 +109,18 @@ public class SunElevationDataFilter extends Operator {
             pm.done();
         }
 	}
-	
-	private Tile getValidTile(RasterDataNode rasterDataNode, Rectangle rectangle, ProgressMonitor pm) throws OperatorException {
-	    RenderedImage image = rasterDataNode.getValidMaskImage();
-        ProgressMonitor oldPm = OperatorImage.setProgressMonitor(image, pm);
-        try {
-            /////////////////////////////////////////////////////////////////////
-            //
-            // Note: GPF pull-processing is triggered here!
-            //
-            Raster awtRaster = image.getData(rectangle); // Note: copyData is NOT faster!
-            //
-            /////////////////////////////////////////////////////////////////////
-            return new TileImpl(rasterDataNode, awtRaster);
-        } finally {
-            OperatorImage.setProgressMonitor(image, oldPm);
-        }
-	}
+
+    private Tile getValidTile(RasterDataNode rasterDataNode, Rectangle rectangle) throws OperatorException {
+        RenderedImage image = rasterDataNode.getValidMaskImage();
+        /////////////////////////////////////////////////////////////////////
+        //
+        // Note: GPF pull-processing is triggered here!
+        //
+        Raster awtRaster = image.getData(rectangle); // Note: copyData is NOT faster!
+        //
+        /////////////////////////////////////////////////////////////////////
+        return new TileImpl(rasterDataNode, awtRaster);
+    }
 
 	public static class Spi extends OperatorSpi {
 		public Spi() {

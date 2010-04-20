@@ -2,7 +2,6 @@ package uk.ac.ucl.mssl.climatephysics.stereomatcher;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import uk.ac.ucl.mssl.climatephysics.stereomatcher.MannsteinATSRCameraModel;
 
 public class MannsteinATSRCameraModelTest extends TestCase {
 	public void testAngularDistances(){

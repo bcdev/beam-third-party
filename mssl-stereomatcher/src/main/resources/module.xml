@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>mssl-stereomatcher</symbolicName>
-    <version>0.9.1</version>
+    <version>0.9.2</version>
     <name>ATSR Cloud Stereo Matcher</name>
     <description>
       This module can be used for the stereo-photogrammetric analysis of ATSR data.
@@ -16,6 +16,8 @@
     
     <changelog>
         <![CDATA[
+        Changes in version 0.9.2:<br/>
+        - Ported to BEAM-4.7.1 API<br/>
         Changes in version 0.9.1:<br/>
         - Ported to BEAM-4.6 API<br/>
         Changes in version 0.9:<br/>

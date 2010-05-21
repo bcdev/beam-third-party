@@ -6,6 +6,7 @@ import com.bc.jexp.Term;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.dataio.ProductWriter;
 import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.framework.datamodel.Product;
@@ -728,9 +729,12 @@ public class BaerProcessor extends Processor {
         _out_cloud_band.setDescription(BaerConstants.CLOUD_BAND_DESCRIPTION);
         _outputProduct.addBand(_out_cloud_band);
 
+        final FlagCoding fc = FlagsManager.getFlagCoding();
+        _outputProduct.getFlagCodingGroup().add(fc);
+
         _out_flags_band = new Band(BaerConstants.OUT_FLAGS_BAND_NAME, ProductData.TYPE_UINT16, width, height);
         _out_flags_band.setDescription(BaerConstants.OUT_FLAGS_BAND_DESCRIPTION);
-        _out_flags_band.setFlagCoding(FlagsManager.getFlagCoding());
+        _out_flags_band.setSampleCoding(fc);
         _outputProduct.addBand(_out_flags_band);
     }
 

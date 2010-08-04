@@ -9,7 +9,7 @@
         The first utilises the Mannstein camera model to translate parallax into height, while the second uses clear
         views of land as ground control points to determine the presence and size of any shift between the nadir and the forward view.
 
-        The documentation: <a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/mssl-stereomatcher-0.9.1/docs/mssl-stereomatcher.pdf">User Manual</a>
+        The documentation: <a href="http://github.com/downloads/bcdev/beam-third-party/mssl-stereomatcher.pdf">User Manual</a>
         ]]>
     </description>
     <categories>Application,Processor</categories>

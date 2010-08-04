@@ -11,8 +11,8 @@
 
         <p>Documentation:</p>
         <ul>
-            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/jrc-fapar-2.1.1/docs/Readme_MGVI_Beam.txt">README</a></li>
-            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/jrc-fapar-2.1.1/docs/atbd_mgvi_jrc.pdf">ATBD</a></li>
+            <li><a href="http://github.com/downloads/bcdev/beam-third-party/readme_MGVI_BEAM.txt">README</a></li>
+            <li><a href="http://github.com/downloads/bcdev/beam-third-party/atbd_mgvi_jrc.pdf">ATBD</a></li>
         </ul>
         ]]>
     </description>

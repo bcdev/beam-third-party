@@ -10,10 +10,10 @@
 
         <p>Documentation:</p>
         <ul>
-            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/Readme_FUB-WeW-Water_Beam.txt">README</a></li>
-            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/ATMCORR_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Atmospheric correction algorithm for MERIS above case-2 waters</a></li>
-            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/BEAM_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Retrieval of atmospheric and oceanic properties from MERIS measurements</a></li>
-            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/Kratzer_et_al_in_press_2007.pdf">Article in Science Direct: Using MERIS full resolution data to monitor coastal waters</a></li>
+            <li><a href="http://github.com/downloads/bcdev/beam-third-party/README.txt">README</a></li>
+            <li><a href="http://github.com/downloads/bcdev/beam-third-party/ATMCORR_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Atmospheric correction algorithm for MERIS above case-2 waters</a></li>
+            <li><a href="http://github.com/downloads/bcdev/beam-third-party/BEAM_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Retrieval of atmospheric and oceanic properties from MERIS measurements</a></li>
+            <li><a href="http://github.com/downloads/bcdev/beam-third-party/Kratzer_et_al_in_press_2007.pdf">Article in Science Direct: Using MERIS full resolution data to monitor coastal waters</a></li>
         </ul>            
         ]]>
     </description>

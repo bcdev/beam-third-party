@@ -5,7 +5,16 @@
     <name>FAPAR Processor</name>
 
     <description>
-        This processor computes the FAPAR value (MGVI) from MERIS Level 1b products and/or Amorgos output.
+        <![CDATA[
+        <p>A VISAT plug-in and stand-alone processor which computes the Fraction of Absorbed Photosynthetically
+        Active Radiation (FAPAR) for MERIS Level-1b data.</p>
+
+        <p>Documentation:</p>
+        <ul>
+            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/jrc-fapar-2.1.1/docs/Readme_MGVI_Beam.txt">README</a></li>
+            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/jrc-fapar-2.1.1/docs/atbd_mgvi_jrc.pdf">ATBD</a></li>
+        </ul>
+        ]]>
     </description>
 
     <vendor>Institute for Environment and Sustainability</vendor>

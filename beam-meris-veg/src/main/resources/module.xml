@@ -5,7 +5,24 @@
     <version>2.0.4</version>
 
     <description>
-        This module contains the BAER, TOC-VEG and TOA-VEG processors for MERIS L1B products.
+        <![CDATA[
+        <p>A set of three VISAT plug-ins and stand-alone processors:</p>
+
+        <ul>
+            <li>BAER - computes the Aerosol Optical Thickness, the Angstrom coefficient and generates atmospherically corrected reflectances in 13 channels over land from MERIS Level-2 data</li>
+            <li>TOA-VEG - computes the Fraction of Absorbed Photosynthetically Active Radiation (FAPAR), the fCover, the LAI and the LAI chlorophyll content product from MERIS Level-1b data</li>
+            <li>TOC-VEG - computes the Fraction of Absorbed Photosynthetically Active Radiation (FAPAR), the fCover, the LAI and the LAI chlorophyll content product from MERIS Level-2 data</li>
+        </ul>
+
+        <p>Documentation:</p>
+        <ul>
+            <li>BEAR: <a href="http://www.brockmann-consult.de/beam/software/plugins/baer-1.0.0/baer-readme.txt">README</a><a href="http://www.brockmann-consult.de/beam/software/plugins/baer-1.0.0/BAER_ATBD_NOV-3160-NT-2703_v2.0.pdf">ATBD</a><a href="http://www.brockmann-consult.de/beam/software/plugins/baer-1.0.0/BAER_Val_Report_NOV-3341-NT-3284_v1.1.pdf">Validation Report</a></li>
+            <li>TOA: <a href="http://www.brockmann-consult.de/beam/software/plugins/toaveg-1.1.0/toaveg-readme.txt">README</a><a href="http://www.brockmann-consult.de/beam/software/plugins/toaveg-1.1.0/MERIS_ATBD_TOA_VEG_03_06.pdf">ATBD</a><a href="http://www.brockmann-consult.de/beam/software/plugins/toaveg-1.1.0/Valid_MERIS_TOA_VEG_03_06.pdf">Validation Report</a></li>
+            <li>TOC: <a href="http://www.brockmann-consult.de/beam/software/plugins/tocveg-0.6.0/tocveg-readme.txt">README</a><a href="http://www.brockmann-consult.de/beam/software/plugins/tocveg-0.6.0/MERIS_ATBD_TOC_VEG_03_06.pdf">ATBD</a><a href="http://www.brockmann-consult.de/beam/software/plugins/tocveg-0.6.0/Valid_MERIS_TOC_VEG_03_06_V2.pdf">Validation Report</a></li>
+        </ul>
+
+        <p>Authors: F. Baret of INRA, Wolfgang v. Hoyningen Huene of Uni Bremen, C. Castillon of Noveltis</p>
+        ]]>
     </description>
     
     <vendor>Noveltis</vendor>

@@ -4,8 +4,18 @@
     <version>1.2.5</version>
     <name>WeW Water Processor</name>
     <description>
-        The WeW Water Processor calculates a
-        Level 2 water product from MERIS Level 1b and MERIS Level 1N (ICOL) data.
+        <![CDATA[
+        <p>A VISAT plug-in and stand-alone processor which makes use of MERIS Level-1b TOA radiances in the bands 1-7,
+        9-10 and 12-14 in order to retrieve case II water properties and atmospheric properties above case II waters.</p>
+
+        <p>Documentation:</p>
+        <ul>
+            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/Readme_FUB-WeW-Water_Beam.txt">README</a></li>
+            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/ATMCORR_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Atmospheric correction algorithm for MERIS above case-2 waters</a></li>
+            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/BEAM_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Retrieval of atmospheric and oceanic properties from MERIS measurements</a></li>
+            <li><a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/beam-wew-water-1.2.2/docs/Kratzer_et_al_in_press_2007.pdf">Article in Science Direct: Using MERIS full resolution data to monitor coastal waters</a></li>
+        </ul>            
+        ]]>
     </description>
 
     <vendor>Freie Universitaet Berlin (FUB)</vendor>

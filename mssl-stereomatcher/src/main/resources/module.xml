@@ -4,7 +4,13 @@
     <version>0.9.3</version>
     <name>ATSR Cloud Stereo Matcher</name>
     <description>
-      This module can be used for the stereo-photogrammetric analysis of ATSR data.
+        <![CDATA[
+        For the retrieval of geometric cloud-top height and the assessment of the co-registration error in ATSR data.
+        The first utilises the Mannstein camera model to translate parallax into height, while the second uses clear
+        views of land as ground control points to determine the presence and size of any shift between the nadir and the forward view.
+
+        The documentation: <a href="http://www.brockmann-consult.de/beam/software/repositories/4.6/mssl-stereomatcher-0.9.1/docs/mssl-stereomatcher.pdf">User Manual</a>
+        ]]>
     </description>
     <categories>Application,Processor</categories>
     

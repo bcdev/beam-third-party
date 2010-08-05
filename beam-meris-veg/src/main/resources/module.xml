@@ -16,7 +16,7 @@
 
         <p>Documentation:</p>
         <ul>
-            <li>BEAR: <a href="http://github.com/downloads/bcdev/beam-third-party/baer-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/BAER_ATBD_NOV-3160-NT-2703_v2.0.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/BAER_Val_Report_NOV-3341-NT-3284_v1.1.pdf">Validation Report</a></li>
+            <li>BAER: <a href="http://github.com/downloads/bcdev/beam-third-party/baer-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/BAER_ATBD_NOV-3160-NT-2703_v2.0.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/BAER_Val_Report_NOV-3341-NT-3284_v1.1.pdf">Validation Report</a></li>
             <li>TOA: <a href="http://github.com/downloads/bcdev/beam-third-party/toaveg-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/MERIS_ATBD_TOA_VEG_03_06.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/Valid_MERIS_TOA_VEG_03_06.pdf">Validation Report</a></li>
             <li>TOC: <a href="http://github.com/downloads/bcdev/beam-third-party/tocveg-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/MERIS_ATBD_TOC_VEG_03_06.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/Valid_MERIS_TOC_VEG_03_06_V2.pdf">Validation Report</a></li>
         </ul>

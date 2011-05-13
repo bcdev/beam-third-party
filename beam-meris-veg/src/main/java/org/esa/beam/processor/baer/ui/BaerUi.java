@@ -431,7 +431,7 @@ public class BaerUi extends AbstractProcessorUI implements ParamChangeListener {
         final File file = (File) _paramGroup.getParameter(DefaultRequestElementFactory.INPUT_PRODUCT_PARAM_NAME).getValue();
         Product inProduct = null;
         try {
-            inProduct = ProductIO.readProduct(file, null);
+            inProduct = ProductIO.readProduct(file);
         } catch (IOException e) {
             Debug.trace(e);
         }
@@ -492,7 +492,7 @@ public class BaerUi extends AbstractProcessorUI implements ParamChangeListener {
             if (file != null && file.exists()) {
                 Product inProduct = null;
                 try {
-                    inProduct = ProductIO.readProduct(file, null);
+                    inProduct = ProductIO.readProduct(file);
                 } catch (IOException i) {
                     Debug.trace(i);
                 }

@@ -555,7 +555,7 @@ public class WaterProcessorUI implements ProcessorUI {
         }
         String msg = null;
         try {
-            Product product = ProductIO.readProduct(file, null);
+            Product product = ProductIO.readProduct(file);
             if (product != null) {
                 /*
                     final String lowBandName = WaterProcessor.LOWER_INPUT_BAND_NAME;

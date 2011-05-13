@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <name>WeW Water Processor</name>
     <description>
         <![CDATA[
@@ -32,8 +32,12 @@
 
     <changelog>
         <![CDATA[
+        From 1.2.5 to 1.2.6<br/>
+        Adapted to BEAM 4.8<br/>
+        From 1.2.4 to 1.2.5<br/>
+        Adapted to BEAM 4.8<br/>
         From 1.2.3 to 1.2.4<br/>
-        Adopted to BEAM 4.7.1<br/>
+        Adapted to BEAM 4.7.1<br/>
         From 1.2.2 to 1.2.3<br/>
         [BEAM-1006] MER_FSG pixel geocoding not used<br/>
         From 1.2.1 to 1.2.2<br/>

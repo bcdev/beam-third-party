@@ -459,7 +459,7 @@ public class ToaVegProcessor extends Processor {
 
         // flags stuff
 
-        _outputProduct.addFlagCoding(VegFlagsManager.getCoding(ToaVegConstants.VEG_FLAGS_BAND_NAME));
+        _outputProduct.getFlagCodingGroup().add(VegFlagsManager.getCoding(ToaVegConstants.VEG_FLAGS_BAND_NAME));
         VegFlagsManager.addBitmaskDefsToProduct(_outputProduct,ToaVegConstants.VEG_FLAGS_BAND_NAME);
 
         // add the metadata
@@ -572,7 +572,7 @@ public class ToaVegProcessor extends Processor {
 
         _veg_flags_band = new Band(ToaVegConstants.VEG_FLAGS_BAND_NAME, ProductData.TYPE_UINT16, width, height);
         _veg_flags_band.setDescription(ToaVegConstants.VEG_FLAGS_BAND_DESCRIPTION);
-        _veg_flags_band.setFlagCoding(VegFlagsManager.getCoding(ToaVegConstants.VEG_FLAGS_BAND_NAME));
+        _veg_flags_band.setSampleCoding(VegFlagsManager.getCoding(ToaVegConstants.VEG_FLAGS_BAND_NAME));
         _outputProduct.addBand(_veg_flags_band);
     }
 

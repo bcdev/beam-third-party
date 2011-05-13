@@ -1,19 +1,23 @@
-File name:		readme_MGVI_BEAM.txt
-Authors:		Ophelie Aussedat and Nadine Gobron
-Affiliation:		Institute for Environment and Sustainability
-			Joint Research Centre
-			Via Enrico Fermi, 1
-			I-21020 Ispra (VA), Italy
-E-mails:		Ophelie.Aussedat@jrc.it
-			Nadine.Gobron@jrc.it
+File name:	Readme_MGVI_BEAM.txt
 
-Web Site:		http://fapar.jrc.it
+Authors:	Ophelie Aussedat and Nadine Gobron
+
+Affiliation:	Institute for Environment and Sustainability
+           	Joint Research Centre
+		Via Enrico Fermi, 1
+		I-21020 Ispra (VA), Italy
+
+E-mails:	Ophelie.Aussedat@jrc.ec.europa.eu
+		Nadine.Gobron@jrc.ec.europa.eu
+
+Web Site:	http://fapar.jrc.ec.europa.eu
 
 
 Document title:	Documentation of the FAPAR Processor, a plug-in for MERIS/(A)ATSR Toolbox (BEAM)
 
 Release date : 
 
+	version 2.2 : December 2010
 	version 2.1 : December 2007
 	version 2.0 : 11 April 2005
 	version 1.0 : 4 October 2004
@@ -34,7 +38,7 @@ The BEAM software includes an application programming interface (API) and a set 
 
 http://www.brockmann-consult.de/beam/downloads.html
 
-WARNING: FAPAR processor version 2.1 needs BEAM VISAT Version 4.0 or more while the version 1.0 can be run under previous BEAM releases.
+!!!!!  WARNING: FAPAR processor version 2.1 needs BEAM VISAT Version 4.0 or more while the version 1.0 can be run under previous BEAM releases.
 
 Installation
 ------------
@@ -93,17 +97,27 @@ This help directory must be copied into $BEAM_DIR$/extensions. The help can then
 Changelog
 ---------
 
+Changes from version 2.1 to 2.2
+- Necessary code modifications in order to make to output product more compliant with "official" MERIS Level 2 products. This has required the following changes:
+  - The raw datatype of the FAPAR band has been set from uint16 to uint8
+  - Parameters "no-data value" and "valid pixel expression" of the FAPAR band have been set
+  - Scaling factor of the FAPAR band has been set from 1/250 to 1/254
+  - Scaling offset of the FAPAR band has been set to -1/254
+  - Marked "cloud over land" pixels not detected through MGVI processing.
+  - Computed anysotropic normalization and atmospheric rectification on pixels corresponding to bright surfaces.
+  - The maximum value of one of the parameters determining whether a pixel corresponds to a bright surface has been set from 1.25\rho_{681} to 1.3\rho_{681}.  
+
+Changes from version 2.0 to 2.1
+
+- Necessary code modifications and file additions (module.xml) to accomodate the structure of Beam 4.1. This version CANNOT be used on earlier versions of BEAM-VISAT.
+- The processor can work either with plain MERIS data or with AMORGOS data output, carrying the extra bands CorrectedLatitude and CorrectedLongitude. 
+
 Changes from version 1.0 to version 2.0:
 
 - Fapar Processor 2.0 can write the output in HDF5 as well as BEAM-DIMAP
 - A Help directory is provided that enable the user to find more information about the processor directly from BEAM VISAT Help menu.
 - Output bands reflectances and rectified reflectances are set as sprectal bands and can be viewed using the spectrum tool. Bands can be viewed all together but it is also possible to view only some bands by selecting them in the spectrum tool.
 - Fapar Processor 2.0 uses the processor API as of BEAM 3.1 and thus can not be run with BEAM VISAT previous versions
-
-Changes from version 2.0 to 2.1
-
-- Necessary code modifications and file additions (module.xml) to accomodate the structure of Beam 4.1. This version CANNOT be used on earlier versions of BEAM-VISAT.
-- The processor can work either with plain MERIS data or with AMORGOS data output, carrying the extra bands CorrectedLatitude and CorrectedLongitude. 
 
 Warranties and copyright information
 ------------------------------------
@@ -118,9 +132,25 @@ The copyright on this file and the associated software remains with the Joint Re
 Last References:
 ---------------
 
-Gobron, N., O. Aussedat, B. Pinty, M. Taberner and M.M. Verstraete (2004),'Medium Resolution Imaging Spectrometer (MERIS) Level 2 Land Products Algorithm Theoretical Basis Document Revision 3.0,EUR Report No. 21387 EN.
 
-Gobron, N. M. Taberner, B. Pinty, F. Melin, M.M. Verstraete and J.-L. Widlowski (2003) 'Evaluation of the MERIS Global Vegetation Index: Methodology and Initial Results', Proceedings of the MERIS and ATSR Calibration and Geophysical Validation (MAVT), Frascati, Italy, 20-23 October, 2003, European Space Agency SP 541.
-
-Gobron, N. , F. Mélin, B. Pinty, M. Taberner and M. M. Verstraete (2003) 'MERIS Global Vegetation Index: Evaluation and Performance', Proceedings of the MERIS User Workshop, Frascati, Italy, 10-14 November, European Space Agency SP 549.
+[1] Gobron, N., Pinty, B., Aussedat, O., Taberner, M., Faber, O., Mélin, F., Lavergne, T., Robustelli, M., Snoeij, P. (2008)
+    Uncertainty Estimates for the FAPAR Operational Products Derived from MERIS - Impact of Top-of-Atmosphere Radiance Uncertainties and Validation with Field Data.
+    Remote Sensing of Environment, 112(4):1871–1883.
+    Special issue: Remote Sensing Data Assimilation. Edited by Loew, A.
+    DOI: 10.1016/j.rse.2007.09.011
+    
+[2] Gobron, N., Mélin, F., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+    MERIS Global Vegetation Index: Evaluation and Performance.
+    In: Proceedings of the MERIS User Workshop. 10-14 November 2003, Frascati, Italy, volume 549 of ESA Special Publication, European Space Agency.
+    Online: http://envisat.esa.int/workshops/meris03/participants/48/paper_23_gobron.pdf
+    
+[3] Gobron, N., Aussedat, O., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+    Medium Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products - Algorithm Theoretical Basis Document.
+    EUR Report 21387 EN, European Commission - DG Joint Research Centre, Institute for Environment and Sustainability, 20 pages.
+    Available at: http://fapar.jrc.ec.europa.eu/pubs/?pubid=2004.eur-report.21387&format=html
+    
+[4] Gobron, N., Taberner, M., Pinty, B., Mélin, F., Verstraete, M. M., Widlowski, J.-L. (2003)
+    Evaluation of the MERIS Global Vegetation Index: Methodology and Initial Results.
+    In: Proceedings of the Working Meeting on the MERIS and ATSR Calibration and Geophysical Validation. 20-23 October 2003, Frascati, Italy, volume 541 of ESA Special Publication, European Space Agency.
+    Online: http://envisat.esa.int/workshops/mavt_2003/MAVT-2003_504-paper_NGobron.pdf
 

@@ -2,7 +2,7 @@
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-meris-veg</symbolicName>
     <name>MERIS Vegetation Processors</name>
-    <version>2.0.4</version>
+    <version>2.0.5</version>
 
     <description>
         <![CDATA[
@@ -16,9 +16,21 @@
 
         <p>Documentation:</p>
         <ul>
-            <li>BAER: <a href="http://github.com/downloads/bcdev/beam-third-party/baer-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/BAER_ATBD_NOV-3160-NT-2703_v2.0.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/BAER_Val_Report_NOV-3341-NT-3284_v1.1.pdf">Validation Report</a></li>
-            <li>TOA: <a href="http://github.com/downloads/bcdev/beam-third-party/toaveg-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/MERIS_ATBD_TOA_VEG_03_06.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/Valid_MERIS_TOA_VEG_03_06.pdf">Validation Report</a></li>
-            <li>TOC: <a href="http://github.com/downloads/bcdev/beam-third-party/tocveg-README.txt">README</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/MERIS_ATBD_TOC_VEG_03_06.pdf">ATBD</a>&nbsp;&nbsp;<a href="http://github.com/downloads/bcdev/beam-third-party/Valid_MERIS_TOC_VEG_03_06_V2.pdf">Validation Report</a></li>
+            <li>BEAR:
+            <a href="http://github.com/downloads/bcdev/beam-third-party/baer-README.txt">README</a>
+            <a href="http://github.com/downloads/bcdev/beam-third-party/BAER_ATBD_NOV-3160-NT-2703_v2.0.pdf">ATBD</a>
+            <a href="http://github.com/downloads/bcdev/beam-third-party/BAER_Val_Report_NOV-3341-NT-3284_v1.1.pdf">Validation Report</a>
+            </li>
+            <li>TOA:
+            <a href="http://github.com/downloads/bcdev/beam-third-party/toaveg-README.txt">README</a>
+            <a href="http://github.com/downloads/bcdev/beam-third-party/MERIS_ATBD_TOA_VEG_03_06.pdf">ATBD</a>
+            <a href="http://github.com/downloads/bcdev/beam-third-party/Valid_MERIS_TOA_VEG_03_06.pdf">Validation Report</a><
+            /li>
+            <li>TOC:
+            <a href="http://github.com/downloads/bcdev/beam-third-party/tocveg-README.txt">README</a>
+            <a href="http://github.com/downloads/bcdev/beam-third-party/MERIS_ATBD_TOC_VEG_03_06.pdf">ATBD</a>
+            <a href="http://github.com/downloads/bcdev/beam-third-party/Valid_MERIS_TOC_VEG_03_06_V2.pdf">Validation Report</a>
+            </li>
         </ul>
 
         <p>Authors: F. Baret of INRA, Wolfgang v. Hoyningen Huene of Uni Bremen, C. Castillon of Noveltis</p>

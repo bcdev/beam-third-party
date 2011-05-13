@@ -24,20 +24,33 @@
  *  This software is provided as is without any warranty whatsoever.
  * 
  *  REFERENCES:
- *       N. Gobron, M. Taberner, B. Pinty, F. Melin, M. M. Verstraete and J.-L.
- *       Widlowski (2002) 'MERIS Land Algorithm: preliminary results', in
- *       Proceedings of the ENVISAT Validation Workshop, Frascati, Italy, 09-13
- *       December, 2002, European Space Agency, SP 531
- * 
- *       N. Gobron, B. Pinty, M. M. Verstraete and M. Taberner (2002) 'Medium
- *       Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products
- *       - Algorithm Theoretical Basis Document, Institute for Environment and
- *       Sustainability, *EUR Report No. 20143 EN*, 19 pp
- * 
- *       Gobron, N., B. Pinty, M. M. Verstraete and M. Taberner (2002) 'Medium
- *       Resolution Imaging Spectrometer (MERIS) - An optimized FAPAR Algorithm -
- *       Theoretical Basis Document, Institute for Environment and
- *       Sustainability, *EUR Report No. 20149 EN*, 19 pp
+ *  [1] Gobron, N., Pinty, B., Aussedat, O., Taberner, M., Faber, O., Mélin, F., 
+ *  Lavergne, T., Robustelli, M., Snoeij, P. (2008)
+ *  Uncertainty Estimates for the FAPAR Operational Products Derived from MERIS - 
+ *  Impact of Top-of-Atmosphere Radiance Uncertainties and Validation with Field Data.
+ *  Remote Sensing of Environment, 112(4):1871–1883.
+ *  Special issue: Remote Sensing Data Assimilation. Edited by Loew, A.
+ *  DOI: 10.1016/j.rse.2007.09.011
+ *
+ *  [2] Gobron, N., Mélin, F., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+ *  MERIS Global Vegetation Index: Evaluation and Performance.
+ *  In: Proceedings of the MERIS User Workshop. 10-14 November 2003, Frascati, Italy, 
+ *  volume 549 of ESA Special Publication, European Space Agency.
+ *  Online: http://envisat.esa.int/workshops/meris03/participants/48/paper_23_gobron.pdf
+ *
+ *  [3] Gobron, N., Aussedat, O., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+ *  Medium Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products - 
+ *  Algorithm Theoretical Basis Document.
+ *  EUR Report 21387 EN, European Commission - DG Joint Research Centre, Institute for 
+ *  Environment and Sustainability, 20 pages.
+ *  Available at: http://fapar.jrc.ec.europa.eu/pubs/?pubid=2004.eur-report.21387&format=html
+ *
+ *  [4] Gobron, N., Taberner, M., Pinty, B., Mélin, F., Verstraete, M. M., Widlowski, J.-L. (2003)
+ *  Evaluation of the MERIS Global Vegetation Index: Methodology and Initial Results.
+ *  In: Proceedings of the Working Meeting on the MERIS and ATSR Calibration and Geophysical 
+ *  Validation. 20-23 October 2003, Frascati, Italy, volume 541 of ESA Special Publication, 
+ *  European Space Agency.
+ *  Online: http://envisat.esa.int/workshops/mavt_2003/MAVT-2003_504-paper_NGobron.pdf
  */
 package it.jrc.beam.fapar;
 
@@ -49,7 +62,6 @@ import org.esa.beam.framework.param.ParamGroup;
 import org.esa.beam.framework.param.Parameter;
 import org.esa.beam.framework.processor.ProcessorConstants;
 import org.esa.beam.framework.processor.ProcessorException;
-import org.esa.beam.framework.processor.ProcessorUtils;
 import org.esa.beam.framework.processor.ProductRef;
 import org.esa.beam.framework.processor.Request;
 import org.esa.beam.framework.processor.ui.ProcessorApp;
@@ -57,6 +69,7 @@ import org.esa.beam.framework.processor.ui.ProcessorUI;
 import org.esa.beam.framework.ui.GridBagUtils;
 import org.esa.beam.util.Debug;
 import org.esa.beam.util.Guardian;
+import org.esa.beam.framework.processor.ProcessorUtils;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -148,6 +161,7 @@ public class FaparProcessorUI implements ProcessorUI {
         return _app;
     }
 
+
     ///////////////////////////////////////////////////////////////////////////
     /////// END OF PUBLIC
     ///////////////////////////////////////////////////////////////////////////
@@ -178,13 +192,13 @@ public class FaparProcessorUI implements ProcessorUI {
      */
     private void initParamGroup() {
         _paramGroup = new ParamGroup();
-        // Value when the processor is open
+	// Value when the processor is open
         final Parameter inputProductParameter = _factory.createDefaultInputProductParameter();
         _paramGroup.addParameter(inputProductParameter);
         _paramGroup.addParameter(_factory.createDefaultOutputProductParameter());
         _paramGroup.addParameter(_factory.createOutputFormatParameter());
 
-        // Add a listener and an action to perform if any change is made to the dialog box
+	// Add a listener and an action to perform if any change is made to the dialog box
         inputProductParameter.addParamChangeListener(new ParamChangeListener() {
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidInputProduct(inputProductParameter);
@@ -255,8 +269,7 @@ public class FaparProcessorUI implements ProcessorUI {
      */
     private ProductRef createInputProductRef() {
         try {
-            final String filePath = _paramGroup.getParameter(
-                    ProcessorConstants.INPUT_PRODUCT_PARAM_NAME).getValueAsText();
+            final String filePath = _paramGroup.getParameter(ProcessorConstants.INPUT_PRODUCT_PARAM_NAME).getValueAsText();
             File ProductFile = new File(filePath);
             return new ProductRef(ProductFile, null, null);
         } catch (NullPointerException e) {
@@ -270,8 +283,7 @@ public class FaparProcessorUI implements ProcessorUI {
      */
     private ProductRef createOutputProductRef() {
         final String fileName = _paramGroup.getParameter(ProcessorConstants.OUTPUT_PRODUCT_PARAM_NAME).getValueAsText();
-        final String fileFormat = _paramGroup.getParameter(
-                ProcessorConstants.OUTPUT_FORMAT_PARAM_NAME).getValueAsText();
+        final String fileFormat = _paramGroup.getParameter(ProcessorConstants.OUTPUT_FORMAT_PARAM_NAME).getValueAsText();
 
         return ProcessorUtils.createProductRef(fileName, fileFormat);
     }
@@ -298,11 +310,8 @@ public class FaparProcessorUI implements ProcessorUI {
 
     /**
      * Brings up a message box if the input product is not valid. Valid input products are: products wich contains at
-     * least the bands named '{@link FaparProcessor#INPUT_BAND_NAME_RED redBandName}' and '{@link
-     * FaparProcessor#INPUT_BAND_NAME_BLUE blueBandName}' and '{@link FaparProcessor#INPUT_BAND_NAME_NIR nirBandName}'
-     * and tie point grids named '{@link FaparProcessor#INPUT_TPG_NAME_SZA}' and
-     * '{@link FaparProcessor#INPUT_TPG_NAME_SAA}' and '{@link FaparProcessor#INPUT_TPG_NAME_VZA}' and
-     * '{@link FaparProcessor#INPUT_TPG_NAME_VAA}'.
+     * least the bands named '{@link it.jrc.beam.fapar.FaparProcessor#INPUT_BAND_NAME_RED redBandName}' and '{@link
+     * it.jrc.beam.fapar.FaparProcessor#INPUT_BAND_NAME_BLUE blueBandName}' and '{@link it.jrc.beam.fapar.FaparProcessor#INPUT_BAND_NAME_NIR nirBandName}' and tie point grids named '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_SZA}' and '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_SAA}' and '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_VZA}' and '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_VAA}'.
      * The message box only comes up if the parameter contains an
      * existing file. So you can create requests with not existing input products without interfering message Box.
      *
@@ -327,30 +336,29 @@ public class FaparProcessorUI implements ProcessorUI {
                 final String blueBandName = FaparProcessor.INPUT_BAND_NAME_BLUE;
                 final String redBandName = FaparProcessor.INPUT_BAND_NAME_RED;
                 final String nirBandName = FaparProcessor.INPUT_BAND_NAME_NIR;
-                if (product.getBand(blueBandName) == null || product.getBand(redBandName) == null || product.getBand(
-                        nirBandName) == null) {
+                if (product.getBand(blueBandName) == null || product.getBand(redBandName) == null || product.getBand(nirBandName) == null) {
                     msg = "The FAPAR Processor only works with products which contains\n" +
                           "at least the bands '" + blueBandName + "' and '" + redBandName + "' and '" + nirBandName + "'.";
                 }
-                final String szaTPGName = FaparProcessor.INPUT_TPG_NAME_SZA;
-                final String vzaTPGName = FaparProcessor.INPUT_TPG_NAME_VZA;
-                final String saaTPGName = FaparProcessor.INPUT_TPG_NAME_SAA;
-                final String vaaTPGName = FaparProcessor.INPUT_TPG_NAME_VAA;
-                if (product.getTiePointGrid(szaTPGName) == null || product.getTiePointGrid(
-                        vzaTPGName) == null || product.getTiePointGrid(saaTPGName) == null || product.getTiePointGrid(
-                        vaaTPGName) == null) {
-                    msg = "The FAPAR Processor only works with products which contains\n" +
-                          "at least the tie point grids '" + szaTPGName + "' and '" + vzaTPGName + "' and '" + saaTPGName + "' and '" + vaaTPGName + "'.";
-                }
-            } else {
-                msg = "Unknown file format.";
-            }
-        } catch (IOException e) {
-            msg = e.getMessage();
-        }
-        if (msg != null) {
-            JOptionPane.showMessageDialog(getGuiComponent(), "Invalid input file:\n" + msg,
-                                          FaparProcessor.PROCESSOR_NAME, JOptionPane.ERROR_MESSAGE);
-        }
+		final String szaTPGName = FaparProcessor.INPUT_TPG_NAME_SZA;
+		final String vzaTPGName = FaparProcessor.INPUT_TPG_NAME_VZA;
+		final String saaTPGName = FaparProcessor.INPUT_TPG_NAME_SAA;
+		final String vaaTPGName = FaparProcessor.INPUT_TPG_NAME_VAA;
+		if (product.getTiePointGrid(szaTPGName) == null || product.getTiePointGrid(vzaTPGName) == null || product.getTiePointGrid(saaTPGName) == null || product.getTiePointGrid(vaaTPGName) == null) 
+		{
+			msg = "The FAPAR Processor only works with products which contains\n" +
+				"at least the tie point grids '" + szaTPGName + "' and '" + vzaTPGName + "' and '" + saaTPGName + "' and '" + vaaTPGName + "'.";
+		} 
+	    }else 
+	    {
+		    msg = "Unknown file format.";
+	    }
+	} catch (IOException e) {
+		msg = e.getMessage();
+	}
+	if (msg != null) {
+		JOptionPane.showMessageDialog(getGuiComponent(), "Invalid input file:\n" + msg,
+				FaparProcessor.PROCESSOR_NAME, JOptionPane.ERROR_MESSAGE);
+	}
     }
 }

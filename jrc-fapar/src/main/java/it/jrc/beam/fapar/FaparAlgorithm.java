@@ -1,5 +1,5 @@
 /*
- * $Id: FaparAlgorithm.java,v 1.5 2007/12/11 15:56:31 andreio Exp $
+ * $Id: FaparAlgorithm.java,v 1.6 12/16/2010 1:08:07 PM peregan Exp $
  * Written by: Ophelie Aussedat, September, 2004
  * 
  * Copyright (C) 2004 by STARS
@@ -24,20 +24,33 @@
  *  This software is provided as is without any warranty whatsoever.
  * 
  *  REFERENCES:
- *       N. Gobron, M. Taberner, B. Pinty, F. Melin, M. M. Verstraete and J.-L.
- *       Widlowski (2002) 'MERIS Land Algorithm: preliminary results', in
- *       Proceedings of the ENVISAT Validation Workshop, Frascati, Italy, 09-13
- *       December, 2002, European Space Agency, SP 531
+ *  [1] Gobron, N., Pinty, B., Aussedat, O., Taberner, M., Faber, O., Mélin, F., 
+ *  Lavergne, T., Robustelli, M., Snoeij, P. (2008)
+ *  Uncertainty Estimates for the FAPAR Operational Products Derived from MERIS - 
+ *  Impact of Top-of-Atmosphere Radiance Uncertainties and Validation with Field Data.
+ *  Remote Sensing of Environment, 112(4):1871–1883.
+ *  Special issue: Remote Sensing Data Assimilation. Edited by Loew, A.
+ *  DOI: 10.1016/j.rse.2007.09.011
  *
- *       N. Gobron, B. Pinty, M. M. Verstraete and M. Taberner (2002) 'Medium
- *       Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products
- *       - Algorithm Theoretical Basis Document, Institute for Environment and
- *       Sustainability, *EUR Report No. 20143 EN*, 19 pp
+ *  [2] Gobron, N., Mélin, F., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+ *  MERIS Global Vegetation Index: Evaluation and Performance.
+ *  In: Proceedings of the MERIS User Workshop. 10-14 November 2003, Frascati, Italy, 
+ *  volume 549 of ESA Special Publication, European Space Agency.
+ *  Online: http://envisat.esa.int/workshops/meris03/participants/48/paper_23_gobron.pdf
  *
- *       Gobron, N., B. Pinty, M. M. Verstraete and M. Taberner (2002) 'Medium
- *       Resolution Imaging Spectrometer (MERIS) - An optimized FAPAR Algorithm -
- *       Theoretical Basis Document, Institute for Environment and
- *       Sustainability, *EUR Report No. 20149 EN*, 19 pp
+ *  [3] Gobron, N., Aussedat, O., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+ *  Medium Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products - 
+ *  Algorithm Theoretical Basis Document.
+ *  EUR Report 21387 EN, European Commission - DG Joint Research Centre, Institute for 
+ *  Environment and Sustainability, 20 pages.
+ *  Available at: http://fapar.jrc.ec.europa.eu/pubs/?pubid=2004.eur-report.21387&format=html
+ *
+ *  [4] Gobron, N., Taberner, M., Pinty, B., Mélin, F., Verstraete, M. M., Widlowski, J.-L. (2003)
+ *  Evaluation of the MERIS Global Vegetation Index: Methodology and Initial Results.
+ *  In: Proceedings of the Working Meeting on the MERIS and ATSR Calibration and Geophysical 
+ *  Validation. 20-23 October 2003, Frascati, Italy, volume 541 of ESA Special Publication, 
+ *  European Space Agency.
+ *  Online: http://envisat.esa.int/workshops/mavt_2003/MAVT-2003_504-paper_NGobron.pdf
  */
 package it.jrc.beam.fapar;
 
@@ -60,9 +73,9 @@ public final class FaparAlgorithm {
 	public static final int NIR=2;
 	
 	// Algorithms polynoms coefficients
-	private double[][] _coeff;
+	private double[][][] _coeff;
 	// Algorithms functions parameters 
-	private double[][] _param;
+	private double[][][] _param;
 	// Bidirectional Reflectance Factors
 	private float[][] _brf;
 	
@@ -82,8 +95,9 @@ public final class FaparAlgorithm {
 	 */
 	public FaparAlgorithm() {
 		// Initialize Parameters and Coefficients
+
 		initializeParameters();
-		initializeCoefficients();	
+		initializeCoefficients();
 
 		_brf=null;
 		_red_rec=null;
@@ -118,30 +132,154 @@ public final class FaparAlgorithm {
     /**
      * Sets the parameters for computing the anisotropic correction.
      */
+/* ANDREA: revised method initializeParameters() in order to take into account ID numbers different from 0      
+     
+/*     
     private void initializeParameters() {
-	_param=new double[3][3];/*rho_HS,ki,theta_HG*/
-	_param[BLUE/*0*/][0]=0.24012;_param[BLUE][1]=0.56192;_param[BLUE][2]=-0.04203;
-	_param[RED/*1*/][0]=-0.46273;_param[RED][1]=0.70879;_param[RED][2]=0.037;
-	_param[NIR/*2*/][0]=0.63841;_param[NIR][1]=0.86523;_param[NIR][2]=-0.00123;
+	_param=new double[3][3];
+	_param[BLUE][0]=0.24012;_param[BLUE][1]=0.56192;_param[BLUE][2]=-0.04203;
+	_param[RED][0]=-0.46273;_param[RED][1]=0.70879;_param[RED][2]=0.037;
+	_param[NIR][0]=0.63841;_param[NIR][1]=0.86523;_param[NIR][2]=-0.00123;
     }
+*/
+  private void initializeParameters() {
+  
+    _param=new double[5][3][3];  /*rho_HS,ki,theta_HG*/
+
+  // vegetated surface
+  
+    _param[0][BLUE][0] =  0.24012;
+    _param[0][BLUE][1] =  0.56192;
+    _param[0][BLUE][2] = -0.04203;
+
+    _param[0][RED][0]  = -0.46273;
+    _param[0][RED][1]  =  0.70879;
+    _param[0][RED][2]  =  0.037;
+
+    _param[0][NIR][0]  =  0.63841;
+    _param[0][NIR][1]  =  0.86523;
+    _param[0][NIR][2]  = -0.00123;
+    
+  // bright surface
+
+    _param[4][BLUE][0] =  0.42640;
+    _param[4][BLUE][1] =  0.68545;
+    _param[4][BLUE][2] = -0.02263;
+
+    _param[4][RED][0] =  0.55649;
+    _param[4][RED][1] =  0.87412;
+    _param[4][RED][2] = -0.00357;
+
+    _param[4][NIR][0] =  0.65740;
+    _param[4][NIR][1] =  0.89788;
+    _param[4][NIR][2] = -0.01377;
+    
+  }
 
     /**
      * Sets the polynoms coefficients.
      */
+/*     
     private void initializeCoefficients() 
     {
 	_coeff=new double[3][11];//(g1,g2 coeff)
 	
 	// Coeff for g1
-	_coeff[0][0]=-9.2615;_coeff[0][1]=-0.029011;_coeff[0][2]=3.2545;_coeff[0][3]=0.055845;_coeff[0][4]=9.8268;_coeff[0][5]=_coeff[0][6]=_coeff[0][7]=_coeff[0][8]=_coeff[0][9]=0.0;_coeff[0][10]=1.0;
+	_coeff[0][0]=-9.2615;
+  _coeff[0][1]=-0.029011;
+  _coeff[0][2]=3.2545;
+  _coeff[0][3]=0.055845;
+  _coeff[0][4]=9.8268;
+  _coeff[0][5]=_coeff[0][6]=_coeff[0][7]=_coeff[0][8]=_coeff[0][9]=0.0;
+  _coeff[0][10]=1.0;
 	
 	// Coeff for g2
-	_coeff[1][0]=-0.47131;_coeff[1][1]=-0.21018;_coeff[1][2]=-0.045159;_coeff[1][3]=0.076505;_coeff[1][4]=-0.80707;_coeff[1][5]=-0.048362;_coeff[1][6]=-1.2471;_coeff[1][7]=-0.54507;_coeff[1][8]=-0.47602;_coeff[1][9]=-1.1027;_coeff[1][10]=0.0;
+	_coeff[1][0]=-0.47131;
+  _coeff[1][1]=-0.21018;
+  _coeff[1][2]=-0.045159;
+  _coeff[1][3]=0.076505;
+  _coeff[1][4]=-0.80707;
+  _coeff[1][5]=-0.048362;
+  _coeff[1][6]=-1.2471;
+  _coeff[1][7]=-0.54507;
+  _coeff[1][8]=-0.47602;
+  _coeff[1][9]=-1.1027;
+  _coeff[1][10]=0.0;
 	//Coeff for g0
-	_coeff[2][0]=0.255;_coeff[2][1]=0.306;_coeff[2][2]=-0.0045;_coeff[2][3]=-0.32;_coeff[2][4]=0.32;_coeff[2][5]=-0.005;
+	_coeff[2][0]=0.255;
+  _coeff[2][1]=0.306;
+  _coeff[2][2]=-0.0045;
+  _coeff[2][3]=-0.32;
+  _coeff[2][4]=0.32;
+  _coeff[2][5]=-0.005;
 	_coeff[2][6]=_coeff[2][7]=_coeff[2][8]=_coeff[2][9]=_coeff[2][10]=0.0;
     }
+*/    
+  private void initializeCoefficients() 
+  {
+    _coeff=new double[5][3][11];  //(g1,g2 coeff)
     
+    // vegetated surface -> flag = 0
+    
+  	// Coeff for g1
+  	_coeff[0][0][0]  = -9.2615;
+    _coeff[0][0][1]  = -0.029011;
+    _coeff[0][0][2]  =  3.2545;
+    _coeff[0][0][3]  =  0.055845;
+    _coeff[0][0][4]  =  9.8268;
+    _coeff[0][0][5]  = _coeff[0][0][6] = _coeff[0][0][7] = _coeff[0][0][8] = _coeff[0][0][9]=0.0;
+    _coeff[0][0][10] = 1.0;
+  	// Coeff for g2
+  	_coeff[0][1][0]  = -0.47131;
+    _coeff[0][1][1]  = -0.21018;
+    _coeff[0][1][2]  = -0.045159;
+    _coeff[0][1][3]  =  0.076505;
+    _coeff[0][1][4]  = -0.80707;
+    _coeff[0][1][5]  = -0.048362;
+    _coeff[0][1][6]  = -1.2471;
+    _coeff[0][1][7]  = -0.54507;
+    _coeff[0][1][8]  = -0.47602;
+    _coeff[0][1][9]  = -1.1027;
+    _coeff[0][1][10] =  0.0;
+  	//Coeff for g0
+  	_coeff[0][2][0]  =  0.255;
+    _coeff[0][2][1]  =  0.306;
+    _coeff[0][2][2]  = -0.0045;
+    _coeff[0][2][3]  = -0.32;
+    _coeff[0][2][4]  =  0.32;
+    _coeff[0][2][5]  = -0.005;
+  	_coeff[0][2][6]  = _coeff[0][2][7] = _coeff[0][2][8] = _coeff[0][2][9] = _coeff[0][2][10] = 0.0;
+
+    // bright surface -> flag = 4
+
+  	// Coeff for g1
+  	_coeff[4][0][0]  =  0.79990;
+    _coeff[4][0][1]  =  0.25117;
+    _coeff[4][0][2]  = -0.24396;
+    _coeff[4][0][3]  =  0.61913;
+    _coeff[4][0][4]  = -1.7330;
+    _coeff[4][0][5]  =  6.3093;
+    _coeff[4][0][6]  =  0.16104;
+    _coeff[4][0][7]  = -0.10645;
+    _coeff[4][0][8]  = -2.8388;
+    _coeff[4][0][9]  = -9.1247;
+    _coeff[4][0][10] =  0.0;
+  	// Coeff for g2
+  	_coeff[4][1][0]  = -0.10065;
+    _coeff[4][1][1]  = -0.41872;
+    _coeff[4][1][2]  =  0.12671;
+    _coeff[4][1][3]  = -0.30530;
+    _coeff[4][1][4]  = -0.39783;
+    _coeff[4][1][5]  =  0.56605;
+    _coeff[4][1][6]  =  0.049710;
+    _coeff[4][1][7]  = -0.11131;
+    _coeff[4][1][8]  = -1.0396;
+    _coeff[4][1][9]  = -0.87161;
+    _coeff[4][1][10] =  0.0;
+  	//No Coeff for g0 if flag = 4
+
+  }
+
     /**
      * Computes the anisotropic normalisation. 
      * Update the array of values of bidirectional reflectance factor normalized by the anisotropic function values (brf) of this algorithm 
@@ -155,74 +293,81 @@ public final class FaparAlgorithm {
      * @param nir_reflectance	array of reflectances values
      *
      */
+// ANDREA: revised in order to take into account also flag = 4   
     public void anisotropicCorrection(float[] sza, float[] saa, float[] vza, float[] vaa, float[] blue_reflectance, float red_reflectance[], float nir_reflectance[])
     {
-	int width=sza.length;
-	double f1;	//f1(theta_0,theta_v,ki)
-	double f2;	//f2(omega,theta_HG)
-	double f3;	//f3(omega,rho_HS)
-	double G, cos_g, theta_0, theta_v, theta_0_rad, theta_v_rad, phi;		
-	// parameters
-	double rho_HS, ki, theta_HG;
-	// return value
-	_brf=new float[3][width];
-	
-	// initialize the brf with the reflectances values
-	for (int i=0;i<width;i++)
-	{
-		// Copy the values
-		_brf[BLUE][i]=blue_reflectance[i];_brf[RED][i]=red_reflectance[i];_brf[NIR][i]=nir_reflectance[i];
-	}
-	
-	// loop over the 3 reflectance array (blue, red, nir)
-	for (int p=0;p<3;p++)
-	{
-		// Get the parameter for the corresponding reflectance
-		rho_HS=_param[p][0];
-		ki=_param[p][1];
-		theta_HG=_param[p][2];
-				
-		// loop over all the values
-		for (int i=0;i<width;i++)
-		{
-			// check for process flag. If set to false we must set the default value for
-			// invalid pixels and process the next pixel
-			if (_process[i]!=0) {
-				continue;
-			}
-			
-			// Get some useful temporary values
-			theta_0=(double)sza[i];
-			theta_v=(double)vza[i];
-			theta_0_rad=MathUtils.DTOR*theta_0; // value in radian
-			theta_v_rad=MathUtils.DTOR*theta_v;
-			phi=(double)saa[i]-(double)vaa[i]; // Relative azimuth angle
-			
-			// G
-			G=Math.pow( Math.pow( Math.tan( theta_0_rad ), 2) +
-					Math.pow( Math.tan( theta_v_rad ), 2) -
-					2*Math.tan( theta_0_rad ) * Math.tan( theta_v_rad ) * Math.cos( MathUtils.DTOR * phi), 0.5);
-			//cos g
-			cos_g=Math.cos(theta_0_rad)*Math.cos(theta_v_rad)+Math.sin(theta_0_rad)*Math.sin(theta_v_rad)*Math.cos(MathUtils.DTOR * phi);
-			
-			// f1
-			double x=Math.pow(Math.cos(theta_0_rad)*Math.cos(theta_v_rad),ki-1);
-			double y=Math.pow(Math.cos(theta_0_rad)+Math.cos(theta_v_rad),1-ki);
-			f1=x/y;
-			
-			// f2
-			x=1-Math.pow(theta_HG,2);
-			y=Math.pow(1+2*theta_HG*cos_g+Math.pow(theta_HG,2),1.5);
-			f2=x/y;
-			
-			// f3
-			x=1-rho_HS;
-			y=1+G;
-			f3=1+x/y;
-			
-			_brf[p][i]=_brf[p][i]/(float)(f1*f2*f3);
-		}				
-	}
+    	int width = sza.length;
+    	double f1;	//f1(theta_0,theta_v,ki)
+    	double f2;	//f2(omega,theta_HG)
+    	double f3;	//f3(omega,rho_HS)
+    	double G, cos_g, theta_0, theta_v, theta_0_rad, theta_v_rad, phi;		
+    	// parameters
+    	double rho_HS, ki, theta_HG;
+    	// return value
+    	_brf = new float[3][width];
+    	
+    	// initialize the brf with the reflectances values
+    	for (int i=0;i<width;i++)
+    	{
+    		// Copy the values
+    		_brf[BLUE][i] = blue_reflectance[i];
+        _brf[RED][i]  = red_reflectance[i];
+        _brf[NIR][i]  = nir_reflectance[i];
+    	}                 
+    	
+  		// loop over all the values
+  		for (int i = 0; i < width; i++)
+  		{
+     	// loop over the 3 reflectance array (blue, red, nir)
+      	for (int p = 0; p < 3; p++)
+      	{
+    			// check for process flag. If set to false we must set the default value for
+    			// invalid pixels and process the next pixel
+// ANDREA: revised in order to take into account also flag = 4			
+  /*			
+    			if (_process[i] != 0) {
+    				continue;
+    			}
+  */			
+    			if (_process[i] != 0 && _process[i] != 4) {
+    				continue;
+    			}
+    			
+      		// Get the parameter for the corresponding reflectance
+      		rho_HS   = _param[_process[i]][p][0];
+      		ki       = _param[_process[i]][p][1];
+      		theta_HG = _param[_process[i]][p][2];
+
+    			// Get some useful temporary values
+    			theta_0     = (double)sza[i];
+    			theta_v     = (double)vza[i];
+    			theta_0_rad = MathUtils.DTOR*theta_0; // value in radian
+    			theta_v_rad = MathUtils.DTOR*theta_v;
+    			phi         = (double)saa[i] - (double)vaa[i]; // Relative azimuth angle
+    			
+    			// G
+    			G     = Math.pow( Math.pow( Math.tan( theta_0_rad ), 2) + Math.pow( Math.tan( theta_v_rad ), 2) - 2*Math.tan( theta_0_rad ) * Math.tan( theta_v_rad ) * Math.cos( MathUtils.DTOR * phi), 0.5);
+    			//cos g
+    			cos_g = Math.cos(theta_0_rad)*Math.cos(theta_v_rad)+Math.sin(theta_0_rad)*Math.sin(theta_v_rad)*Math.cos(MathUtils.DTOR * phi);
+    			
+    			// f1
+    			double x = Math.pow(Math.cos(theta_0_rad) * Math.cos(theta_v_rad),ki-1);
+    			double y = Math.pow(Math.cos(theta_0_rad) + Math.cos(theta_v_rad),1-ki);
+    			f1 = x/y;
+    			
+    			// f2
+    			x = 1 - Math.pow(theta_HG,2);
+    			y = Math.pow(1+2*theta_HG*cos_g+Math.pow(theta_HG,2),1.5);
+    			f2 = x/y;
+    			
+    			// f3
+    			x = 1 - rho_HS;
+    			y = 1 + G;
+    			f3 = 1 + x/y;
+    			
+    			_brf[p][i] = _brf[p][i]/(float)(f1*f2*f3);
+    		}				
+    	}
     }
 
     /**
@@ -247,24 +392,36 @@ public final class FaparAlgorithm {
      *
      * @return New array result of the formula
      */
+// ANDREA: revised in order to take into account also flag = 4     
     private final float[] Poly1(float[] band1, float[] band2)
     {
-	    float [] return_r=new float[band1.length];
-	    
-	    for (int i=0;i<band1.length;i++)
+	    float [] return_r = new float[band1.length];
+	    double B1, B2;
+	    for (int i = 0; i < band1.length; i++)
 	    {
 		    // check for process flag. If set to false we must set the default value for
 		    // invalid pixels and process the next pixel
-	            if (_process[i]!=0) {
-			    return_r[i]=INV;
+	      if (_process[i] != 0 && _process[i] != 4) {
+			    return_r[i] = INV;
 			    continue;
 		    }
-		    
-		    return_r[i]=(float)((_coeff[0][0] * Math.pow(band1[i]+_coeff[0][1], 2) + _coeff[0][2] * Math.pow(band2[i]+_coeff[0][3], 2) + _coeff[0][4] * (double)band1[i] * (double)band2[i]));
-
-		    if (return_r[i]<0.0 || return_r[i]>1.0) { _process[i]=5; return_r[i]=INV;}
+		    B1 = (double)band1[i];
+		    B2 = (double)band2[i];
+		    switch (_process[i])
+		    {
+          case 0:
+     		    return_r[i] = (float)(_coeff[_process[i]][0][0] * Math.pow(B1+_coeff[_process[i]][0][1], 2) + _coeff[_process[i]][0][2] * Math.pow(B2+_coeff[_process[i]][0][3], 2) + _coeff[_process[i]][0][4] * B1 * B2);
+     		    break;
+          case 4:
+     		    return_r[i] = (float)((_coeff[_process[i]][0][0] * Math.pow(B1+_coeff[_process[i]][0][1], 2) + _coeff[_process[i]][0][2] * Math.pow(B2+_coeff[_process[i]][0][3], 2) + _coeff[_process[i]][0][4] * B1 * B2) / (_coeff[_process[i]][0][5] * Math.pow(B1 + _coeff[_process[i]][0][6], 2) + _coeff[_process[i]][0][7] * Math.pow(B2 + _coeff[_process[i]][0][8], 2) + _coeff[_process[i]][0][9] * B1 * B2));
+     		    break;
+        }
+		    if (return_r[i] < 0.0 || return_r[i] > 1.0) 
+        { 
+          _process[i] = 5;
+          return_r[i] = INV;
+        }
 	    }
-	    
 	    return return_r;
     }
     
@@ -275,30 +432,36 @@ public final class FaparAlgorithm {
      *
      * @return New array result of the formula
      */
+// ANDREA: revised in order to take into account also flag = 4     
     private final float[] Poly2(float[] band1, float[] band2)
     {
-	    float [] return_r=new float[band1.length];
-	    
+	    float [] return_r = new float[band1.length];
 	    double B1, B2;
-	   
-	    for (int i=0;i<band1.length;i++)
+	    for (int i = 0; i < band1.length; i++)
 	    {
 		    // check for process flag. If set to false we must set the default value for
 		    // invalid pixels and process the next pixel
-		    if (_process[i]!=0) {
-			    return_r[i]=INV;
+		    if (_process[i] != 0 && _process[i] != 4) {
+			    return_r[i] = INV;
 			    continue;
 		    }
-		    
-		    B1=(double)band1[i];
-		    B2=(double)band2[i];
-		    
-		    return_r[i]=(float)((_coeff[1][0] * Math.pow(B1 + _coeff[1][1], 2) + _coeff[1][2] * Math.pow(B2 + _coeff[1][3], 2) + _coeff[1][4] * B1 * B2) / 
-				    (_coeff[1][5] * Math.pow(B1 + _coeff[1][6], 2) + _coeff[1][7] * Math.pow(B2 + _coeff[1][8], 2) + _coeff[1][9] * B1 * B2 + _coeff[1][10]));
-		    
-		    if (return_r[i]<0.0 || return_r[i]>1.0) { _process[i]=5; return_r[i]=INV;}
+		    B1 = (double)band1[i];
+		    B2 = (double)band2[i];
+		    switch (_process[i]) 
+        {
+          case 0:
+     		    return_r[i] = (float)((_coeff[_process[i]][1][0] * Math.pow(B1 + _coeff[_process[i]][1][1], 2) + _coeff[_process[i]][1][2] * Math.pow(B2 + _coeff[_process[i]][1][3], 2) + _coeff[_process[i]][1][4] * B1 * B2) / (_coeff[_process[i]][1][5] * Math.pow(B1 + _coeff[_process[i]][1][6], 2) + _coeff[_process[i]][1][7] * Math.pow(B2 + _coeff[_process[i]][1][8], 2) + _coeff[_process[i]][1][9] * B1 * B2 + _coeff[_process[i]][1][10]));
+            break;
+          case 4:
+    		    return_r[i] = (float)((_coeff[_process[i]][1][0] * Math.pow(B1 + _coeff[_process[i]][1][1], 2) + _coeff[_process[i]][1][2] * Math.pow(B2 + _coeff[_process[i]][1][3], 2) + _coeff[_process[i]][1][4] * B1 * B2) / (_coeff[_process[i]][1][5] * Math.pow(B1 + _coeff[_process[i]][1][6], 2) + _coeff[_process[i]][1][7] * Math.pow(B2 + _coeff[_process[i]][1][8], 2) + _coeff[_process[i]][1][9] * B1 * B2));
+    		    break;
+        }
+		    if (return_r[i] < 0.0 || return_r[i] > 1.0) 
+        {
+          _process[i] = 5;
+          return_r[i] = INV;
+        }
 	    }
-	    
 	    return return_r;
     }
 
@@ -321,43 +484,44 @@ public final class FaparAlgorithm {
      *
      * @return array of fapar values
      */
-    public final float[] run(float[] sza, float[] saa, float[] vza, float[] vaa,
-                             float[] blueReflectance, float[] redReflectance, float[] nirReflectance, 
-			     int[] process) {
-	int length=sza.length;
+    public final float[] run(float[] sza, float[] saa, float[] vza, float[] vaa, float[] blueReflectance, float[] redReflectance, float[] nirReflectance, int[] process) 
+    {
+    
+	    int length = sza.length;
 	
-        // array to be returned
-        float[] r_return=new float[length];
+      // array to be returned
+      float[] r_return = new float[length];
 		
-	// Allocate space for rectified reflectances array
-	_red_rec=new float[length];
-	_nir_rec=new float[length];
-	
-	_process=process;
-	
-	// Apply the anisotropic normalisation
-	// -----------------------------------
-	anisotropicCorrection(sza, saa, vza, vaa, blueReflectance, redReflectance, nirReflectance);
-	
-	// Apply the atmospheric rectification and initialize the rectified red and near values
-	// ------------------------------------------------------------------------------------
-	atmosphericRectification(_brf[BLUE], _brf[RED], _brf[NIR]);
-        
-	// loop over all the values
-        // ------------------------
-        for (int n = 0; n < length; n++) 
-	{
-		if (_process[n]==0)
-		{
-			// Compute the fapar
-			 r_return[n]=(float)(_coeff[2][0]*_nir_rec[n]-_coeff[2][1]*_red_rec[n]-_coeff[2][2])/
-				 (float)(Math.pow(_coeff[2][3]-_red_rec[n],2) + Math.pow(_coeff[2][4]-_nir_rec[n],2) + _coeff[2][5]);
-			 
-			 // If fapar has a bad value set the flag
-			 if (r_return[n]<0.0 || r_return[n]>1.0) {_process[n]=5; r_return[n]=INV;}
-		}
-	}
-
-        return r_return;
+    	// Allocate space for rectified reflectances array
+    	_red_rec = new float[length];
+    	_nir_rec = new float[length];
+    	
+    	_process = process;
+    
+     	// Apply the anisotropic normalisation
+    	// -----------------------------------
+    	anisotropicCorrection(sza, saa, vza, vaa, blueReflectance, redReflectance, nirReflectance);
+    	
+    	// Apply the atmospheric rectification and initialize the rectified red and near values
+    	// ------------------------------------------------------------------------------------
+    	atmosphericRectification(_brf[BLUE], _brf[RED], _brf[NIR]);
+            
+    	// loop over all the values
+      // ------------------------
+      for (int n = 0; n < length; n++) 
+    	{
+    		if (_process[n] == 0)
+    		{
+ 			// Compute the fapar
+    			r_return[n] = (float)(_coeff[0][2][0]*_nir_rec[n]-_coeff[0][2][1]*_red_rec[n]-_coeff[0][2][2])/(float)(Math.pow(_coeff[0][2][3]-_red_rec[n],2) + Math.pow(_coeff[0][2][4]-_nir_rec[n],2) + _coeff[0][2][5]);
+      // If fapar has a bad value set the flag
+    			if (r_return[n] < 0.0 || r_return[n] > 1.0) 
+          {
+            _process[n] = 5;
+            r_return[n] = INV;
+          }
+    		}
+    	}
+      return r_return;
     }
 }

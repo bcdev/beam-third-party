@@ -445,7 +445,7 @@ public class TocVegProcessor extends Processor {
         addBandsToOutputProduct();
 
         // flags stuff
-        _outputProduct.addFlagCoding(VegFlagsManager.getCoding(TocVegConstants.VEG_FLAGS_BAND_NAME));
+        _outputProduct.getFlagCodingGroup().add(VegFlagsManager.getCoding(TocVegConstants.VEG_FLAGS_BAND_NAME));
         VegFlagsManager.addBitmaskDefsToProduct(_outputProduct, TocVegConstants.VEG_FLAGS_BAND_NAME);
 
         // add the metadata
@@ -542,7 +542,7 @@ public class TocVegProcessor extends Processor {
 
         _veg_flags_band = new Band(TocVegConstants.VEG_FLAGS_BAND_NAME, ProductData.TYPE_UINT16, width, height);
         _veg_flags_band.setDescription(TocVegConstants.VEG_FLAGS_BAND_DESCRIPTION);
-        _veg_flags_band.setFlagCoding(VegFlagsManager.getCoding(TocVegConstants.VEG_FLAGS_BAND_NAME));
+        _veg_flags_band.setSampleCoding(VegFlagsManager.getCoding(TocVegConstants.VEG_FLAGS_BAND_NAME));
         _outputProduct.addBand(_veg_flags_band);
     }
 

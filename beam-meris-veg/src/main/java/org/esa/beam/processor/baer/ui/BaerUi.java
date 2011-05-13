@@ -373,7 +373,7 @@ public class BaerUi extends AbstractProcessorUI implements ParamChangeListener {
         // check if file exists and is file
         if ((inputFile != null) && inputFile.exists() && inputFile.isFile()) {
             try {
-                Product inProduct = ProductIO.readProduct(inputFile.toURI().toURL(), null);
+                Product inProduct = ProductIO.readProduct(inputFile);
                 if (inProduct != null) {
                     String[] bitmaskFlags = inProduct.getAllFlagNames();
 

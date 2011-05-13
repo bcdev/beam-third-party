@@ -657,7 +657,7 @@ public class WaterProcessor extends Processor {
         _outputProduct.addBand(_resultFlagsOutputBand);
 
         // Copy predefined bitmask definitions
-        ProductUtils.copyBitmaskDefs(_inputProduct, _outputProduct);
+        ProductUtils.copyMasks(_inputProduct, _outputProduct);
 
         String falgNamePrefix = RESULT_FLAGS_NAME + ".";
         _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[0].toLowerCase(),

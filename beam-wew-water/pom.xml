@@ -6,7 +6,7 @@
     <groupId>wew.water</groupId>
     <artifactId>beam-wew-water</artifactId>
     <name>beam-wew-water</name>
-    <version>1.2.7-SNAPSHOT</version>
+    <version>1.2.7</version>
 
     <packaging>jar</packaging>
 

@@ -6,7 +6,7 @@
     <groupId>it.jrc.beam.fapar</groupId>
     <artifactId>jrc-fapar</artifactId>
     <name>FAPAR Processor</name>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.3</version>
 
     <packaging>jar</packaging>
 

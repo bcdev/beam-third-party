@@ -17,6 +17,8 @@ Document title:	Documentation of the FAPAR Processor, a plug-in for MERIS/(A)ATS
 
 Release date : 
 
+    version 2.3 : June 2011
+	version 2.2 : December 2010
 	version 2.2 : December 2010
 	version 2.1 : December 2007
 	version 2.0 : 11 April 2005
@@ -98,6 +100,10 @@ Changelog
 ---------
 
 Changes from version 2.1 to 2.2
+- Support for data products coming from Amorgos
+- Adapted to API modifications in BEAM 4.9
+
+Changes from version 2.1 to 2.2
 - Necessary code modifications in order to make to output product more compliant with "official" MERIS Level 2 products. This has required the following changes:
   - The raw datatype of the FAPAR band has been set from uint16 to uint8
   - Parameters "no-data value" and "valid pixel expression" of the FAPAR band have been set
@@ -105,7 +111,7 @@ Changes from version 2.1 to 2.2
   - Scaling offset of the FAPAR band has been set to -1/254
   - Marked "cloud over land" pixels not detected through MGVI processing.
   - Computed anysotropic normalization and atmospheric rectification on pixels corresponding to bright surfaces.
-  - The maximum value of one of the parameters determining whether a pixel corresponds to a bright surface has been set from 1.25\rho_{681} to 1.3\rho_{681}.  
+  - The maximum value of one of the parameters determining whether a pixel corresponds to a bright surface has been set from 1.25\rho_{681} to 1.3\rho_{681}.
 
 Changes from version 2.0 to 2.1
 

@@ -24,20 +24,33 @@
  *  This software is provided as is without any warranty whatsoever.
  * 
  *  REFERENCES:
- *       N. Gobron, M. Taberner, B. Pinty, F. Melin, M. M. Verstraete and J.-L.
- *       Widlowski (2002) 'MERIS Land Algorithm: preliminary results', in
- *       Proceedings of the ENVISAT Validation Workshop, Frascati, Italy, 09-13
- *       December, 2002, European Space Agency, SP 531
+ *  [1] Gobron, N., Pinty, B., Aussedat, O., Taberner, M., Faber, O., Mélin, F.,
+ *  Lavergne, T., Robustelli, M., Snoeij, P. (2008)
+ *  Uncertainty Estimates for the FAPAR Operational Products Derived from MERIS -
+ *  Impact of Top-of-Atmosphere Radiance Uncertainties and Validation with Field Data.
+ *  Remote Sensing of Environment, 112(4):1871–1883.
+ *  Special issue: Remote Sensing Data Assimilation. Edited by Loew, A.
+ *  DOI: 10.1016/j.rse.2007.09.011
  * 
- *       N. Gobron, B. Pinty, M. M. Verstraete and M. Taberner (2002) 'Medium
- *       Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products
- *       - Algorithm Theoretical Basis Document, Institute for Environment and
- *       Sustainability, *EUR Report No. 20143 EN*, 19 pp
+ *  [2] Gobron, N., Mélin, F., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+ *  MERIS Global Vegetation Index: Evaluation and Performance.
+ *  In: Proceedings of the MERIS User Workshop. 10-14 November 2003, Frascati, Italy,
+ *  volume 549 of ESA Special Publication, European Space Agency.
+ *  Online: http://envisat.esa.int/workshops/meris03/participants/48/paper_23_gobron.pdf
  * 
- *       Gobron, N., B. Pinty, M. M. Verstraete and M. Taberner (2002) 'Medium
- *       Resolution Imaging Spectrometer (MERIS) - An optimized FAPAR Algorithm -
- *       Theoretical Basis Document, Institute for Environment and
- *       Sustainability, *EUR Report No. 20149 EN*, 19 pp
+ *  [3] Gobron, N., Aussedat, O., Pinty, B., Taberner, M., Verstraete, M. M. (2004)
+ *  Medium Resolution Imaging Spectrometer (MERIS) - Level 2 Land Surface Products -
+ *  Algorithm Theoretical Basis Document.
+ *  EUR Report 21387 EN, European Commission - DG Joint Research Centre, Institute for
+ *  Environment and Sustainability, 20 pages.
+ *  Available at: http://fapar.jrc.ec.europa.eu/pubs/?pubid=2004.eur-report.21387&format=html
+ *
+ *  [4] Gobron, N., Taberner, M., Pinty, B., Mélin, F., Verstraete, M. M., Widlowski, J.-L. (2003)
+ *  Evaluation of the MERIS Global Vegetation Index: Methodology and Initial Results.
+ *  In: Proceedings of the Working Meeting on the MERIS and ATSR Calibration and Geophysical
+ *  Validation. 20-23 October 2003, Frascati, Italy, volume 541 of ESA Special Publication,
+ *  European Space Agency.
+ *  Online: http://envisat.esa.int/workshops/mavt_2003/MAVT-2003_504-paper_NGobron.pdf
  */
 package it.jrc.beam.fapar;
 

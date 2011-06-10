@@ -55,6 +55,8 @@
 package it.jrc.beam.fapar;
 
 import com.bc.ceres.core.ProgressMonitor;
+import org.esa.beam.framework.datamodel.Mask;
+import org.esa.beam.framework.datamodel.ProductNodeGroup;
 import org.esa.beam.framework.processor.RequestElementFactory;
 import org.esa.beam.dataio.dimap.DimapProductConstants;
 import org.esa.beam.framework.dataio.ProductWriter;
@@ -74,7 +76,6 @@ import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.util.math.RsMathUtils;
 import org.esa.beam.framework.processor.ProcessorUtils;
 import org.esa.beam.framework.datamodel.FlagCoding;
-import org.esa.beam.framework.datamodel.BitmaskDef;
 
 import org.esa.beam.framework.datamodel.IndexCoding;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
@@ -170,10 +171,7 @@ public class FaparProcessor extends Processor {
      * Processor Name
      */
     public static final String PROCESSOR_NAME = "FaparProcessor";
-    // ANDREA: updated version number
-//    private static final String _processorVersion = "2.1";
-    private static final String _processorVersion = "2.2";
-    // ANDREA: END
+    private static final String _processorVersion = "2.3";
     //
     private static final String _processorCopyrightInfo = "Copyright (C) 2007-2010 SOLO";
 
@@ -403,7 +401,6 @@ public class FaparProcessor extends Processor {
         // MC ++
         _corrlongitudeInputBand = _inputProduct.getBand(INPUT_BAND_NAME_CORR_LONGITUDE);
         if (_corrlongitudeInputBand == null) {
-            //throw new ProcessorException("Cannot load band " + INPUT_BAND_NAME_CORR_LONGITUDE);
             _AmorgosData = false;
         } else {
             _AmorgosData = true;
@@ -412,7 +409,6 @@ public class FaparProcessor extends Processor {
 
         _corrlatitudeInputBand = _inputProduct.getBand(INPUT_BAND_NAME_CORR_LATITUDE);
         if (_corrlatitudeInputBand == null) {
-            //throw new ProcessorException("Cannot load band " + INPUT_BAND_NAME_CORR_LATITUDE);
             _AmorgosData = false;
         } else {
             _AmorgosData = true;
@@ -499,29 +495,36 @@ public class FaparProcessor extends Processor {
         outputFlags.addFlag("MGVI_BRIGHT", 0x800, "Bright pixel flagged by MGVI processing");
         outputFlags.addFlag("MGVI_INVAL_FAPAR", 0x1000, "Invalid rectification flagged by MGVI processing");
 
-        BitmaskDef[] bmdefs = _inputProduct.getBitmaskDefs();
-        BitmaskDef b;
-        for (int i = 0; i < _inputProduct.getNumBitmaskDefs(); i++) {
-            b = new BitmaskDef(bmdefs[i].getName(), bmdefs[i].getDescription(),
-                               (bmdefs[i].getExpr()).replaceAll("l1", "l2"), bmdefs[i].getColor(),
-                               bmdefs[i].getTransparency());
-            _outputProduct.addBitmaskDef(b);
+        ProductNodeGroup<Mask> sourceMaskGroup = _inputProduct.getMaskGroup();
+        ProductNodeGroup<Mask> targetMaskGroup = _outputProduct.getMaskGroup();
+        for (int i = 0; i < sourceMaskGroup.getNodeCount(); i++) {
+            Mask sourceMask = sourceMaskGroup.get(i);
+            if (isNotGeometryMask(sourceMask)){
+                String newExpression = Mask.BandMathsType.getExpression(sourceMask).replaceAll("l1", "l2");
+                Mask targetMask = Mask.BandMathsType.create(sourceMask.getName(), sourceMask.getDescription(),
+                                                            sceneWidth, sceneHeight, newExpression,
+                                                            sourceMask.getImageColor(),
+                                                            sourceMask.getImageTransparency());
+                targetMaskGroup.add(targetMask);
+            }
         }
-        b = new BitmaskDef("mgvi_bad", "Bad pixel flagged by MGVI processing", "l2_flags.MGVI_BAD_DATA",
-                           new Color(51, 255, 204)/*(255, 153, 102)*/, (float) 0.5);
-        _outputProduct.addBitmaskDef(b);
-        b = new BitmaskDef("mgvi_csi", "Cloud, snow or ice pixel flagged by MGVI processing", "l2_flags.MGVI_CSI",
-                           new Color(51, 153, 255)/*(255, 153, 0)*/, (float) 0.5);
-        _outputProduct.addBitmaskDef(b);
-        b = new BitmaskDef("mgvi_ws", "Water or deep shadow pixel flagged by MGVI processing", "l2_flags.MGVI_WS",
-                           new Color(51, 204, 255)/*(204, 102,0)*/, (float) 0.5);
-        _outputProduct.addBitmaskDef(b);
-        b = new BitmaskDef("mgvi_bright", "Bright pixel flagged by MGVI processing", "l2_flags.MGVI_BRIGHT",
-                           new Color(51, 217, 217)/*(255, 204, 204)*/, (float) 0.5);
-        _outputProduct.addBitmaskDef(b);
-        b = new BitmaskDef("mgvi_inval_rec", "Invalid rectification flagged by MGVI processing",
-                           "l2_flags.MGVI_INVAL_FAPAR", new Color(255, 102, 255)/*(153, 51, 0)*/, (float) 0.5);
-        _outputProduct.addBitmaskDef(b);
+        targetMaskGroup.add(Mask.BandMathsType.create("mgvi_bad", "Bad pixel flagged by MGVI processing",
+                                                      sceneWidth, sceneHeight, "l2_flags.MGVI_BAD_DATA",
+                                                      new Color(51, 255, 204), (float) 0.5));
+        targetMaskGroup.add(Mask.BandMathsType.create("mgvi_csi", "Cloud, snow or ice pixel flagged by MGVI processing",
+                                                      sceneWidth, sceneHeight, "l2_flags.MGVI_CSI",
+                                                      new Color(51, 153, 255), (float) 0.5));
+        targetMaskGroup.add(Mask.BandMathsType.create("mgvi_ws",
+                                                      "Water or deep shadow pixel flagged by MGVI processing",
+                                                      sceneWidth, sceneHeight, "l2_flags.MGVI_WS",
+                                                      new Color(51, 204, 255), (float) 0.5));
+        targetMaskGroup.add(Mask.BandMathsType.create("mgvi_bright", "Bright pixel flagged by MGVI processing",
+                                                      sceneWidth, sceneHeight, "l2_flags.MGVI_BRIGHT",
+                                                      new Color(51, 217, 217), (float) 0.5));
+        targetMaskGroup.add(Mask.BandMathsType.create("mgvi_inval_rec",
+                                                      "Invalid rectification flagged by MGVI processing",
+                                                      sceneWidth, sceneHeight, "l2_flags.MGVI_INVAL_FAPAR",
+                                                      new Color(255, 102, 255), (float) 0.5));
 
         // create and add the fapar band
 // ANDREA: set raw data type to uint8, as in ESA MERIS L2 products
@@ -560,8 +563,6 @@ public class FaparProcessor extends Processor {
 
         // create and add the green reflectance band
         if (_greenInputBand != null) {
-            // MC 22.11.07 - debug - System.out.println (sceneWidth);
-            // MC 22.11.07 - debug - System.out.println (sceneHeight);
             _reflectanceGreenBand = new Band("reflectance_TOA_5", ProductData.TYPE_FLOAT32, sceneWidth, sceneHeight);
             _outputProduct.addBand(_reflectanceGreenBand);
             _reflectanceGreenBand.setScalingFactor(1.0);
@@ -626,7 +627,7 @@ public class FaparProcessor extends Processor {
 
         // MC ++
         // create and add the corrected latitude
-        if (_AmorgosData == true) {
+        if (_AmorgosData) {
             _corrlongitude = new Band("corr_longitude", ProductData.TYPE_INT32, sceneWidth, sceneHeight);
             _outputProduct.addBand(_corrlongitude);
             _corrlongitude.setScalingFactor(9.999999974752427e-7);
@@ -673,11 +674,15 @@ public class FaparProcessor extends Processor {
 
     }
 
+    private boolean isNotGeometryMask(Mask sourceMask) {
+        return !Mask.VectorDataType.TYPE_NAME.equals(sourceMask.getImageType().getName());
+    }
+
     /**
      * Copies the tiepoint grids for latitude and longitude and the geocoding information from the input product to the
      * output product.
      */
-    private void copyGeolocationToOutput() throws ProcessorException {
+    private void copyGeolocationToOutput() {
 
         TiePointGrid latTiePoint = null;
         TiePointGrid lonTiePoint = null;
@@ -934,7 +939,7 @@ public class FaparProcessor extends Processor {
                 nir_reflectance = RsMathUtils.radianceToReflectance(radiance, sza, _nirInputBand.getSolarFlux(), null);
 
                 // MC ++
-                if (_AmorgosData == true) {
+                if (_AmorgosData) {
                     // Get the corr Latitude
                     corrlatitude = _corrlatitudeInputBand.readPixels(0, y, width, 1, corrlatitude,
                                                                      ProgressMonitor.NULL);
@@ -1059,7 +1064,7 @@ public class FaparProcessor extends Processor {
                 _reflectanceNirBand.writePixels(0, y, width, 1, nir_reflectance, ProgressMonitor.NULL);
 
                 // MC ++
-                if (_AmorgosData == true) {
+                if (_AmorgosData) {
                     _corrlatitude.writePixels(0, y, width, 1, corrlatitude, ProgressMonitor.NULL);
                     _corrlongitude.writePixels(0, y, width, 1, corrlongitude, ProgressMonitor.NULL);
                 }

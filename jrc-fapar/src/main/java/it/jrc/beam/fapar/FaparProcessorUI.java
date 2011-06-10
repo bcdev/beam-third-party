@@ -102,6 +102,7 @@ public class FaparProcessorUI implements ProcessorUI {
      * Retrieves the base component for the processor specific user interface classes. This can be any Java Swing
      * containertype. This method creates the UI from scratch if not present.
      */
+    @Override
     public JComponent getGuiComponent() {
         if (_tabbedPane == null) {
             createUI();
@@ -114,8 +115,9 @@ public class FaparProcessorUI implements ProcessorUI {
      *
      * @return a <code>Request</code> object with all elements required by the FAPAR processor
      */
+    @Override
     public Vector getRequests() throws ProcessorException {
-        Vector requests = new Vector();
+        Vector<Request> requests = new Vector<Request>();
         requests.add(createRequest());
         return requests;
     }
@@ -125,9 +127,10 @@ public class FaparProcessorUI implements ProcessorUI {
      *
      * @param requests the request list to be edited must not be <code>null</code>.
      */
+    @Override
     public void setRequests(Vector requests) throws ProcessorException {
         Guardian.assertNotNull("requests", requests);
-        if (requests.size() > 0) {
+        if (!requests.isEmpty()) {
             Request request = (Request) requests.elementAt(0);
             _requestFile = request.getFile();
             updateParamInputFile(request);
@@ -141,8 +144,9 @@ public class FaparProcessorUI implements ProcessorUI {
     /**
      * Create a new default request for the FAPAR processor and sets it to the UI
      */
+    @Override
     public void setDefaultRequests() throws ProcessorException {
-        Vector requests = new Vector();
+        Vector<Request> requests = new Vector<Request>();
         requests.add(createDefaultRequest());
         setRequests(requests);
     }
@@ -150,6 +154,7 @@ public class FaparProcessorUI implements ProcessorUI {
     /**
      * Sets the processor app for the UI
      */
+    @Override
     public void setApp(ProcessorApp app) {
         _app = app;
     }
@@ -200,6 +205,7 @@ public class FaparProcessorUI implements ProcessorUI {
 
 	// Add a listener and an action to perform if any change is made to the dialog box
         inputProductParameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidInputProduct(inputProductParameter);
             }
@@ -310,12 +316,12 @@ public class FaparProcessorUI implements ProcessorUI {
 
     /**
      * Brings up a message box if the input product is not valid. Valid input products are: products wich contains at
-     * least the bands named '{@link it.jrc.beam.fapar.FaparProcessor#INPUT_BAND_NAME_RED redBandName}' and '{@link
-     * it.jrc.beam.fapar.FaparProcessor#INPUT_BAND_NAME_BLUE blueBandName}' and '{@link it.jrc.beam.fapar.FaparProcessor#INPUT_BAND_NAME_NIR nirBandName}' and tie point grids named '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_SZA}' and '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_SAA}' and '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_VZA}' and '{@link it.jrc.beam.fapar.FaparProcessor#.INPUT_TPG_NAME_VAA}'.
+     * least the bands named '{@link FaparProcessor#INPUT_BAND_NAME_RED redBandName}' and '{@link
+     * FaparProcessor#INPUT_BAND_NAME_BLUE blueBandName}' and '{@link FaparProcessor#INPUT_BAND_NAME_NIR nirBandName}'
+     * and tie point grids named '{@link FaparProcessor#INPUT_TPG_NAME_SZA}' and '{@link FaparProcessor#INPUT_TPG_NAME_SAA}'
+     * and '{@link FaparProcessor#INPUT_TPG_NAME_VZA}' and '{@link FaparProcessor#INPUT_TPG_NAME_VAA}'.
      * The message box only comes up if the parameter contains an
      * existing file. So you can create requests with not existing input products without interfering message Box.
-     *
-     * @param parameter
      */
     private void checkForValidInputProduct(Parameter parameter) {
         Object value = parameter.getValue();
@@ -331,7 +337,7 @@ public class FaparProcessorUI implements ProcessorUI {
         }
         String msg = null;
         try {
-            Product product = ProductIO.readProduct(file, null);
+            Product product = ProductIO.readProduct(file);
             if (product != null) {
                 final String blueBandName = FaparProcessor.INPUT_BAND_NAME_BLUE;
                 final String redBandName = FaparProcessor.INPUT_BAND_NAME_RED;

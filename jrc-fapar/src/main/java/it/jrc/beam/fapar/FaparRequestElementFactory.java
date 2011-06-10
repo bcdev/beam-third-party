@@ -129,7 +129,7 @@ public class FaparRequestElementFactory implements RequestElementFactory {
      * @param typeId     the product type identifier, can be <code>null</code> if not known
      *
      * @throws IllegalArgumentException       if <code>file</code> is <code>null</code>
-     * @throws org.esa.beam.framework.processor.RequestElementFactoryException if the element could not be created
+     * @throws RequestElementFactoryException if the element could not be created
      */
     public ProductRef createInputProductRef(File file, String fileFormat, String typeId) throws RequestElementFactoryException {
         return _defaultFactory.createInputProductRef(file, fileFormat, typeId);
@@ -143,7 +143,7 @@ public class FaparRequestElementFactory implements RequestElementFactory {
      * @param typeId     the product type identifier, can be <code>null</code> if not known
      *
      * @throws IllegalArgumentException       if <code>file</code> is <code>null</code>
-     * @throws org.esa.beam.framework.processor.RequestElementFactoryException if the element could not be created
+     * @throws RequestElementFactoryException if the element could not be created
      */
     public ProductRef createOutputProductRef(File file, String fileFormat, String typeId) throws RequestElementFactoryException {
         return _defaultFactory.createOutputProductRef(file, fileFormat, typeId);

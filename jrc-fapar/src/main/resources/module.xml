@@ -1,13 +1,14 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
+
     <symbolicName>jrc-fapar</symbolicName>
-    <version>2.2</version>
+    <version>2.3</version>
     <name>FAPAR Processor</name>
 
     <description>
         <![CDATA[
         <p>A VISAT plug-in and stand-alone processor which computes the Fraction of Absorbed Photosynthetically
-        Active Radiation (FAPAR) for MERIS Level-1b data.</p>
+        Active Radiation (FAPAR) for MERIS Level-1b data and and/or Amorgos output.</p>
 
         <p>Documentation:</p>
         <ul>
@@ -23,8 +24,10 @@
 
     <changelog>
         <![CDATA[
-        <br>Changes in version 2.2:<br/>
+        <br/>Changes in version 2.3:<br/>
         - Adapted to BEAM 4.9<br/>
+        - Support for data products coming from Amorgos<br/>
+        <br/>Changes in version 2.2:<br/>
         - Necessary code modifications in order to make to output product more compliant with "official" MERIS Level 2 products.<br/>
           This has required the following changes:<br/>
           <ul>

@@ -991,7 +991,7 @@ public class BaerProcessor extends Processor {
 
         pm.beginTask(BaerConstants.LOG_MSG_GENERATE_PIXEL, work); /*I18N*/
 
-        copyFlagBandData(_inputProduct, _outputProduct, SubProgressMonitor.create(pm, 1));
+        copyFlagBands(_inputProduct, _outputProduct);
 
         for (int line = 0; line < height; line++) {
 

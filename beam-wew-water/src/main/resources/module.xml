@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <name>WeW Water Processor</name>
     <description>
         <![CDATA[
@@ -32,6 +32,8 @@
 
     <changelog>
         <![CDATA[
+        From 1.2.6 to 1.2.7<br/>
+        Adapted to BEAM 4.9<br/>
         From 1.2.5 to 1.2.6<br/>
         Adapted to BEAM 4.8<br/>
         From 1.2.4 to 1.2.5<br/>

@@ -6,7 +6,7 @@
     <groupId>wew.water</groupId>
     <artifactId>beam-wew-water</artifactId>
     <name>beam-wew-water</name>
-    <version>1.2.6</version>
+    <version>1.2.7-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -69,11 +69,6 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <!--
-    In version 3 of Maven the sourceEncoding property will be embedded in the
-    build tag. For now the convention is to that it as property.
-    TODO: Move the sourceEncoding property to the build tag if version 3 is released
-    -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

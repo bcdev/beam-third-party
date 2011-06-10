@@ -20,12 +20,13 @@ import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.dataio.ProductIO;
 import org.esa.beam.framework.dataio.ProductWriter;
 import org.esa.beam.framework.datamodel.Band;
-import org.esa.beam.framework.datamodel.BitmaskDef;
 import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.datamodel.ProductNodeGroup;
 import org.esa.beam.framework.datamodel.TiePointGrid;
 import org.esa.beam.framework.processor.Processor;
 import org.esa.beam.framework.processor.ProcessorConstants;
@@ -59,7 +60,7 @@ public class WaterProcessor extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
-    public static final String PROCESSOR_VERSION = "1.2.4";        // PROCESS
+    public static final String PROCESSOR_VERSION = "1.2.7";        // PROCESS
     public static final String PROCESSOR_COPYRIGHT = "Copyright (C) 2005/7 by WeW (michael.schaale@wew.fu-berlin.de)";
 
     public static final String LOGGER_NAME = "beam.processor.water";
@@ -366,8 +367,7 @@ public class WaterProcessor extends Processor {
             closeProducts();
 
             LOGGER.info(ProcessorConstants.LOG_MSG_SUCCESS);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // catch all exceptions expect ProcessorException and throw ProcessorException
             throw new ProcessorException(e.getMessage());
         }
@@ -660,50 +660,42 @@ public class WaterProcessor extends Processor {
         ProductUtils.copyMasks(_inputProduct, _outputProduct);
 
         String falgNamePrefix = RESULT_FLAGS_NAME + ".";
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[0].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[0],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[0],
-                                                    Color.cyan, 0.0f));
+        ProductNodeGroup<Mask> maskGroup = _outputProduct.getMaskGroup();
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[0].toLowerCase(), RESULT_ERROR_TEXT[0],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[0],
+                                                Color.cyan, 0.0f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[1].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[1],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[1],
-                                                    Color.green, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[1].toLowerCase(), RESULT_ERROR_TEXT[1],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[1],
+                                                Color.green, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[2].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[2],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[2],
-                                                    Color.green, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[2].toLowerCase(), RESULT_ERROR_TEXT[2],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[2],
+                                                Color.green, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[3].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[3],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[3],
-                                                    Color.yellow, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[3].toLowerCase(), RESULT_ERROR_TEXT[3],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[3],
+                                                Color.yellow, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[4].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[4],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[4],
-                                                    Color.yellow, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[4].toLowerCase(), RESULT_ERROR_TEXT[4],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[4],
+                                                Color.yellow, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[5].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[5],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[5],
-                                                    Color.orange, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[5].toLowerCase(), RESULT_ERROR_TEXT[5],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[5],
+                                                Color.orange, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[6].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[6],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[6],
-                                                    Color.orange, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[6].toLowerCase(), RESULT_ERROR_TEXT[6],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[6],
+                                                Color.orange, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[7].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[7],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[7],
-                                                    Color.blue, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[7].toLowerCase(), RESULT_ERROR_TEXT[7],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[7],
+                                                Color.blue, 0.5f));
 
-        _outputProduct.addBitmaskDef(new BitmaskDef(RESULT_ERROR_NAME[8].toLowerCase(),
-                                                    RESULT_ERROR_TEXT[8],
-                                                    falgNamePrefix + RESULT_ERROR_NAME[8],
-                                                    Color.blue, 0.5f));
+        maskGroup.add(Mask.BandMathsType.create(RESULT_ERROR_NAME[8].toLowerCase(), RESULT_ERROR_TEXT[8],
+                                                sceneWidth, sceneHeight, falgNamePrefix + RESULT_ERROR_NAME[8],
+                                                Color.blue, 0.5f));
 
         // Initialize the disk representation
         //
@@ -782,7 +774,6 @@ public class WaterProcessor extends Processor {
 
     *  **********************************************************************
     */
-
     private void processWater(ProgressMonitor pm) throws ProcessorException, IOException {
 
         int i;

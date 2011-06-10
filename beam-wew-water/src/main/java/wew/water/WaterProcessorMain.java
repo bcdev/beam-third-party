@@ -20,7 +20,7 @@ import org.esa.beam.framework.processor.ProcessorRunner;
  * the command line. The command line arguments that can be understood by the processor are:
  * <ul>
  *  <li>-i or --interactive (optional): open the user interface for this Water Processor</li>
- *  <li>-d or --debug (optional): swicth the BEAM framework into debugging mode. This will give a wealth of
+ *  <li>-d or --debug (optional): switch the BEAM framework into debugging mode. This will give a wealth of
  * additional state information logged to the console window</li>
  *  <li>the path to a request file (mandatory)</li>
  * </ul>

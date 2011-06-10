@@ -60,6 +60,7 @@ public class WaterProcessorUI implements ProcessorUI {
      * This can be any Java Swing containertype. This method creates the UI from scratch if
      * not present.
      */
+    @Override
     public JComponent getGuiComponent() {
         if (_tabbedPane == null) {
             createUI();
@@ -70,8 +71,9 @@ public class WaterProcessorUI implements ProcessorUI {
     /*
      * Retrieves the requests currently edited.
      */
+    @Override
     public Vector getRequests() throws ProcessorException {
-        Vector requests = new Vector();
+        Vector<Request> requests = new Vector<Request>();
         requests.add(createRequest());
         return requests;
     }
@@ -81,20 +83,21 @@ public class WaterProcessorUI implements ProcessorUI {
      *
      * @param requests the request list to be edited must not be <code>null</code>.
      */
+    @Override
     public void setRequests(Vector requests) throws ProcessorException {
         Guardian.assertNotNull("requests", requests);
-        if (requests.size() > 0) {
+        if (!requests.isEmpty()) {
             Request request = (Request) requests.elementAt(0);
             _requestFile = request.getFile();
             updateParamInputFile(request);
             updateParamOutputFile(request);
             updateParamOutputFormat(request);
-            updateParamCheckbox1Format(request);
-            updateParamCheckbox2Format(request);
-            updateParamCheckbox3Format(request);
-            updateParamCheckbox4Format(request);
-            updateParamCheckbox5Format(request);
-            updateParamCheckbox6Format(request);
+            updateParamCheckBoxFormat(request, WaterProcessor.CHECKBOX1_PARAM_NAME);
+            updateParamCheckBoxFormat(request, WaterProcessor.CHECKBOX2_PARAM_NAME);
+            updateParamCheckBoxFormat(request, WaterProcessor.CHECKBOX3_PARAM_NAME);
+            updateParamCheckBoxFormat(request, WaterProcessor.CHECKBOX4_PARAM_NAME);
+            updateParamCheckBoxFormat(request, WaterProcessor.CHECKBOX5_PARAM_NAME);
+            updateParamCheckBoxFormat(request, WaterProcessor.CHECKBOX6_PARAM_NAME);
         } else {
             setDefaultRequests();
         }
@@ -103,8 +106,9 @@ public class WaterProcessorUI implements ProcessorUI {
     /*
      * Create a new default request for the sst processor and sets it to the UI
      */
+    @Override
     public void setDefaultRequests() throws ProcessorException {
-        Vector requests = new Vector();
+        Vector<Request> requests = new Vector<Request>();
         requests.add(createDefaultRequest());
         setRequests(requests);
     }
@@ -112,6 +116,7 @@ public class WaterProcessorUI implements ProcessorUI {
     /*
      * Sets the processor app for the UI
      */
+    @Override
     public void setApp(ProcessorApp app) {
     }
 
@@ -174,42 +179,49 @@ public class WaterProcessorUI implements ProcessorUI {
         _paramGroup.addParameter(checkbox6Parameter);
 
         inputProductParameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidInputProduct(inputProductParameter);
             }
         });
 
         checkbox1Parameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidCheckbox1(checkbox1Parameter);
             }
         });
 
         checkbox2Parameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidCheckbox2(checkbox2Parameter);
             }
         });
 
         checkbox3Parameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidCheckbox3(checkbox3Parameter);
             }
         });
 
         checkbox4Parameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidCheckbox4(checkbox4Parameter);
             }
         });
 
         checkbox5Parameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidCheckbox5(checkbox5Parameter);
             }
         });
 
         checkbox6Parameter.addParamChangeListener(new ParamChangeListener() {
+            @Override
             public void parameterValueChanged(ParamChangeEvent event) {
                 checkForValidCheckbox6(checkbox6Parameter);
             }
@@ -365,158 +377,22 @@ public class WaterProcessorUI implements ProcessorUI {
         _paramGroup.getParameter(ProcessorConstants.OUTPUT_FORMAT_PARAM_NAME).setValue(format, null);
     }
 
-    private void updateParamCheckbox1Format(Request request) {
-        Parameter param;
-        Parameter toUpdate;
-        Boolean value;
-
-        param = request.getParameter(WaterProcessor.CHECKBOX1_PARAM_NAME);
+    private void updateParamCheckBoxFormat(Request request, String paramName) {
+        Parameter param = request.getParameter(paramName);
         if (param != null) {
             // param.getValueType sometimes indicate type String (when reading an XML)
             // or type Boolean (when setting the checkmarks and saving the request).
             // The reason for this behaviour could not be figured out. Thus this
             // workaround was created.
+            Boolean value;
             if (param.getValueType() == String.class) {
                 // Analyse the String ...
-                value = false;
-                if (param.getValue().equals("true")) {
-                    value = true;
-                }
+                value = "true".equals(param.getValue());
             } else {
                 // Directly use the Boolean
                 value = Boolean.valueOf(String.valueOf(param.getValue()));
             }
-            toUpdate = _paramGroup.getParameter(WaterProcessor.CHECKBOX1_PARAM_NAME);
-            toUpdate.setValue(value, null);
-        }
-    }
-
-    private void updateParamCheckbox2Format(Request request) {
-        Parameter param;
-        Parameter toUpdate;
-        Boolean value;
-
-        param = request.getParameter(WaterProcessor.CHECKBOX2_PARAM_NAME);
-        if (param != null) {
-            // param.getValueType sometimes indicate type String (when reading an XML)
-            // or type Boolean (when setting the checkmarks and saving the request).
-            // The reason for this behaviour could not be figured out. Thus this
-            // workaround was created.
-            if (param.getValueType() == String.class) {
-                // Analyse the String ...
-                value = false;
-                if (param.getValue().equals("true")) {
-                    value = true;
-                }
-            } else {
-                // Directly use the Boolean
-                value = Boolean.valueOf(String.valueOf(param.getValue()));
-            }
-            toUpdate = _paramGroup.getParameter(WaterProcessor.CHECKBOX2_PARAM_NAME);
-            toUpdate.setValue(value, null);
-        }
-    }
-
-    private void updateParamCheckbox3Format(Request request) {
-        Parameter param;
-        Parameter toUpdate;
-        Boolean value;
-
-        param = request.getParameter(WaterProcessor.CHECKBOX3_PARAM_NAME);
-        if (param != null) {
-            // param.getValueType sometimes indicate type String (when reading an XML)
-            // or type Boolean (when setting the checkmarks and saving the request).
-            // The reason for this behaviour could not be figured out. Thus this
-            // workaround was created.
-            if (param.getValueType() == String.class) {
-                // Analyse the String ...
-                value = false;
-                if (param.getValue().equals("true")) {
-                    value = true;
-                }
-            } else {
-                // Directly use the Boolean
-                value = Boolean.valueOf(String.valueOf(param.getValue()));
-            }
-            toUpdate = _paramGroup.getParameter(WaterProcessor.CHECKBOX3_PARAM_NAME);
-            toUpdate.setValue(value, null);
-        }
-    }
-
-    private void updateParamCheckbox4Format(Request request) {
-        Parameter param;
-        Parameter toUpdate;
-        Boolean value;
-
-        param = request.getParameter(WaterProcessor.CHECKBOX4_PARAM_NAME);
-        if (param != null) {
-            // param.getValueType sometimes indicate type String (when reading an XML)
-            // or type Boolean (when setting the checkmarks and saving the request).
-            // The reason for this behaviour could not be figured out. Thus this
-            // workaround was created.
-            if (param.getValueType() == String.class) {
-                // Analyse the String ...
-                value = false;
-                if (param.getValue().equals("true")) {
-                    value = true;
-                }
-            } else {
-                // Directly use the Boolean
-                value = Boolean.valueOf(String.valueOf(param.getValue()));
-            }
-            toUpdate = _paramGroup.getParameter(WaterProcessor.CHECKBOX4_PARAM_NAME);
-            toUpdate.setValue(value, null);
-        }
-    }
-
-    private void updateParamCheckbox5Format(Request request) {
-        Parameter param;
-        Parameter toUpdate;
-        Boolean value;
-
-        param = request.getParameter(WaterProcessor.CHECKBOX5_PARAM_NAME);
-        if (param != null) {
-            // param.getValueType sometimes indicate type String (when reading an XML)
-            // or type Boolean (when setting the checkmarks and saving the request).
-            // The reason for this behaviour could not be figured out. Thus this
-            // workaround was created.
-            if (param.getValueType() == String.class) {
-                // Analyse the String ...
-                value = false;
-                if (param.getValue().equals("true")) {
-                    value = true;
-                }
-            } else {
-                // Directly use the Boolean
-                value = Boolean.valueOf(String.valueOf(param.getValue()));
-            }
-            toUpdate = _paramGroup.getParameter(WaterProcessor.CHECKBOX5_PARAM_NAME);
-            toUpdate.setValue(value, null);
-        }
-    }
-
-    private void updateParamCheckbox6Format(Request request) {
-        Parameter param;
-        Parameter toUpdate;
-        Boolean value;
-
-        param = request.getParameter(WaterProcessor.CHECKBOX6_PARAM_NAME);
-        if (param != null) {
-            // param.getValueType sometimes indicate type String (when reading an XML)
-            // or type Boolean (when setting the checkmarks and saving the request).
-            // The reason for this behaviour could not be figured out. Thus this
-            // workaround was created.
-            if (param.getValueType() == String.class) {
-                // Analyse the String ...
-                value = false;
-                if (param.getValue().equals("true")) {
-                    value = true;
-                }
-            } else {
-                // Directly use the Boolean
-                value = Boolean.valueOf(String.valueOf(param.getValue()));
-            }
-            toUpdate = _paramGroup.getParameter(WaterProcessor.CHECKBOX6_PARAM_NAME);
+            Parameter toUpdate = _paramGroup.getParameter(paramName);
             toUpdate.setValue(value, null);
         }
     }
@@ -579,8 +455,8 @@ public class WaterProcessorUI implements ProcessorUI {
 
     private void checkForValidCheckbox1(Parameter parameter) {
         Object value = parameter.getValue();
-        Object typ = parameter.getValueType();
-        boolean value_box1, value_box2;
+        boolean value_box1;
+        boolean value_box2;
 
         // We do only arrive here, if something has changed. Keep this in mind !
 
@@ -602,8 +478,8 @@ public class WaterProcessorUI implements ProcessorUI {
 
     private void checkForValidCheckbox2(Parameter parameter) {
         Object value = parameter.getValue();
-        Object typ = parameter.getValueType();
-        boolean value_box1, value_box2;
+        boolean value_box1;
+        boolean value_box2;
 
         // We do only arrive here, if something has changed. Keep this in mind !
 
@@ -625,7 +501,6 @@ public class WaterProcessorUI implements ProcessorUI {
 
     private void checkForValidCheckbox3(Parameter parameter) {
         Object value = parameter.getValue();
-        Object typ = parameter.getValueType();
         boolean value_box3, value_box4;
 
         // We do only arrive here, if something has changed. Keep this in mind !
@@ -655,7 +530,6 @@ public class WaterProcessorUI implements ProcessorUI {
 
     private void checkForValidCheckbox4(Parameter parameter) {
         Object value = parameter.getValue();
-        Object typ = parameter.getValueType();
         boolean value_box3, value_box4;
 
         // We do only arrive here, if something has changed. Keep this in mind !
@@ -684,7 +558,6 @@ public class WaterProcessorUI implements ProcessorUI {
 
     private void checkForValidCheckbox5(Parameter parameter) {
         Object value = parameter.getValue();
-        Object typ = parameter.getValueType();
         boolean value_box5;
 
         // We do only arrive here, if something has changed. Keep this in mind !
@@ -700,7 +573,6 @@ public class WaterProcessorUI implements ProcessorUI {
 
     private void checkForValidCheckbox6(Parameter parameter) {
         Object value = parameter.getValue();
-        Object typ = parameter.getValueType();
         boolean value_box6;
 
         // We do only arrive here, if something has changed. Keep this in mind !

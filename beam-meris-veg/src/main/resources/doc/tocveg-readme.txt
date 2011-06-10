@@ -25,7 +25,6 @@ auxiliary data files:
         o config.xml        (TOC-VEG configuration)
         o *.xml, *.par      (TOC-VEG auxiliary data files)
     o tocveg-readme.txt     (this file)
-    o tocveg-changelog.txt  (list of software changes)
     o tocveg-version.txt    (current version number)
 
 
@@ -105,7 +104,7 @@ in the 11 MERIS bands, the sun and view zenith angles, the relative azimuth.
 4.3 References
 
 MERIS_ATBD_TOC_VEG_03_06.pdf, Algorithm Theoretical Basis Document for MERIS
-top of canopy Land Products (TOC_VEG), Frédéric Baret, Cédric Bacour, David Béal
+top of canopy Land Products (TOC_VEG), Frï¿½dï¿½ric Baret, Cï¿½dric Bacour, David Bï¿½al
 Marie Weiss, Beatrice Berthelot and Peter Regner Contract ESA
 AO/1-4233/02/I-LG.
 Valid_MERIS_TOC_VEG_03_06_V2.pdf, Report on the validation of MERIS TOC_VEG land

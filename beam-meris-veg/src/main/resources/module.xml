@@ -202,6 +202,10 @@ Meris BAER Changelog<br>
 =========================================================<br>
 <br>
     Changes for Version 1.0<br>
+     * renamed cloud band to 'BAND_CLOUD' which is in line with naming of latitude and longitude bands.<br>
+       This was needed because a mask with the name 'cloud' already exists.
+<br>
+    Changes for Version 1.0<br>
      * split in 3 process (cloud, baer, atmospheric correction)<br>
      * changing interface (Cloud Detection, Baer Process, Atmospheric Correction)<br>
      * suppress cloud shadow<br>

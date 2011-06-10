@@ -1,7 +1,7 @@
                            README for
 
                    MERIS Vegetation Processors
-                        BAER Version 1.0
+                        BAER Version 1.1
 
 =======================================================================
 1. Introduction
@@ -25,7 +25,6 @@ auxiliary data files:
         o config.xml        (BAER configuration)
         o *.xml, *.par      (BAER auxiliary data files)
     o baer-readme.txt       (this file)
-    o baer-changelog.txt    (list of software changes)
     o baer-version.txt      (current version number)
 
 
@@ -79,8 +78,8 @@ For L2 data over land, the variability of the vegetation cover and the kind of t
  be considered dynamically by means of a surface reflectance model tuned from the satellite scene 
 self by the NDVI. The aerosol reflectance is obtained by removing the estimation of the surface effect.
  Look-up-tables of the relationship between AOT - aerosol reflectance and the use of constraints
- enable the determination of the AOT for 7 MERIS channels in a spectral range of 0.412 - 0.670 µm. 
-AOT is extrapolated, using Angström power law with parameters estimated from the retrieved AOT.
+ enable the determination of the AOT for 7 MERIS channels in a spectral range of 0.412 - 0.670 ï¿½m. 
+AOT is extrapolated, using Angstrï¿½m power law with parameters estimated from the retrieved AOT.
  Others terms of radiative transfer (aerosol reflectance, total transmittance and hemispheric
  reflectance) are computed once the AOT known to correct the Top Of Aerosol reflectance from 
 aerosol effect.
@@ -97,7 +96,7 @@ and the atmospheric pressure.
 4.3 References
 
 NOv-3341-NT-3352.pdf, Algorithm Theoretical Basis Document for MERIS
-Determination of aerosol optical thickness over land surfaces using Bremen aerosol retrieval (BAER) and its application to atmospheric correction over lands, Wolfgang Von Hoyningen-Huene, Alexander Kokhanovsky, John Burrows, Béatrice Berthelot, Peter Regner, November 2005, Contract ESA AO/1-4233/02/I-LG.
+Determination of aerosol optical thickness over land surfaces using Bremen aerosol retrieval (BAER) and its application to atmospheric correction over lands, Wolfgang Von Hoyningen-Huene, Alexander Kokhanovsky, John Burrows, Bï¿½atrice Berthelot, Peter Regner, November 2005, Contract ESA AO/1-4233/02/I-LG.
 NOv-3341-NT-3284.pdf, Validation report of BAER products
 
 4.4 Processor Input and Output

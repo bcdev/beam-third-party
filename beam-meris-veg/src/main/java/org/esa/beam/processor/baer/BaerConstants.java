@@ -12,7 +12,7 @@ public class BaerConstants {
     // processor name, version and copyright
     // -------------------------------------
     public static final String PROC_NAME = "MERIS BAER";
-    public static final String PROC_VERSION = "1.0";
+    public static final String PROC_VERSION = "1.1";
     public static final String PROC_COPYRIGHT = "Copyright 2005 by NOVELTIS";
 
     // Help file access constants
@@ -135,7 +135,7 @@ public class BaerConstants {
     public static final String TOA_VEG_BAND_NAME = "TOA_VEG";
     public static final String TOA_VEG_BAND_DESCRIPTION = "MERIS global vegetation index";
 
-    public static final String CLOUD_BAND_NAME = "CLOUD";
+    public static final String CLOUD_BAND_NAME = "BAND_CLOUD";
     public static final String CLOUD_BAND_DESCRIPTION = "Cloud";
 
     public static final String OUT_FLAGS_BAND_NAME = "BAER_FLAGS";

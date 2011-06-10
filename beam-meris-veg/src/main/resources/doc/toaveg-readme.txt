@@ -1,7 +1,7 @@
                            README for
 
                    MERIS Vegetation Processor
-                     TOA-VEG Version 1.1.1
+                     TOA-VEG Version 1.1.2
 
 =======================================================================
 1. Introduction
@@ -25,7 +25,6 @@ auxiliary data files:
         o config.xml        (TOA-VEG configuration)
         o *.xml, *.par      (TOA-VEG auxiliary data files)
     o toaveg-readme.txt     (this file)
-    o toaveg-changelog.txt  (list of software changes)
     o toaveg-version.txt    (current version number)
 
 =======================================================================
@@ -82,7 +81,7 @@ neurones corresponding to a total around 340 coefficients to adjust.
 
 The theoretical performances were evaluated over the test simulated data set.
 The quality of the results is not guaranteed when solar zenith angle is larger
-than 60° due to the limitations in representativity of the canopy radiative
+than 60ï¿½ due to the limitations in representativity of the canopy radiative
 transfer model used for training the neural network.
 
 TOA_VEG requires as input in addition to the measured top of atmosphere 
@@ -92,7 +91,7 @@ azimuth and the atmospheric pressure.
 4.3 References
 
 MERIS_ATBD_TOA_VEG_03_06.pdf, Algorithm Theoretical Basis Document for MERIS
-Top of canopy Land Products (TOA_VEG version 3), Marie Weiss, Frédéric Baret, K. Pavageau, David Béal
+Top of canopy Land Products (TOA_VEG version 3), Marie Weiss, Frï¿½dï¿½ric Baret, K. Pavageau, David Bï¿½al
 Marie Weiss, Beatrice Berthelot and Peter Regner, March 2006, Contract ESA AO/1-4233/02/I-LG.
 Valid_MERIS_TOA_VEG_03_06.pdf, Validation report, April 2006.
 

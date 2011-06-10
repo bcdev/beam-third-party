@@ -458,27 +458,6 @@ public class FaparProcessor extends Processor {
 
 // ANDREA
 
-        Band[] test_bands = _inputProduct.getBands();
-        for (int i = 0; i < test_bands.length; i++) {
-            Band test_band = test_bands[i];
-            FlagCoding test_flagCoding = test_band.getFlagCoding();
-            if (test_flagCoding != null) {
-                String[] test_flagNames = test_flagCoding.getFlagNames();
-                for (int j = 0; j < test_flagNames.length; j++) {
-                    String test_flagName = test_flagNames[j];
-                    MetadataAttribute test_flag = test_flagCoding.getFlag(test_flagName);
-                    int test_flagMask = test_flagCoding.getFlagMask(test_flagName);
-                }
-                String[] test_attributeNames = test_flagCoding.getAttributeNames();
-                for (int j = 0; j < test_attributeNames.length; j++) {
-                    String test_attributeName = test_attributeNames[j];
-                }
-
-            }
-            IndexCoding test_indexCoding = test_band.getIndexCoding();
-        }
-
-
         // Get the flags and add some
         FlagCoding outputFlags = _outputProduct.getFlagCodingGroup().get(_flagName);
         if (outputFlags == null) {
@@ -1072,7 +1051,7 @@ public class FaparProcessor extends Processor {
 
                 // Notify process listeners about processing progress and
                 // check whether or not processing shall be terminated
-                pm.worked(y);
+                pm.worked(1);
                 if (pm.isCanceled()) {
                     // Processing terminated!
                     // --> Completely remove output product
@@ -1084,21 +1063,6 @@ public class FaparProcessor extends Processor {
                     return;
                 }
 
-                // update progressbar
-                // ------------------
-//		    if (!fireProcessInProgress(y)) {
-//			    _logger.warning(ProcessorConstants.LOG_MSG_PROC_CANCELED);
-//			    setCurrentStatus(ProcessorConstants.STATUS_ABORTED);
-//			    return;
-//		    }
-//
-//		    // check aborted
-//		    // -------------
-//		    if (isAborted()){
-//			    _logger.warning(ProcessorConstants.LOG_MSG_PROC_ABORTED);
-//			    fireProcessEnded(false);
-//			    return;
-//		    }
             }
         } finally {
             pm.done();
@@ -1106,10 +1070,6 @@ public class FaparProcessor extends Processor {
 
         _flag.writePixels(0, 0, width, height, flg, ProgressMonitor.NULL);
         _logger.info(ProcessorConstants.LOG_MSG_PROC_SUCCESS);
-
-        // finish
-        // ------
-//	    fireProcessEnded(true);
 
     }
 }

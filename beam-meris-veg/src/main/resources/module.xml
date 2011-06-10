@@ -201,7 +201,7 @@ Meris TOC-VEG Changelog<br>
 Meris BAER Changelog<br>
 =========================================================<br>
 <br>
-    Changes for Version 1.0<br>
+    Changes for Version 1.1<br>
      * [BEAM-1304] BAER processor doesn't start processing<br>
        Renamed cloud band to 'BAND_CLOUD' which is in line with naming of latitude and longitude bands.<br>
        This was needed because a mask with the name 'cloud' already exists.<br>

@@ -197,9 +197,9 @@ public class M5StereoMatcher extends Operator {
 		//TODO leave these in, somehow it all fails when they are taken out.
 		//TODO must be some side effect -- maybe pulling on JAI images
 		@SuppressWarnings("unused")
-		Tile referenceTile = getSourceTile(referenceBand, targetRectangle, pm);	
+		Tile referenceTile = getSourceTile(referenceBand, targetRectangle);
 		@SuppressWarnings("unused")
-		Tile comparisonTile = getSourceTile(comparisonBand, targetRectangle, pm);		
+		Tile comparisonTile = getSourceTile(comparisonBand, targetRectangle);
 
 		Tile qualityTile = targetTiles.get(quality);
 		Tile xDisparityTile = targetTiles.get(xDisparities);
@@ -207,7 +207,7 @@ public class M5StereoMatcher extends Operator {
 
 		Tile filterTile = null;
 		if (null != filterBand){
-			filterTile = getSourceTile(filterBand, targetRectangle, pm);
+			filterTile = getSourceTile(filterBand, targetRectangle);
 			if (filterTileAllNull(filterTile)){
 				setTileToNull(qualityTile);
 				setTileToNull(xDisparityTile);
@@ -254,13 +254,12 @@ public class M5StereoMatcher extends Operator {
 		pm.setTaskName("Stereo matching tile " + targetRectangle);
 		for (Point2D.Float disparity : disparitySet) {
 			pm.setSubTaskName("Computing disparity for tile " + targetRectangle + " at x/y" + disparity.x + " " + disparity.y);
-			if (pm.isCanceled()) {
-				return;
-			} else {
-				pm.worked(1);
-			}
+            if (pm.isCanceled()) {
+                return;
+            }
+            pm.worked(1);
 
-			if (Math.abs(disparity.y) >= targetRectangle.getHeight()){
+            if (Math.abs(disparity.y) >= targetRectangle.getHeight()){
 				//System.out.println("Not enough data for disparity x/y" + disparity.x + " " + disparity.y);
 				continue;
 			}

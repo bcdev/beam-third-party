@@ -120,10 +120,10 @@ public class ImageCoregistration extends Operator {
 
 	    pm.beginTask("Computing filter", targetRect.height+16);
         try {
-            Tile xDispTile = getSourceTile(xDispBand, targetRect, SubProgressMonitor.create(pm, 4));
-            Tile yDispTile = getSourceTile(yDispBand, targetRect, SubProgressMonitor.create(pm, 4));
-            Tile expectedDisparityTile = getSourceTile(expectedDispBand, targetRect, SubProgressMonitor.create(pm, 4));
-            Tile filterTile = getSourceTile(filterBand, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile xDispTile = getSourceTile(xDispBand, targetRect);
+            Tile yDispTile = getSourceTile(yDispBand, targetRect);
+            Tile expectedDisparityTile = getSourceTile(expectedDispBand, targetRect);
+            Tile filterTile = getSourceTile(filterBand, targetRect);
 
             Tile xShiftTile = targetTiles.get(xShiftBand);
             Tile yShiftTile = targetTiles.get(yShiftBand);

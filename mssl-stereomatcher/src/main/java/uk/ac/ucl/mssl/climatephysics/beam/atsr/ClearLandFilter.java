@@ -68,8 +68,8 @@ public class ClearLandFilter extends Operator {
 	    Rectangle targetRect = targetTile.getRectangle();
 		pm.beginTask("Computing filter", targetRect.height+8);
 		try {
-		    Tile nadirTile = getSourceTile(nadirBand, targetRect, SubProgressMonitor.create(pm, 4));
-		    Tile forwardTile = getSourceTile(forwardBand, targetRect, SubProgressMonitor.create(pm, 4));
+		    Tile nadirTile = getSourceTile(nadirBand, targetRect);
+		    Tile forwardTile = getSourceTile(forwardBand, targetRect);
 
 		    for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
 		        for(int x = targetRect.x; x < targetRect.x + targetRect.width; x++) {	
@@ -93,11 +93,13 @@ public class ClearLandFilter extends Operator {
 		                            continue;
 		                        }
 		                        cloudy = nadirTile.getSampleBit(x + i, y + j, 1) || forwardTile.getSampleBit(x + i, y + j, 1);
-		                        if (cloudy)
-		                            break;
+		                        if (cloudy) {
+                                    break;
+                                }
 		                    }
-		                    if (cloudy)
-		                        break;
+		                    if (cloudy) {
+                                break;
+                            }
 		                }
 		            }
 		            int value = (!valid) || (!land) || cloudy ? 0 : 1;

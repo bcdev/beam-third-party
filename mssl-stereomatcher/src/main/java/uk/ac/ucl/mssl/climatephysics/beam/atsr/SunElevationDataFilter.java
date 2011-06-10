@@ -82,7 +82,7 @@ public class SunElevationDataFilter extends Operator {
 	    Rectangle targetRect = targetTile.getRectangle();
         pm.beginTask("Computing filter", targetRect.height + 4 + (referenceBand.isValidMaskUsed()?4:0));
         try {
-            Tile sunElevationTile = getSourceTile(sunElevationBand, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile sunElevationTile = getSourceTile(sunElevationBand, targetRect);
             Tile validTile = null;
             if (referenceBand.isValidMaskUsed()) {
                 validTile = getValidTile(referenceBand, targetRect);

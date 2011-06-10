@@ -129,7 +129,7 @@ public class Normaliser extends Operator {
 	private void normaliseBand(Band inputBand, Band copyInputBand, 
 	                           Band normalisedBand, Band stddevBand, Band meanBand, 
 	                           Map<Band, Tile> targetTiles, Rectangle targetRectangle, ProgressMonitor pm){
-		Tile inputTile = getSourceTile(inputBand, targetRectangle, pm);		
+		Tile inputTile = getSourceTile(inputBand, targetRectangle);
 
         RenderedImage inputImage = inputBand.getSourceImage();
                    

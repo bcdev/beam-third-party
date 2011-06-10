@@ -96,8 +96,8 @@ public class MannsteinCameraModel extends Operator {
 	    Rectangle targetRect = targetTile.getRectangle();
         pm.beginTask("Computing filter", targetRect.height+8);
         try {
-            Tile yDisparityTile = getSourceTile(yDisparityBand, targetRect, SubProgressMonitor.create(pm, 4));	
-            Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRect, SubProgressMonitor.create(pm, 4));		
+            Tile yDisparityTile = getSourceTile(yDisparityBand, targetRect);
+            Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRect);
 		
             for (int y = (yDisparityTile.getMinY()); y <= yDisparityTile.getMaxY(); y++) {
                 for(int x = yDisparityTile.getMinX(); x <= yDisparityTile.getMaxX(); x++) {					

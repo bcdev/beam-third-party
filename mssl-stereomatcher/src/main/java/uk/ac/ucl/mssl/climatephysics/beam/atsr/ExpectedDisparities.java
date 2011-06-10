@@ -61,7 +61,7 @@ public class ExpectedDisparities extends Operator {
 	    Rectangle targetRect = targetTile.getRectangle();
         pm.beginTask("Computing filter", targetRect.height+4);
         try {
-            Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRect, SubProgressMonitor.create(pm, 4));
+            Tile elevationTile = getSourceTile(elevationTiePointGrid, targetRect);
 		
             for (int y = targetRect.y; y < targetRect.y +targetRect.height; y++) {
                 for(int x = targetRect.x; x < targetRect.x + targetRect.width; x++) {

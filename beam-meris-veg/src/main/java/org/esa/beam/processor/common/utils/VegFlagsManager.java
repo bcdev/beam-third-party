@@ -17,8 +17,10 @@
 package org.esa.beam.processor.common.utils;
 
 import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.Product;
-import org.esa.beam.framework.datamodel.BitmaskDef;
+import org.esa.beam.framework.datamodel.ProductNodeGroup;
+
 import java.awt.Color;
 
 public class VegFlagsManager {
@@ -55,7 +57,9 @@ public class VegFlagsManager {
 
     /**
      * Sets the invalid flag on the flag passed in.
+     *
      * @param currentFlag
+     *
      * @return currentFlag | INVALID_MASK
      */
     public static int setInvalidFlag(int currentFlag) {
@@ -64,7 +68,9 @@ public class VegFlagsManager {
 
     /**
      * Sets the invalidInput flag and the invalid flag on the flag passed in
+     *
      * @param currentFlag
+     *
      * @return
      */
     public static int setInvalidInputFlag(int currentFlag) {
@@ -74,7 +80,9 @@ public class VegFlagsManager {
 
     /**
      * Sets the algorithm_failure flag and the invalid flag on the flag passed in
+     *
      * @param currentFlag
+     *
      * @return
      */
     public static int setAlgorithmFailureFlag(int currentFlag) {
@@ -84,7 +92,9 @@ public class VegFlagsManager {
 
     /**
      * Sets the LAI_OUT_OF_RANGE flag on the flag passed in.
+     *
      * @param currentFlag
+     *
      * @return currentFlag | LAI_OUT_OF_RANGE_FLAG_MASK
      */
     public static int setLaiOutOfRangeFlag(int currentFlag) {
@@ -93,7 +103,9 @@ public class VegFlagsManager {
 
     /**
      * Sets the FCOVER_OUT_OF_RANGE flag on the flag passed in.
+     *
      * @param currentFlag
+     *
      * @return currentFlag | FCOVER_OUT_OF_RANGE_FLAG_MASK
      */
     public static int setFCoverOutOfRangeFlag(int currentFlag) {
@@ -102,7 +114,9 @@ public class VegFlagsManager {
 
     /**
      * Sets the LAIXCAB_OUT_OF_RANGE flag on the flag passed in.
+     *
      * @param currentFlag
+     *
      * @return currentFlag | LAIXCAB_OUT_OF_RANGE_FLAG_MASK
      */
     public static int setLaixCabOutOfRangeFlag(int currentFlag) {
@@ -111,13 +125,14 @@ public class VegFlagsManager {
 
     /**
      * Sets the FAPAR_OUT_OF_RANGE flag on the flag passed in.
+     *
      * @param currentFlag
+     *
      * @return currentFlag | FAPAR_OUT_OF_RANGE_FLAG_MASK
      */
     public static int setFaparOutOfRangeFlag(int currentFlag) {
         return currentFlag | FAPAR_OUT_OF_RANGE_FLAG_MASK;
     }
-
 
 
     /**
@@ -130,8 +145,10 @@ public class VegFlagsManager {
         coding.addFlag(INVALID_INPUT_FLAG_NAME, INVALID_INPUT_FLAG_MASK, INVALID_INPUT_FLAG_DESCRIPTION);
         coding.addFlag(ALGORITHM_FAILURE_FLAG_NAME, ALGORITHM_FAILURE_FLAG_MASK, ALGORITHM_FAILURE_FLAG_DESCRIPTION);
         coding.addFlag(LAI_OUT_OF_RANGE_FLAG_NAME, LAI_OUT_OF_RANGE_FLAG_MASK, LAI_OUT_OF_RANGE_FLAG_DESCRIPTION);
-        coding.addFlag(FCOVER_OUT_OF_RANGE_FLAG_NAME, FCOVER_OUT_OF_RANGE_FLAG_MASK, FCOVER_OUT_OF_RANGE_FLAG_DESCRIPTION);
-        coding.addFlag(LAIXCAB_OUT_OF_RANGE_FLAG_NAME, LAIXCAB_OUT_OF_RANGE_FLAG_MASK, LAIXCAB_OUT_OF_RANGE_FLAG_DESCRIPTION);
+        coding.addFlag(FCOVER_OUT_OF_RANGE_FLAG_NAME, FCOVER_OUT_OF_RANGE_FLAG_MASK,
+                       FCOVER_OUT_OF_RANGE_FLAG_DESCRIPTION);
+        coding.addFlag(LAIXCAB_OUT_OF_RANGE_FLAG_NAME, LAIXCAB_OUT_OF_RANGE_FLAG_MASK,
+                       LAIXCAB_OUT_OF_RANGE_FLAG_DESCRIPTION);
         coding.addFlag(FAPAR_OUT_OF_RANGE_FLAG_NAME, FAPAR_OUT_OF_RANGE_FLAG_MASK, FAPAR_OUT_OF_RANGE_FLAG_DESCRIPTION);
 
         return coding;
@@ -139,36 +156,53 @@ public class VegFlagsManager {
 
     /**
      * Adds the bitmask definitions for this flag coding to the product passed in
+     *
      * @param prod
      */
     public static void addBitmaskDefsToProduct(Product prod, String flags_band_name) {
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + INVALID_FLAG_NAME, INVALID_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + INVALID_FLAG_NAME,
-                                          Color.red, 0.5F));
+        ProductNodeGroup<Mask> maskGroup = prod.getMaskGroup();
+        int width = prod.getSceneRasterWidth();
+        int height = prod.getSceneRasterHeight();
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + INVALID_FLAG_NAME, INVALID_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + INVALID_FLAG_NAME,
+                                                Color.red, 0.5F));
 
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + INVALID_INPUT_FLAG_NAME, INVALID_INPUT_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + INVALID_INPUT_FLAG_NAME,
-                                          Color.orange, 0.5F));
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + INVALID_INPUT_FLAG_NAME,
+                                                INVALID_INPUT_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + INVALID_INPUT_FLAG_NAME,
+                                                Color.orange, 0.5F));
 
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + ALGORITHM_FAILURE_FLAG_NAME, ALGORITHM_FAILURE_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + ALGORITHM_FAILURE_FLAG_NAME,
-                                          Color.magenta, 0.5F));
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + ALGORITHM_FAILURE_FLAG_NAME,
+                                                ALGORITHM_FAILURE_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + ALGORITHM_FAILURE_FLAG_NAME,
+                                                Color.magenta, 0.5F));
 
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + LAI_OUT_OF_RANGE_FLAG_NAME, LAI_OUT_OF_RANGE_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + LAI_OUT_OF_RANGE_FLAG_NAME,
-                                          Color.red.brighter(), 0.5F));
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + LAI_OUT_OF_RANGE_FLAG_NAME,
+                                                LAI_OUT_OF_RANGE_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + LAI_OUT_OF_RANGE_FLAG_NAME,
+                                                Color.red.brighter(), 0.5F));
 
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + FCOVER_OUT_OF_RANGE_FLAG_NAME, FCOVER_OUT_OF_RANGE_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + FCOVER_OUT_OF_RANGE_FLAG_NAME,
-                                          Color.yellow, 0.5F));
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + FCOVER_OUT_OF_RANGE_FLAG_NAME,
+                                                FCOVER_OUT_OF_RANGE_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + FCOVER_OUT_OF_RANGE_FLAG_NAME,
+                                                Color.yellow, 0.5F));
 
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + LAIXCAB_OUT_OF_RANGE_FLAG_NAME, LAIXCAB_OUT_OF_RANGE_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + LAIXCAB_OUT_OF_RANGE_FLAG_NAME,
-                                          Color.orange.darker(), 0.5F));
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + LAIXCAB_OUT_OF_RANGE_FLAG_NAME,
+                                                LAIXCAB_OUT_OF_RANGE_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + LAIXCAB_OUT_OF_RANGE_FLAG_NAME,
+                                                Color.orange.darker(), 0.5F));
 
-        prod.addBitmaskDef(new BitmaskDef(flags_band_name + "." + FAPAR_OUT_OF_RANGE_FLAG_NAME, FAPAR_OUT_OF_RANGE_FLAG_DESCRIPTION,
-                                          flags_band_name + "." + FAPAR_OUT_OF_RANGE_FLAG_NAME,
-                                          Color.magenta.brighter(), 0.5F));
+        maskGroup.add(Mask.BandMathsType.create(flags_band_name + "." + FAPAR_OUT_OF_RANGE_FLAG_NAME,
+                                                FAPAR_OUT_OF_RANGE_FLAG_DESCRIPTION,
+                                                width, height,
+                                                flags_band_name + "." + FAPAR_OUT_OF_RANGE_FLAG_NAME,
+                                                Color.magenta.brighter(), 0.5F));
     }
 }
 

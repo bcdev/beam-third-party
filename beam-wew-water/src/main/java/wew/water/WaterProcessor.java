@@ -27,7 +27,7 @@ import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
 import org.esa.beam.framework.datamodel.ProductNodeGroup;
-import org.esa.beam.framework.datamodel.TiePointGrid;
+import org.esa.beam.framework.datamodel.RasterDataNode;
 import org.esa.beam.framework.processor.Processor;
 import org.esa.beam.framework.processor.ProcessorConstants;
 import org.esa.beam.framework.processor.ProcessorException;
@@ -46,9 +46,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 
 /*
  * The <code>WaterProcessor</code> implements all specific functionality to calculate a RESULT
@@ -60,7 +61,7 @@ public class WaterProcessor extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
-    public static final String PROCESSOR_VERSION = "1.2.7";        // PROCESS
+    public static final String PROCESSOR_VERSION = "1.2.8";        // PROCESS
     public static final String PROCESSOR_COPYRIGHT = "Copyright (C) 2005/7 by WeW (michael.schaale@wew.fu-berlin.de)";
 
     public static final String LOGGER_NAME = "beam.processor.water";
@@ -169,11 +170,6 @@ public class WaterProcessor extends Processor {
     private static final int COASTLINE = 0x00000040;
     private static final int INVALID = 0x00000080;
 
-    private static final String LAT_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[0];
-    private static final String LON_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[1];
-    private static final String ELEV_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[2];
-    private static final String LATCORR_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[4];
-    private static final String LONCORR_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[5];
     private static final String SZA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[6];
     private static final String SAA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[7];
     private static final String VZA_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[8];
@@ -182,8 +178,12 @@ public class WaterProcessor extends Processor {
     private static final String MW_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[11];
     private static final String PRESS_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12];
     private static final String O3_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13];
-    private static final String WV_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[14];
 
+    static final String[] REQUIRED_TIE_POINT_GRID_NAMES = new String[]{
+            SZA_GRID_NAME, SAA_GRID_NAME, VZA_GRID_NAME,
+            VAA_GRID_NAME, ZW_GRID_NAME, MW_GRID_NAME,
+            PRESS_GRID_NAME, O3_GRID_NAME
+    };
 
     // Fields
     private ArrayList<Band> _inputBandList;
@@ -440,13 +440,8 @@ public class WaterProcessor extends Processor {
         // ----------------------------------------------------------------------
         _inputProduct = loadInputProduct(0);
 
-        // Allow MERIS only !!
-        //
-        String inputType = _inputProduct.getProductType();
-        if (!isAcceptedInputType(inputType)) {
-            throw new ProcessorException("Invalid product type: MERIS Level 1b or MERIS Level 1N (icol) required.");
-        }
-
+        // check for required raster data nodes
+        validateInputProduct(_inputProduct);
 
         String[] bandNames = _inputProduct.getBandNames();
 
@@ -462,8 +457,7 @@ public class WaterProcessor extends Processor {
                 } else {
                     String msg = String.format(
                             "The requested band '%s' is not a spectral band! It is excluded from processing", bandName);
-                    LOGGER.warning(
-                            msg);
+                    LOGGER.warning(msg);
                 }
             }
         }
@@ -484,9 +478,15 @@ public class WaterProcessor extends Processor {
         solarFlux = getSolarFlux(_inputProduct, _inputBandList);
     }
 
-    static boolean isAcceptedInputType(String inputType) {
-        Matcher matcher = EnvisatConstants.MERIS_L1_TYPE_PATTERN.matcher(inputType);
-        return matcher.matches() || inputType.matches(ICOL_PATTERN);
+    static void validateInputProduct(Product inputProduct) throws ProcessorException {
+        List<String> requiredRasterNames = new ArrayList<String>(Arrays.asList(REQUIRED_TIE_POINT_GRID_NAMES));
+        requiredRasterNames.add(L1FLAGS_INPUT_BAND_NAME);
+        for (String requiredRasterName : requiredRasterNames) {
+            if (!inputProduct.containsRasterDataNode(requiredRasterName)) {
+                String message = String.format("Required raster data node '%s' is missing.", requiredRasterName);
+                throw new ProcessorException(message);
+            }
+        }
     }
 
     /*
@@ -787,11 +787,6 @@ public class WaterProcessor extends Processor {
         int height = _inputProduct.getSceneRasterHeight();
         int nbands = _inputBandList.size();
 
-        float[] lat = new float[width];
-        float[] lon = new float[width];
-        float[] latc = new float[width];
-        float[] lonc = new float[width];
-        float[] elev = new float[width];
         float[] sza = new float[width];
         float[] saa = new float[width];
         float[] vza = new float[width];
@@ -799,7 +794,6 @@ public class WaterProcessor extends Processor {
         float[] zw = new float[width];
         float[] mw = new float[width];
         float[] press = new float[width];
-        float[] wv = new float[width];
         float[] o3 = new float[width];
 
         // allocate memory for a multispectral scan line
@@ -842,23 +836,16 @@ public class WaterProcessor extends Processor {
 
         // Load the auxiliary data
         //
-        TiePointGrid latGrid = getTiePointGrid(LAT_GRID_NAME);
-        TiePointGrid lonGrid = getTiePointGrid(LON_GRID_NAME);
-        TiePointGrid latcorrGrid = getTiePointGrid(LATCORR_GRID_NAME);
-        TiePointGrid loncorrGrid = getTiePointGrid(LONCORR_GRID_NAME);
-        TiePointGrid elevGrid = getTiePointGrid(ELEV_GRID_NAME);
-        TiePointGrid szaGrid = getTiePointGrid(SZA_GRID_NAME);
-        TiePointGrid saaGrid = getTiePointGrid(SAA_GRID_NAME);
-        TiePointGrid vzaGrid = getTiePointGrid(VZA_GRID_NAME);
-        TiePointGrid vaaGrid = getTiePointGrid(VAA_GRID_NAME);
-        TiePointGrid zwGrid = getTiePointGrid(ZW_GRID_NAME);
-        TiePointGrid mwGrid = getTiePointGrid(MW_GRID_NAME);
-        TiePointGrid pressGrid = getTiePointGrid(PRESS_GRID_NAME);
-        TiePointGrid o3Grid = getTiePointGrid(O3_GRID_NAME);
-        TiePointGrid wvGrid = getTiePointGrid(WV_GRID_NAME);
+        RasterDataNode szaGrid = getTiePointGrid(SZA_GRID_NAME);
+        RasterDataNode saaGrid = getTiePointGrid(SAA_GRID_NAME);
+        RasterDataNode vzaGrid = getTiePointGrid(VZA_GRID_NAME);
+        RasterDataNode vaaGrid = getTiePointGrid(VAA_GRID_NAME);
+        RasterDataNode zwGrid = getTiePointGrid(ZW_GRID_NAME);
+        RasterDataNode mwGrid = getTiePointGrid(MW_GRID_NAME);
+        RasterDataNode pressGrid = getTiePointGrid(PRESS_GRID_NAME);
+        RasterDataNode o3Grid = getTiePointGrid(O3_GRID_NAME);
 
         d2r = Math.acos(-1.0) / 180.0;
-        float fd2r = (float) d2r;
 
         // Get the number of I/O nodes in advance
         // implicit atm.corr.
@@ -933,11 +920,6 @@ public class WaterProcessor extends Processor {
                 _l1FlagsInputBand.readPixels(0, y, width, 1, l1Flags);
 
                 // Third the auxiliary data
-                latGrid.readPixels(0, y, width, 1, lat);
-                lonGrid.readPixels(0, y, width, 1, lon);
-                latcorrGrid.readPixels(0, y, width, 1, latc);
-                loncorrGrid.readPixels(0, y, width, 1, lonc);
-                elevGrid.readPixels(0, y, width, 1, elev);
                 szaGrid.readPixels(0, y, width, 1, sza);
                 saaGrid.readPixels(0, y, width, 1, saa);
                 vzaGrid.readPixels(0, y, width, 1, vza);
@@ -946,7 +928,6 @@ public class WaterProcessor extends Processor {
                 mwGrid.readPixels(0, y, width, 1, mw);
                 pressGrid.readPixels(0, y, width, 1, press);
                 o3Grid.readPixels(0, y, width, 1, o3);
-                wvGrid.readPixels(0, y, width, 1, wv);
 
                 // process the complete scanline
                 //
@@ -1229,10 +1210,10 @@ public class WaterProcessor extends Processor {
 
     } // processWater
 
-    private TiePointGrid getTiePointGrid(String latGridName) throws ProcessorException {
-        TiePointGrid latGrid = _inputProduct.getTiePointGrid(latGridName);
-        checkParamNotNull(latGrid, latGridName);
-        LOGGER.fine(SmacConstants.LOG_MSG_LOADED + latGridName);
+    private RasterDataNode getTiePointGrid(String rasterName) throws ProcessorException {
+        RasterDataNode latGrid = _inputProduct.getRasterDataNode(rasterName);
+        checkParamNotNull(latGrid, rasterName);
+        LOGGER.fine(SmacConstants.LOG_MSG_LOADED + rasterName);
         return latGrid;
     }
 

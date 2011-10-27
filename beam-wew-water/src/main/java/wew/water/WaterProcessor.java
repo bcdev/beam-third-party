@@ -19,28 +19,15 @@ import org.esa.beam.dataio.dimap.DimapProductConstants;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.dataio.ProductIO;
 import org.esa.beam.framework.dataio.ProductWriter;
-import org.esa.beam.framework.datamodel.Band;
-import org.esa.beam.framework.datamodel.FlagCoding;
-import org.esa.beam.framework.datamodel.Mask;
-import org.esa.beam.framework.datamodel.MetadataAttribute;
-import org.esa.beam.framework.datamodel.MetadataElement;
-import org.esa.beam.framework.datamodel.Product;
-import org.esa.beam.framework.datamodel.ProductData;
-import org.esa.beam.framework.datamodel.ProductNodeGroup;
-import org.esa.beam.framework.datamodel.RasterDataNode;
-import org.esa.beam.framework.processor.Processor;
-import org.esa.beam.framework.processor.ProcessorConstants;
-import org.esa.beam.framework.processor.ProcessorException;
-import org.esa.beam.framework.processor.ProcessorUtils;
-import org.esa.beam.framework.processor.ProductRef;
-import org.esa.beam.framework.processor.Request;
+import org.esa.beam.framework.datamodel.*;
+import org.esa.beam.framework.processor.*;
 import org.esa.beam.framework.processor.ui.ProcessorUI;
 import org.esa.beam.processor.smac.SmacConstants;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.SystemUtils;
 import org.esa.beam.util.io.FileUtils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -186,7 +173,6 @@ public class WaterProcessor extends Processor {
     };
 
     // Fields
-    private ArrayList<Band> _inputBandList;
     private Product _inputProduct;
     private Product _outputProduct;
     private Band _l1FlagsInputBand;
@@ -267,10 +253,10 @@ public class WaterProcessor extends Processor {
             "log10(mg/m^3)",
             "log10(1/m)",
             "log10(g/m^3)",
-            "/",
-            "/",
-            "/",
-            "/",
+            "1",
+            "1",
+            "1",
+            "1",
             "1/sr",
             "1/sr",
             "1/sr",
@@ -298,8 +284,16 @@ public class WaterProcessor extends Processor {
             10.00f, 10.00f, 10.00f, 10.00f
     };
 
-    // Mask value to be written if inversion fails 
-    private static final float RESULT_MASK_VALUE = +5.0f;
+    private static final double[] DEFSOL = new double[]{
+            1670.5964, 1824.1444, 1874.9883,
+            1877.6682, 1754.7749, 1606.6401,
+            1490.0026, 1431.8726, 1369.2035,
+            1231.7164, 1220.0767, 1144.9675,
+            932.3497, 904.8193, 871.0908
+    };
+
+    // Mask value to be written if inversion fails
+    private static final double RESULT_MASK_VALUE = +5.0;
 
     // - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS - PROCESS  
 
@@ -430,52 +424,35 @@ public class WaterProcessor extends Processor {
      */
 
     private void loadInputProduct() throws ProcessorException, IOException {
-        _inputBandList = new ArrayList<Band>();
-
-        // clear vector of bands
-        // ---------------------
-        _inputBandList.clear();
 
         // only the first product - there might be more but these will be ignored
-        // ----------------------------------------------------------------------
         _inputProduct = loadInputProduct(0);
 
         // check for required raster data nodes
         validateInputProduct(_inputProduct);
 
-        String[] bandNames = _inputProduct.getBandNames();
-
-        for (String bandName : bandNames) {
-            Band band = _inputProduct.getBand(bandName);
-
-            if (band == null) {
-                String msg = String.format("The requested band '%s' is not contained in the input product!", bandName);
-                LOGGER.warning(msg);
-            } else {
-                if (band.getSpectralBandIndex() != -1) {
-                    _inputBandList.add(band);
-                } else {
-                    String msg = String.format(
-                            "The requested band '%s' is not a spectral band! It is excluded from processing", bandName);
-                    LOGGER.warning(msg);
-                }
+        for (int i = 0; i < 15; i++) {
+            String radianceBandName = "radiance_" + (i + 1);
+            Band radianceBand = _inputProduct.getBand(radianceBandName);
+            if (radianceBand == null) {
+                throw new ProcessorException(String.format("Missing input band '%s'.", radianceBandName));
             }
-        }
-
-        for (int i = 0; i < _inputBandList.size(); i++) {
-            _inputBand[i] = _inputProduct.getBand(bandNames[i]);
+            if (radianceBand.getSpectralWavelength() <= 0.0) {
+                throw new ProcessorException(String.format("Input band '%s' does not have wavelength information.", radianceBandName));
+            }
+            _inputBand[i] = radianceBand;
         }
 
         _l1FlagsInputBand = _inputProduct.getBand(L1FLAGS_INPUT_BAND_NAME);
         if (_l1FlagsInputBand == null) {
-            throw new ProcessorException(String.format("Can not load band %s", L1FLAGS_INPUT_BAND_NAME));
+            throw new ProcessorException(String.format("Missing input band '%s'.", L1FLAGS_INPUT_BAND_NAME));
         }
         LOGGER.info(String.format("%s%s", ProcessorConstants.LOG_MSG_LOADED_BAND, L1FLAGS_INPUT_BAND_NAME));
 
         /*
        * Finally read solar flux for all MERIS L1b bands.
        */
-        solarFlux = getSolarFlux(_inputProduct, _inputBandList);
+        solarFlux = getSolarFlux(_inputProduct, _inputBand);
     }
 
     static void validateInputProduct(Product inputProduct) throws ProcessorException {
@@ -496,28 +473,20 @@ public class WaterProcessor extends Processor {
      * show heavy variations over the year or for slight wavelength
      * shifts we do use some defaults if necessary.  
      */
-    private float[] getSolarFlux(Product product, ArrayList<Band> numbands) {
+    private float[] getSolarFlux(Product product, Band[] bands) {
+
         // Try to grab the solar fluxes
         float[] dsf = getSolarFluxFromMetadata(product);
-
-        // todo - try also to get solar flux from bands
-
         if (dsf == null) {
-            LOGGER.log(Level.WARNING, "No solar flux values found. Using some default values");
-            double[] defsol = {
-                    1670.5964, 1824.1444, 1874.9883,
-                    1877.6682, 1754.7749, 1606.6401,
-                    1490.0026, 1431.8726, 1369.2035,
-                    1231.7164, 1220.0767, 1144.9675,
-                    932.3497, 904.8193, 871.0908
-            };
 
-            // Prepare the defaults
-            dsf = new float[numbands.size()];
-            for (int i = 0; i < numbands.size(); i++) {
-                dsf[i] = (float) 1.0;
-                if (i < defsol.length) {
-                    dsf[i] = (float) defsol[i];
+            LOGGER.log(Level.WARNING, "No solar flux values found in input. Using default values.");
+
+            dsf = new float[bands.length];
+            for (int i = 0; i < bands.length; i++) {
+                Band band = bands[i];
+                dsf[i] = band.getSolarFlux();
+                if (dsf[i] <= 0.0) {
+                    dsf[i] = (float) DEFSOL[i];
                 }
             }
         }
@@ -617,22 +586,22 @@ public class WaterProcessor extends Processor {
             j++;
         }
 
-        for (int i = 0; i < num_c; i++) {
-//    	    _outputBand[i].setSpectralWavelength((float) i);
-            _outputBand[i].setSpectralWavelength((float) (i + 1));
-        }
-
         for (int i = 0; i < num_tau; i++) {
-            _outputBand[i + num_c].setSpectralWavelength(tau_lambda[i]);
+            _outputBand[num_c + i].setSpectralWavelength(tau_lambda[i]);
+            _outputBand[num_c + i].setSpectralBandIndex(i);
+            _outputBand[num_c + i].setNoDataValue(RESULT_MASK_VALUE);
+            _outputBand[num_c + i].setNoDataValueUsed(true);
         }
 
         if (extout) {
             for (int i = 0; i < num_rho_w; i++) {
                 _outputBand[num_tau + num_c + i].setSpectralWavelength(rho_w_lambda[i]);
                 _outputBand[num_tau + num_c + i].setSpectralBandwidth(rho_w_bandw[i]);
+                _outputBand[num_tau + num_c + i].setSpectralBandIndex(i);
+                _outputBand[num_tau + num_c + i].setNoDataValue(RESULT_MASK_VALUE);
+                _outputBand[num_tau + num_c + i].setNoDataValueUsed(true);
             }
         }
-
 
         ProductUtils.copyTiePointGrids(_inputProduct, _outputProduct);
         copyFlagBands(_inputProduct, _outputProduct);
@@ -785,7 +754,7 @@ public class WaterProcessor extends Processor {
 
         int width = _inputProduct.getSceneRasterWidth();
         int height = _inputProduct.getSceneRasterHeight();
-        int nbands = _inputBandList.size();
+        int nbands = _inputBand.length;
 
         float[] sza = new float[width];
         float[] saa = new float[width];
@@ -912,7 +881,7 @@ public class WaterProcessor extends Processor {
                 //
 
                 // First the TOA radiances
-                for (n = 0; n < _inputBandList.size(); n++) {
+                for (n = 0; n < _inputBand.length; n++) {
                     _inputBand[n].readPixels(0, y, width, 1, toa[n]);
                 } // n
 
@@ -1175,7 +1144,7 @@ public class WaterProcessor extends Processor {
                 for (x = 0; x < width; x++) {
                     if (resultFlags[x] != 0) {
                         for (n = 0; n < output_planes; n++) {
-                            result[n][x] = RESULT_MASK_VALUE;
+                            result[n][x] = (float) RESULT_MASK_VALUE;
                         }
                     }
                     // Combine result flags

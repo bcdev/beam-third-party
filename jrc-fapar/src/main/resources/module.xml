@@ -70,11 +70,21 @@
     <extension point="beam-ui:actions">
         <action>
             <id>FaparProcessor</id>
+            <helpId>FaparProcessorPlugIn</helpId>
+            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <parent>tools</parent>
+            <text>FAPAR Processor...</text>
+            <mnemonic>P</mnemonic>
+            <operatorName>Fapar</operatorName>
+            <dialogTitle>FAPAR Processor</dialogTitle>
+            <targetProductNameSuffix>_fapar</targetProductNameSuffix>
+        </action>
+        <action>
+            <id>FaparProcessorOld</id>
             <class>org.esa.beam.visat.actions.ProcessorAction</class>
             <processor>it.jrc.beam.fapar.FaparProcessor</processor>
-            <text>FAPAR Processor ...</text>
+            <text>FAPAR Processor (old) ...</text>
             <shortDescr>Start FAPAR processor</shortDescr>
-            <mnemonic>P</mnemonic>
             <parent>tools</parent>
             <helpID>FaparProcessorPlugIn</helpID>
         </action>

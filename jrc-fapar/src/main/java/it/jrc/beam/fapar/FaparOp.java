@@ -20,6 +20,7 @@ import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.datamodel.ProductNodeFilter;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
@@ -298,14 +299,18 @@ public class FaparOp extends PixelOperator {
     }
 
     @Override
-    protected void configureTargetProduct(ProductConfigurer targetProductConfigurer) {
-        super.configureTargetProduct(targetProductConfigurer);
-
-        final Product sourceProduct = targetProductConfigurer.getSourceProduct();
-        final Product targetProduct = targetProductConfigurer.getTargetProduct();
+    protected void configureTargetProduct(ProductConfigurer productConfigurer) {
+        final Product sourceProduct = productConfigurer.getSourceProduct();
+        final Product targetProduct = productConfigurer.getTargetProduct();
         targetProduct.setDescription("Fraction of Photosyntheticaly Absorbed radiation computed by the MGVI algorithm");
 
-        ProductUtils.copyFlagCodings(sourceProduct, targetProduct);
+        productConfigurer.copyBands(new ProductNodeFilter<Band>() {
+            @Override
+            public boolean accept(Band band) {
+                return band.getFlagCoding() != null;
+            }
+        });
+
         FlagCoding targetFlagCoding = targetProduct.getFlagCodingGroup().get(SOURCE_BAND_NAME_L1_FLAGS);
         if (targetFlagCoding == null) {
             targetFlagCoding = new FlagCoding(TARGET_BAND_NAME_L2_FLAGS);
@@ -319,7 +324,7 @@ public class FaparOp extends PixelOperator {
         targetFlagCoding.addFlag("MGVI_BRIGHT", 0x800, "Bright pixel flagged by MGVI processing");
         targetFlagCoding.addFlag("MGVI_INVAL_FAPAR", 0x1000, "Invalid rectification flagged by MGVI processing");
 
-        targetProductConfigurer.copyMasks();
+        productConfigurer.copyMasks();
 
         targetProduct.addMask("mgvi_bad", "l2_flags.MGVI_BAD_DATA", "Bad pixel flagged by MGVI processing",
                               new Color(51, 255, 204), 0.5);
@@ -355,16 +360,16 @@ public class FaparOp extends PixelOperator {
         addReflectanceTargetBand(sourceProduct, targetProduct, SOURCE_BAND_NAME_RED, TARGET_BAND_NAME_RECTIFIED_RED,
                                  "Angular and atmospheric corrected red reflectance");
 
-        final Band flagBand = targetProductConfigurer.addBand(TARGET_BAND_NAME_L2_FLAGS, ProductData.TYPE_UINT32);
-        flagBand.setSampleCoding(targetProduct.getFlagCodingGroup().get(TARGET_BAND_NAME_L2_FLAGS));
+        final Band flagBand = productConfigurer.addBand(TARGET_BAND_NAME_L2_FLAGS, ProductData.TYPE_UINT32);
+        flagBand.setSampleCoding(targetFlagCoding);
         flagBand.setDescription("Classification and quality flags");
 
         if (sourceProduct.containsBand("corr_latitude") && sourceProduct.containsBand("corr_longitude")) {
-            targetProductConfigurer.copyBands("corr_latitude", "corr_longitude");
+            productConfigurer.copyBands("corr_latitude", "corr_longitude");
         }
-        targetProductConfigurer.copyTiePointGrids();
-        targetProductConfigurer.copyGeoCoding();
-        targetProductConfigurer.copyMetadata();
+        productConfigurer.copyTiePointGrids();
+        productConfigurer.copyGeoCoding();
+        productConfigurer.copyMetadata();
     }
 
     private boolean addReflectanceTargetBand(Product sourceProduct,

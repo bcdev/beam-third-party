@@ -20,7 +20,6 @@ import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
-import org.esa.beam.framework.datamodel.ProductNodeFilter;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
@@ -31,6 +30,7 @@ import org.esa.beam.framework.gpf.pointop.Sample;
 import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
 import org.esa.beam.util.ProductUtils;
+import org.esa.beam.util.math.RsMathUtils;
 
 import java.awt.Color;
 
@@ -69,6 +69,15 @@ public class FaparOp extends PixelOperator {
 
     private transient boolean greenBandPresent;
 
+    private final transient FaparAlgorithm algorithm = new FaparAlgorithm();
+    private final transient float[] blueSolarFlux = {0.0f};
+    private final transient float[] greenSolarFlux = {0.0f};
+    private final transient float[] redSolarFlux = {0.0f};
+    private final transient float[] nirSolarFlux = {0.0f};
+
+    private transient int landOceanFlagMask;
+    private transient int brightFlagMask;
+
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
         /*
@@ -82,11 +91,6 @@ public class FaparOp extends PixelOperator {
            float[] red_reflectance = new float[width];
            float[] nir_reflectance = new float[width];
            float[] green_reflectance = new float[width * height];
-
-           // MC ++
-           float[] corrlatitude = new float[width];
-           float[] corrlongitude = new float[width];
-           // MC --
 
            //float green_sun_flux;
 
@@ -268,6 +272,83 @@ public class FaparOp extends PixelOperator {
                        }
                    }
         */
+
+        // TODO - continue 'translating' code above
+
+        final float[] blue = {sourceSamples[0].getFloat()};
+        final float[] green = {0.0f};
+        final float[] red = {sourceSamples[2].getFloat()};
+        final float[] nir = {sourceSamples[3].getFloat()};
+        final int[] flg = {sourceSamples[4].getInt()};
+        final float[] sza = {sourceSamples[5].getFloat()};
+        final float[] saa = {sourceSamples[6].getFloat()};
+        final float[] vza = {sourceSamples[7].getFloat()};
+        final float[] vaa = {sourceSamples[8].getFloat()};
+        blue[0] = RsMathUtils.radianceToReflectance(blue[0], sza[0], blueSolarFlux[0]);
+        if (greenBandPresent) {
+            green[0] = RsMathUtils.radianceToReflectance(sourceSamples[1].getFloat(), sza[0], greenSolarFlux[0]);
+        }
+        red[0] = RsMathUtils.radianceToReflectance(red[0], sza[0], redSolarFlux[0]);
+        nir[0] = RsMathUtils.radianceToReflectance(nir[0], sza[0], nirSolarFlux[0]);
+
+        final int[] process = {0};
+
+        if (blue[0] <= 0 || red[0] <= 0 || nir[0] <= 0) {
+            process[0] = 1;
+        } else if (blue[0] >= 0.3 || red[0] >= 0.5 || nir[0] >= 0.7) {
+            process[0] = 2;
+        } else if (blue[0] > nir[0]) {
+            process[0] = 3;
+        } else if (nir[0] <= 1.3 * red[0]) {
+            process[0] = 4;
+        } else {
+            process[0] = 0;
+        }
+
+        if (brightFlagMask != 0 && landOceanFlagMask != 0) {
+            int isBright = flg[0] & brightFlagMask;
+            int isLand_Ocean = flg[0] & landOceanFlagMask;
+            if (isLand_Ocean == 0 || isBright != 0) {
+                process[0] = 5;
+            }
+        }
+
+        if (!(process[0] == 0 || process[0] == 4)) {
+            int isLand_Ocean = flg[0] & landOceanFlagMask;
+            if (isLand_Ocean != 0) {
+                int newFlagMask = flg[0] ^ landOceanFlagMask;
+                flg[0] = newFlagMask;
+            }
+        }
+
+        // TODO - write 'run' method using scalars instead of arrays
+        final float[] fapar = algorithm.run(sza, saa, vza, vaa, blue, red, nir, process);
+
+        switch (process[0]) {
+            case 0:
+                targetSamples[0].set(Math.round(fapar[0] * 254 + 1));
+                break;
+            case 4:
+                targetSamples[0].set(1);
+                break;
+            default:
+                targetSamples[0].set(0);
+        }
+
+        if (process[0] != 0) {
+            flg[0] += Math.pow(2, process[0] - 1) * 256;
+        }
+
+        targetSamples[0].set(fapar[0]);
+        targetSamples[1].set(blue[0]);
+        if (greenBandPresent) {
+            targetSamples[2].set(green[0]);
+        }
+        targetSamples[3].set(red[0]);
+        targetSamples[4].set(nir[0]);
+        targetSamples[5].set(0.0f); // TODO - compute rectified NIR
+        targetSamples[6].set(0.0f); // TODO - compute rectified red
+        targetSamples[7].set(flg[0]);
     }
 
     @Override
@@ -304,13 +385,7 @@ public class FaparOp extends PixelOperator {
         final Product targetProduct = productConfigurer.getTargetProduct();
         targetProduct.setDescription("Fraction of Photosyntheticaly Absorbed radiation computed by the MGVI algorithm");
 
-        productConfigurer.copyBands(new ProductNodeFilter<Band>() {
-            @Override
-            public boolean accept(Band band) {
-                return band.getFlagCoding() != null;
-            }
-        });
-
+        ProductUtils.copyFlagCodings(sourceProduct, targetProduct);
         FlagCoding targetFlagCoding = targetProduct.getFlagCodingGroup().get(SOURCE_BAND_NAME_L1_FLAGS);
         if (targetFlagCoding == null) {
             targetFlagCoding = new FlagCoding(TARGET_BAND_NAME_L2_FLAGS);
@@ -360,6 +435,13 @@ public class FaparOp extends PixelOperator {
         addReflectanceTargetBand(sourceProduct, targetProduct, SOURCE_BAND_NAME_RED, TARGET_BAND_NAME_RECTIFIED_RED,
                                  "Angular and atmospheric corrected red reflectance");
 
+        blueSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_BLUE).getSolarFlux();
+        if (greenBandPresent) {
+            greenSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_GREEN).getSolarFlux();
+        }
+        redSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_RED).getSolarFlux();
+        nirSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_NIR).getSolarFlux();
+
         final Band flagBand = productConfigurer.addBand(TARGET_BAND_NAME_L2_FLAGS, ProductData.TYPE_UINT32);
         flagBand.setSampleCoding(targetFlagCoding);
         flagBand.setDescription("Classification and quality flags");
@@ -388,6 +470,20 @@ public class FaparOp extends PixelOperator {
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void prepareInputs() throws OperatorException {
+        super.prepareInputs();
+
+        final Product sourceProduct = getSourceProduct();
+        landOceanFlagMask = 0;
+        brightFlagMask = 0;
+        final FlagCoding sourceFlags = sourceProduct.getFlagCodingGroup().get(SOURCE_BAND_NAME_L1_FLAGS);
+        if (sourceFlags != null) {
+            landOceanFlagMask = sourceFlags.getFlagMask("LAND_OCEAN");
+            brightFlagMask = sourceFlags.getFlagMask("BRIGHT");
+        }
     }
 
     public static class Spi extends OperatorSpi {

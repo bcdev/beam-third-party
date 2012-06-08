@@ -1,4 +1,4 @@
-package org.esa.beam.processor;/*
+/*
  * Copyright (C) 2012 Brockmann Consult GmbH (info@brockmann-consult.de)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -14,12 +14,16 @@ package org.esa.beam.processor;/*
  * with this program; if not, see http://www.gnu.org/licenses/
  */
 
+package org.esa.beam.processor.toa;
+
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
 import org.esa.beam.framework.datamodel.ProductNodeFilter;
 import org.esa.beam.framework.gpf.OperatorException;
+import org.esa.beam.framework.gpf.OperatorSpi;
+import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.pointop.PixelOperator;
 import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
@@ -27,8 +31,10 @@ import org.esa.beam.framework.gpf.pointop.Sample;
 import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
 import org.esa.beam.processor.common.utils.VegFlagsManager;
-import org.esa.beam.processor.toa.ToaVegConstants;
 
+@OperatorMetadata(alias = "ToaVeg", authors = "Martin Boettcher, Ralf Quast", copyright = "Brockmann Consult GmbH",
+                  version = "1.1.2",
+                  description = "Computes FAPAR from MERIS products.")
 public class ToaVegOp extends PixelOperator {
 
     @SourceProduct(alias = "source",
@@ -73,7 +79,8 @@ public class ToaVegOp extends PixelOperator {
 
     @Override
     protected void configureTargetSamples(SampleConfigurer sampleConfigurer) throws OperatorException {
-        sampleConfigurer.defineSample(0, ToaVegConstants.LAI_BAND_NAME);
+        sampleConfigurer.defineSample(0, ToaVegConstants.VEG_FLAGS_BAND_NAME);
+        sampleConfigurer.defineSample(1, ToaVegConstants.LAI_BAND_NAME);
 
         // TODO - other samples
     }
@@ -99,6 +106,10 @@ public class ToaVegOp extends PixelOperator {
         laiBand.setValidPixelExpression(
                 "!" + ToaVegConstants.VEG_FLAGS_BAND_NAME + "." + VegFlagsManager.INVALID_FLAG_NAME + " && !" + ToaVegConstants.VEG_FLAGS_BAND_NAME + "." + VegFlagsManager.LAI_OUT_OF_RANGE_FLAG_NAME);
 
+        final Band vegFlagsBand = productConfigurer.addBand(ToaVegConstants.VEG_FLAGS_BAND_NAME, ProductData.TYPE_UINT16);
+        vegFlagsBand.setDescription(ToaVegConstants.VEG_FLAGS_BAND_DESCRIPTION);
+        vegFlagsBand.setSampleCoding(VegFlagsManager.getCoding(ToaVegConstants.VEG_FLAGS_BAND_NAME));
+
         // TODO - other bands
 
         final Product targetProduct = productConfigurer.getTargetProduct();
@@ -113,5 +124,12 @@ public class ToaVegOp extends PixelOperator {
         super.prepareInputs();
 
         // TODO - prepare auxiliary data
+    }
+
+    public static class Spi extends OperatorSpi {
+
+        public Spi() {
+            super(ToaVegOp.class);
+        }
     }
 }

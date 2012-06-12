@@ -34,7 +34,7 @@ import org.esa.beam.processor.common.utils.VegFlagsManager;
 
 @OperatorMetadata(alias = "ToaVeg", authors = "Martin Boettcher, Ralf Quast", copyright = "Brockmann Consult GmbH",
                   version = "1.1.2",
-                  description = "Computes FAPAR from MERIS products.")
+                  description = "Computes LAI from MERIS products.")
 public class ToaVegOp extends PixelOperator {
 
     @SourceProduct(alias = "source",

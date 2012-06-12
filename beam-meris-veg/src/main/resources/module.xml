@@ -95,6 +95,18 @@
             <parent>MerisVeg</parent>
             <placeAfter>toaVegetationProcessor</placeAfter>
         </action>
+        <action>
+            <id>laiProcessor</id>
+            <helpId>ToaVegOverview</helpId>
+            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <parent>MerisVeg</parent>
+            <text>LAI Processor (MERIS)...</text>
+            <mnemonic>L</mnemonic>
+            <operatorName>ToaVeg</operatorName>
+            <dialogTitle>LAI Processor</dialogTitle>
+            <targetProductNameSuffix>_lai</targetProductNameSuffix>
+            <placeAfter>baerVegetationProcessor</placeAfter>
+        </action>
     </extension>
 
     <extension point="beam-ui:helpSets">

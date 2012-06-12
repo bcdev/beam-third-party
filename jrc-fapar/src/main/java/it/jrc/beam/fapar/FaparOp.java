@@ -78,6 +78,8 @@ public class FaparOp extends PixelOperator {
     private transient int landOceanFlagMask;
     private transient int brightFlagMask;
 
+
+
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
         /*
@@ -326,28 +328,28 @@ public class FaparOp extends PixelOperator {
 
         switch (process[0]) {
             case 0:
-                targetSamples[0].set(Math.round(fapar[0] * 254 + 1));
+                targetSamples[0].set(fapar[0]);
                 break;
             case 4:
-                targetSamples[0].set(1);
+                targetSamples[0].set(0.0f);
                 break;
             default:
-                targetSamples[0].set(0);
+                targetSamples[0].set(-1.0f/254.0f);
         }
 
         if (process[0] != 0) {
             flg[0] += Math.pow(2, process[0] - 1) * 256;
         }
 
-        targetSamples[0].set(fapar[0]);
+        // set above -- targetSamples[0].set(fapar[0]);
         targetSamples[1].set(blue[0]);
         if (greenBandPresent) {
             targetSamples[2].set(green[0]);
         }
         targetSamples[3].set(red[0]);
         targetSamples[4].set(nir[0]);
-        targetSamples[5].set(0.0f); // TODO - compute rectified NIR
-        targetSamples[6].set(0.0f); // TODO - compute rectified red
+        targetSamples[5].set(algorithm.getNirRec()[0]);
+        targetSamples[6].set(algorithm.getRedRec()[0]);
         targetSamples[7].set(flg[0]);
     }
 
@@ -484,6 +486,26 @@ public class FaparOp extends PixelOperator {
             landOceanFlagMask = sourceFlags.getFlagMask("LAND_OCEAN");
             brightFlagMask = sourceFlags.getFlagMask("BRIGHT");
         }
+    }
+
+    public void setBlueSolarFlux(float v) {
+        blueSolarFlux[0] = v;
+    }
+
+    public void setGreenSolarFlux(float v) {
+        greenSolarFlux[0] = v;
+    }
+
+    public void setRedSolarFlux(float v) {
+        redSolarFlux[0] = v;
+    }
+
+    public void setNirSolarFlux(float v) {
+        nirSolarFlux[0] = v;
+    }
+
+    public void setGreenBandPresent(boolean v) {
+        greenBandPresent = v;
     }
 
     public static class Spi extends OperatorSpi {

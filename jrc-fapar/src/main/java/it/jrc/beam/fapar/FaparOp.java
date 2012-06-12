@@ -69,11 +69,11 @@ public class FaparOp extends PixelOperator {
 
     private transient boolean greenBandPresent;
 
-    private final transient FaparAlgorithm algorithm = new FaparAlgorithm();
-    private final transient float[] blueSolarFlux = {0.0f};
-    private final transient float[] greenSolarFlux = {0.0f};
-    private final transient float[] redSolarFlux = {0.0f};
-    private final transient float[] nirSolarFlux = {0.0f};
+    private final transient FaparOpAlgorithm algorithm = new FaparOpAlgorithm();
+    private transient float blueSolarFlux = 0.0f;
+    private transient float greenSolarFlux = 0.0f;
+    private transient float redSolarFlux = 0.0f;
+    private transient float nirSolarFlux = 0.0f;
 
     private transient int landOceanFlagMask;
     private transient int brightFlagMask;
@@ -277,58 +277,58 @@ public class FaparOp extends PixelOperator {
 
         // TODO - continue 'translating' code above
 
-        final float[] blue = {sourceSamples[0].getFloat()};
-        final float[] green = {0.0f};
-        final float[] red = {sourceSamples[2].getFloat()};
-        final float[] nir = {sourceSamples[3].getFloat()};
-        final int[] flg = {sourceSamples[4].getInt()};
-        final float[] sza = {sourceSamples[5].getFloat()};
-        final float[] saa = {sourceSamples[6].getFloat()};
-        final float[] vza = {sourceSamples[7].getFloat()};
-        final float[] vaa = {sourceSamples[8].getFloat()};
-        blue[0] = RsMathUtils.radianceToReflectance(blue[0], sza[0], blueSolarFlux[0]);
+        float blue = sourceSamples[0].getFloat();
+        float green = 0.0f;
+        float red = sourceSamples[2].getFloat();
+        float nir = sourceSamples[3].getFloat();
+        int flg = sourceSamples[4].getInt();
+        final float sza = sourceSamples[5].getFloat();
+        final float saa = sourceSamples[6].getFloat();
+        final float vza = sourceSamples[7].getFloat();
+        final float vaa = sourceSamples[8].getFloat();
+        blue = RsMathUtils.radianceToReflectance(blue, sza, blueSolarFlux);
         if (greenBandPresent) {
-            green[0] = RsMathUtils.radianceToReflectance(sourceSamples[1].getFloat(), sza[0], greenSolarFlux[0]);
+            green = RsMathUtils.radianceToReflectance(sourceSamples[1].getFloat(), sza, greenSolarFlux);
         }
-        red[0] = RsMathUtils.radianceToReflectance(red[0], sza[0], redSolarFlux[0]);
-        nir[0] = RsMathUtils.radianceToReflectance(nir[0], sza[0], nirSolarFlux[0]);
+        red = RsMathUtils.radianceToReflectance(red, sza, redSolarFlux);
+        nir = RsMathUtils.radianceToReflectance(nir, sza, nirSolarFlux);
 
-        final int[] process = {0};
+        int process = 0;
 
-        if (blue[0] <= 0 || red[0] <= 0 || nir[0] <= 0) {
-            process[0] = 1;
-        } else if (blue[0] >= 0.3 || red[0] >= 0.5 || nir[0] >= 0.7) {
-            process[0] = 2;
-        } else if (blue[0] > nir[0]) {
-            process[0] = 3;
-        } else if (nir[0] <= 1.3 * red[0]) {
-            process[0] = 4;
+        if (blue <= 0 || red <= 0 || nir <= 0) {
+            process = 1;
+        } else if (blue >= 0.3 || red >= 0.5 || nir >= 0.7) {
+            process = 2;
+        } else if (blue > nir) {
+            process = 3;
+        } else if (nir <= 1.3 * red) {
+            process = 4;
         } else {
-            process[0] = 0;
+            process = 0;
         }
 
         if (brightFlagMask != 0 && landOceanFlagMask != 0) {
-            int isBright = flg[0] & brightFlagMask;
-            int isLand_Ocean = flg[0] & landOceanFlagMask;
+            int isBright = flg & brightFlagMask;
+            int isLand_Ocean = flg & landOceanFlagMask;
             if (isLand_Ocean == 0 || isBright != 0) {
-                process[0] = 5;
+                process = 5;
             }
         }
 
-        if (!(process[0] == 0 || process[0] == 4)) {
-            int isLand_Ocean = flg[0] & landOceanFlagMask;
+        if (!(process == 0 || process == 4)) {
+            int isLand_Ocean = flg & landOceanFlagMask;
             if (isLand_Ocean != 0) {
-                int newFlagMask = flg[0] ^ landOceanFlagMask;
-                flg[0] = newFlagMask;
+                int newFlagMask = flg ^ landOceanFlagMask;
+                flg = newFlagMask;
             }
         }
 
         // TODO - write 'run' method using scalars instead of arrays
-        final float[] fapar = algorithm.run(sza, saa, vza, vaa, blue, red, nir, process);
+        final float fapar = algorithm.run(sza, saa, vza, vaa, blue, red, nir, process);
 
-        switch (process[0]) {
+        switch (process) {
             case 0:
-                targetSamples[0].set(fapar[0]);
+                targetSamples[0].set(fapar);
                 break;
             case 4:
                 targetSamples[0].set(0.0f);
@@ -337,20 +337,20 @@ public class FaparOp extends PixelOperator {
                 targetSamples[0].set(-1.0f/254.0f);
         }
 
-        if (process[0] != 0) {
-            flg[0] += Math.pow(2, process[0] - 1) * 256;
+        if (process != 0) {
+            flg += Math.pow(2, process - 1) * 256;
         }
 
         // set above -- targetSamples[0].set(fapar[0]);
-        targetSamples[1].set(blue[0]);
+        targetSamples[1].set(blue);
         if (greenBandPresent) {
-            targetSamples[2].set(green[0]);
+            targetSamples[2].set(green);
         }
-        targetSamples[3].set(red[0]);
-        targetSamples[4].set(nir[0]);
-        targetSamples[5].set(algorithm.getNirRec()[0]);
-        targetSamples[6].set(algorithm.getRedRec()[0]);
-        targetSamples[7].set(flg[0]);
+        targetSamples[3].set(red);
+        targetSamples[4].set(nir);
+        targetSamples[5].set(algorithm.getNirRec());
+        targetSamples[6].set(algorithm.getRedRec());
+        targetSamples[7].set(flg);
     }
 
     @Override
@@ -437,12 +437,12 @@ public class FaparOp extends PixelOperator {
         addReflectanceTargetBand(sourceProduct, targetProduct, SOURCE_BAND_NAME_RED, TARGET_BAND_NAME_RECTIFIED_RED,
                                  "Angular and atmospheric corrected red reflectance");
 
-        blueSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_BLUE).getSolarFlux();
+        blueSolarFlux = sourceProduct.getBand(SOURCE_BAND_NAME_BLUE).getSolarFlux();
         if (greenBandPresent) {
-            greenSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_GREEN).getSolarFlux();
+            greenSolarFlux = sourceProduct.getBand(SOURCE_BAND_NAME_GREEN).getSolarFlux();
         }
-        redSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_RED).getSolarFlux();
-        nirSolarFlux[0] = sourceProduct.getBand(SOURCE_BAND_NAME_NIR).getSolarFlux();
+        redSolarFlux = sourceProduct.getBand(SOURCE_BAND_NAME_RED).getSolarFlux();
+        nirSolarFlux = sourceProduct.getBand(SOURCE_BAND_NAME_NIR).getSolarFlux();
 
         final Band flagBand = productConfigurer.addBand(TARGET_BAND_NAME_L2_FLAGS, ProductData.TYPE_UINT32);
         flagBand.setSampleCoding(targetFlagCoding);
@@ -489,19 +489,19 @@ public class FaparOp extends PixelOperator {
     }
 
     public void setBlueSolarFlux(float v) {
-        blueSolarFlux[0] = v;
+        blueSolarFlux = v;
     }
 
     public void setGreenSolarFlux(float v) {
-        greenSolarFlux[0] = v;
+        greenSolarFlux = v;
     }
 
     public void setRedSolarFlux(float v) {
-        redSolarFlux[0] = v;
+        redSolarFlux = v;
     }
 
     public void setNirSolarFlux(float v) {
-        nirSolarFlux[0] = v;
+        nirSolarFlux = v;
     }
 
     public void setGreenBandPresent(boolean v) {

@@ -333,6 +333,7 @@ public class FaparOp extends PixelOperator {
         // TODO - write 'run' method using scalars instead of arrays
         FaparOpAlgorithm algorithm = threadLocalAlgorithm.get();
         final float fapar = algorithm.run(sza, saa, vza, vaa, blue, red, nir, process);
+        process = algorithm.getProcess();
 
         switch (process) {
             case 0:

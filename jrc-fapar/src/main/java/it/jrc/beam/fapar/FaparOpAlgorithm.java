@@ -133,7 +133,7 @@ public final class FaparOpAlgorithm {
      * Returns the flag that is updated by the algorithm if fapar is a value out of range
      * @return  5 for bad fapar value, same as input flag else
      */
-    public int get_process() {
+    public int getProcess() {
         return _process;
     }
 

@@ -69,7 +69,7 @@ public class FaparOp extends PixelOperator {
 
     private transient boolean greenBandPresent;
 
-    private final transient FaparOpAlgorithm algorithm = new FaparOpAlgorithm();
+    private transient ThreadLocal<FaparOpAlgorithm> threadLocalAlgorithm;
     private transient float blueSolarFlux = 0.0f;
     private transient float greenSolarFlux = 0.0f;
     private transient float redSolarFlux = 0.0f;
@@ -78,7 +78,14 @@ public class FaparOp extends PixelOperator {
     private transient int landOceanFlagMask;
     private transient int brightFlagMask;
 
-
+    public FaparOp() {
+        threadLocalAlgorithm = new ThreadLocal<FaparOpAlgorithm>() {
+            @Override
+            public FaparOpAlgorithm get() {
+                return new FaparOpAlgorithm();
+            }
+        };
+    }
 
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
@@ -324,6 +331,7 @@ public class FaparOp extends PixelOperator {
         }
 
         // TODO - write 'run' method using scalars instead of arrays
+        FaparOpAlgorithm algorithm = threadLocalAlgorithm.get();
         final float fapar = algorithm.run(sza, saa, vza, vaa, blue, red, nir, process);
 
         switch (process) {
@@ -334,7 +342,7 @@ public class FaparOp extends PixelOperator {
                 targetSamples[0].set(0.0f);
                 break;
             default:
-                targetSamples[0].set(-1.0f/254.0f);
+                targetSamples[0].set(-1.0f / 254.0f);
         }
 
         if (process != 0) {

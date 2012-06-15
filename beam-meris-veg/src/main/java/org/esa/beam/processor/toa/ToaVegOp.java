@@ -79,9 +79,9 @@ public class ToaVegOp extends PixelOperator {
                            // TODO - can tie-point grids be added here?
                    })
     private Product sourceProduct;
+
     private final transient ToaVegAlgorithm algorithm = new ToaVegAlgorithm();
     private final float[] solarSpecFlux = new float[ToaVegConstants.NUM_BANDS];
-    private boolean _auxFilesLoaded = false;
 
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
@@ -103,7 +103,9 @@ public class ToaVegOp extends PixelOperator {
                 inPixel.setBand(sourceSamples[8 + n].getFloat(), n);
                 inPixel.setBand_SolarSpecFlux(solarSpecFlux[n],n);
             }
-            algorithm.processPixel(inPixel, outPixel);
+            synchronized (algorithm){
+                algorithm.processPixel(inPixel, outPixel);
+            }
         }
 
         targetSamples[0].set(outPixel.getBand_LAI());
@@ -226,9 +228,7 @@ public class ToaVegOp extends PixelOperator {
     }
 
     protected void loadAuxiliaryData() {
-        if (_auxFilesLoaded) {
-            return;
-        }
+
         // TODO - allow for parameter for aux data location
         File auxdataPath = new File(SystemUtils.getApplicationDataDir(), getSymbolicName() + "/auxdata");
         File configFile = new File(auxdataPath, ToaVegConstants.CONFIG_FILE);
@@ -267,7 +267,6 @@ public class ToaVegOp extends PixelOperator {
             algorithm.setNn_fAPARAuxPath(_config.getNN_fAPARAuxFile());
             algorithm.setNn_LAIxCabAuxPath(_config.getNN_LAIxCabAuxFile());
 
-            _auxFilesLoaded = true;
         } catch (MalformedURLException e) {
             throw new OperatorException("Failed to create configuration URL for " + configFile.getPath(), e);
         } catch (ProcessorException e) {

@@ -36,7 +36,6 @@ import com.bc.jnn.JnnException;
 
 public class ToaVegAlgorithm {
 
-    private ToaVegMerisPixel _inputMERIS;
     private ToaVegInputStatisticsAccess _inputStatAccess;
     private VegOutputStatisticsAccess _outputStatAccess;
     private VegUncertaintyModelAccess _uncertaintyAccess;
@@ -320,7 +319,6 @@ public class ToaVegAlgorithm {
         int numInputNN;
         float reflec;
         float solarSpecFlux;
-        _inputMERIS = input;
         numInputNN = 0;
 
         //Calculation of the relative azimuth angle image
@@ -328,13 +326,13 @@ public class ToaVegAlgorithm {
 
         //normalisation of the inputs
          //View Zenith
-        _inputNN[numInputNN] = inputNormalisation(Math.toRadians(_inputMERIS.getBand_Vza()),
+        _inputNN[numInputNN] = inputNormalisation(Math.toRadians(input.getBand_Vza()),
                                                   getTheta_V_Min(),
                                                   getTheta_V_Max());
         numInputNN++;
 
         //Sun Zenith
-        _inputNN[numInputNN] = inputNormalisation(Math.toRadians(_inputMERIS.getBand_Sza()),
+        _inputNN[numInputNN] = inputNormalisation(Math.toRadians(input.getBand_Sza()),
                                                     getTheta_S_Min(),
                                                     getTheta_S_Max());
           numInputNN++;
@@ -348,8 +346,8 @@ public class ToaVegAlgorithm {
 
 
          for (int b = 0; b < ToaVegConstants.NUM_BANDS; b++) {
-            solarSpecFlux = getSolarSpecFlux(b);
-            reflec = RsMathUtils.radianceToReflectance(getBand(b), _inputMERIS.getBand_Sza(), solarSpecFlux);
+            solarSpecFlux = input.getBand_SolarSpecFlux(b);
+            reflec = RsMathUtils.radianceToReflectance(input.getBand(b), input.getBand_Sza(), solarSpecFlux);
             _inputNN[numInputNN] = inputNormalisation(reflec,
                                                       getR_Min(b),
                                                       getR_Max(b));
@@ -430,28 +428,6 @@ public class ToaVegAlgorithm {
 
 
     /**
-     * get value a of TOA_VEG band
-     *
-     * @param index : index of the band
-     *
-     * @return value of band
-     */
-    private float getBand(int index){
-        return _inputMERIS.getBand(index);
-    }
-
-    /**
-      * get value a of solar spectral flux for MERIS band
-      *
-      * @param index : index of the band
-      *
-      * @return value of band
-      */
-     private float getSolarSpecFlux(int index){
-         return _inputMERIS.getBand_SolarSpecFlux(index);
-     }
-
-    /**
      * Scales the input values of the neural network.
      *
      * @param val     variable before normalisation
@@ -460,7 +436,7 @@ public class ToaVegAlgorithm {
      *
      * @return sed variable
      */
-    private double inputNormalisation(double val, double valMin, double valMax) {
+    private static double inputNormalisation(double val, double valMin, double valMax) {
         double valNorm;
          valNorm = ((2 * (val - valMin))/(valMax - valMin)) - 1 ;
         return valNorm;
@@ -475,7 +451,7 @@ public class ToaVegAlgorithm {
      *
      * @return result of the neural network
      */
-    private double neuralNetwork(double[] netInput, JnnNet net) {
+    private static double neuralNetwork(double[] netInput, JnnNet net) {
         double[] netOutput = new double[1];
         net.process(netInput, netOutput);
         return netOutput[0];
@@ -491,7 +467,7 @@ public class ToaVegAlgorithm {
      *
      * @return value of flag
      */
-     private boolean outputDenormalisation(double valNorm,
+     private static boolean outputDenormalisation(double valNorm,
                                           double valMin,
                                           double valMax, float[] val) {
         boolean flag = false;
@@ -513,7 +489,7 @@ public class ToaVegAlgorithm {
 
      }
 
-    private float uncertainty_estimation(float val, boolean flag, double[] coeff){
+    private static float uncertainty_estimation(float val, boolean flag, double[] coeff){
         float sigmaV= 0;
         if (!flag){
             sigmaV  = (float) (coeff[0]

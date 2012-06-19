@@ -343,7 +343,7 @@ public class FaparOp extends PixelOperator {
                 targetSamples[0].set(0.0f);
                 break;
             default:
-                targetSamples[0].set(-1.0f / 254.0f);
+                targetSamples[0].set(-1.0f / 65534.0f);
         }
 
         if (process != 0) {
@@ -425,11 +425,12 @@ public class FaparOp extends PixelOperator {
                               "Invalid rectification flagged by MGVI processing",
                               new Color(255, 102, 255), 0.5);
 
-        final Band faparBand = targetProduct.addBand(TARGET_BAND_NAME_FAPAR, ProductData.TYPE_UINT8);
+        final Band faparBand = targetProduct.addBand(TARGET_BAND_NAME_FAPAR, ProductData.TYPE_UINT16);
         faparBand.setNoDataValue(0.0);
+        faparBand.setNoDataValueUsed(true);
         faparBand.setValidPixelExpression(FAPAR_VALID_EXPRESSION);
-        faparBand.setScalingFactor(1.0 / 254.0);
-        faparBand.setScalingOffset(-1.0 / 254.0);
+        faparBand.setScalingFactor(1.0 / 65534.0);
+        faparBand.setScalingOffset(-1.0 / 65534.0);
         faparBand.setDescription("Fraction of photosynthetically absorbed radiation computed by the MGVI algorithm");
 
         addReflectanceTargetBand(sourceProduct, targetProduct, SOURCE_BAND_NAME_BLUE, TARGET_BAND_NAME_BLUE,

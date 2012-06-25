@@ -475,39 +475,33 @@ public final class FaparOpAlgorithm {
      *
      * @return array of fapar values
      */
-    public final float run(float sza, float saa, float vza, float vaa, float blueReflectance, float redReflectance, float nirReflectance, int process)
-    {
-    
-      // array to be returned
-      float r_return = -1.0f;
-		
-    	// Allocate space for rectified reflectances array
-    	_red_rec = -1.0f;
-    	_nir_rec = -1.0f;
-    	
-    	_process = process;
-    
-     	// Apply the anisotropic normalisation
-    	// -----------------------------------
-    	anisotropicCorrection(sza, saa, vza, vaa, blueReflectance, redReflectance, nirReflectance);
-    	
-    	// Apply the atmospheric rectification and initialize the rectified red and near values
-    	// ------------------------------------------------------------------------------------
-    	atmosphericRectification(_brf[BLUE], _brf[RED], _brf[NIR]);
-            
-    	// loop over all the values
-      // ------------------------
-    		if (_process == 0)
-    		{
- 			// Compute the fapar
-    			r_return = (float)(_coeff[0][2][0]*_nir_rec-_coeff[0][2][1]*_red_rec-_coeff[0][2][2])/(float)(Math.pow(_coeff[0][2][3]-_red_rec,2) + Math.pow(_coeff[0][2][4]-_nir_rec,2) + _coeff[0][2][5]);
-      // If fapar has a bad value set the flag
-    			if (r_return < 0.0 || r_return > 1.0)
-          {
-            _process = 5;
-            r_return = INV;
-          }
-    	}
-      return r_return;
+    public final float run(float sza, float saa, float vza, float vaa, float blueReflectance, float redReflectance, float nirReflectance, int process) {
+
+        float r_return = -1.0f;
+
+        _red_rec = -1.0f;
+        _nir_rec = -1.0f;
+
+        _process = process;
+
+        // Apply the anisotropic normalisation
+        anisotropicCorrection(sza, saa, vza, vaa, blueReflectance, redReflectance, nirReflectance);
+
+        // Apply the atmospheric rectification and initialize the rectified red and near values
+        atmosphericRectification(_brf[BLUE], _brf[RED], _brf[NIR]);
+
+        if (_process == 0) {
+            // Compute the fapar
+            r_return = (float) (_coeff[0][2][0] * _nir_rec - _coeff[0][2][1] * _red_rec - _coeff[0][2][2]) / (float) (Math.pow(_coeff[0][2][3] - _red_rec, 2) + Math.pow(_coeff[0][2][4] - _nir_rec, 2) + _coeff[0][2][5]);
+            // If fapar has a bad value set the flag
+            if (r_return < 0.0) {
+                r_return = 0.0f;
+                _process = 6;
+            } else if (r_return > 1.0) {
+                r_return = 1.0f;
+                _process = 7;
+            }
+        }
+        return r_return;
     }
 }

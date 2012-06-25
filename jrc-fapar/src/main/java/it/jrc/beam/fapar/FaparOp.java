@@ -342,6 +342,12 @@ public class FaparOp extends PixelOperator {
             case 4:
                 targetSamples[0].set(0.0f);
                 break;
+            case 6:
+                targetSamples[0].set(0.0f);
+                break;
+            case 7:
+                targetSamples[0].set(1.0f);
+                break;
             default:
                 targetSamples[0].set(-1.0f / 65534.0f);
         }
@@ -409,6 +415,8 @@ public class FaparOp extends PixelOperator {
         targetFlagCoding.addFlag("MGVI_WS", 0x400, "Water or deep shadow pixel flagged by MGVI processing");
         targetFlagCoding.addFlag("MGVI_BRIGHT", 0x800, "Bright pixel flagged by MGVI processing");
         targetFlagCoding.addFlag("MGVI_INVAL_FAPAR", 0x1000, "Invalid rectification flagged by MGVI processing");
+        targetFlagCoding.addFlag("MGVI_NO_VEGETATION", 0x2000, "Vegetation below zero flagged by MGVI processing");
+        targetFlagCoding.addFlag("MGVI_VEGETATION_OOB", 0x4000, "Vegetation out out bounds flagged by MGVI processing");
 
         productConfigurer.copyMasks();
 

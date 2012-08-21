@@ -14,7 +14,7 @@
             <li><a href="http://github.com/downloads/bcdev/beam-third-party/ATMCORR_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Atmospheric correction algorithm for MERIS above case-2 waters</a></li>
             <li><a href="http://github.com/downloads/bcdev/beam-third-party/BEAM_MERIS_Schroeder_et_al_IJRS_2007.pdf">Article in International Journal of Remote Sensing: Retrieval of atmospheric and oceanic properties from MERIS measurements</a></li>
             <li><a href="http://github.com/downloads/bcdev/beam-third-party/Kratzer_et_al_in_press_2007.pdf">Article in Science Direct: Using MERIS full resolution data to monitor coastal waters</a></li>
-        </ul>            
+        </ul>
         ]]>
     </description>
 
@@ -96,6 +96,16 @@
             <mnemonic>X</mnemonic>
             <parent>tools</parent>
             <helpID>WATERProcessorPlugIn</helpID>
+        </action>
+        <action>
+            <id>FUB-WeW</id>
+            <helpId>WATERProcessorPlugIn</helpId>
+            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <text>FUB/WeW WATER Processor OP (MERIS)...</text>
+            <shortDescr>Invoke the FUB/WeW WATER Processor Plugin.</shortDescr>
+            <operatorName>WaterProcessorOp</operatorName>
+            <dialogTitle>FUB Water Processor</dialogTitle>
+            <targetProductNameSuffix>_FUB_WeW</targetProductNameSuffix>
         </action>
     </extension>
 

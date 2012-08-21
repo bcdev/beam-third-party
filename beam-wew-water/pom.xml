@@ -13,18 +13,23 @@
     <dependencies>
         <dependency>
             <groupId>org.esa.beam</groupId>
+            <artifactId>beam-gpf</artifactId>
+            <version>4.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.esa.beam</groupId>
             <artifactId>beam-core</artifactId>
-            <version>4.10</version>
+            <version>4.10.3</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-processing</artifactId>
-            <version>4.10</version>
+            <version>4.10.3</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-visat</artifactId>
-            <version>4.10</version>
+            <version>4.10.3</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>

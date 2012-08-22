@@ -58,7 +58,7 @@ import wew.water.WaterProcessorUI;
  * account, it just calculates the RESULT over the whole product.
  */
 
-public class WaterProcessor extends Processor {
+public class WaterProcessorRefactored extends Processor {
 
     // Constants
     public static final String PROCESSOR_NAME = "FUB/WeW Water processor";
@@ -710,7 +710,6 @@ public class WaterProcessor extends Processor {
         //
         int[] resultFlags = new int[productWidth];
         int[] resultFlagsNN = new int[productWidth];
-        int mask_to_be_used;
 
         // Ozone data
         //
@@ -786,6 +785,7 @@ public class WaterProcessor extends Processor {
         // Grab a line in the middle of the scene
         _l1FlagsInputBand.readPixels(0, productHeight / 2, productWidth, 1, l1Flags);
         boolean icolMode = _inputProduct.getProductType().matches(ICOL_PATTERN);
+        int mask_to_be_used;
         if (icolMode) {
             mask_to_be_used = MASK_TO_BE_USED;
             System.out.println("--- Input product is of type icol ---");
@@ -966,19 +966,7 @@ public class WaterProcessor extends Processor {
                 stage = 1;
                 recallBCK.lrecall_run46_C2_100_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
                 for (int x = 0; x < productWidth; x++) {
-                    // Input range failure
-                    if ((a[x] > -2.1) && (a[x] < -1.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                    }
-                    // Output range failure
-                    if ((a[x] > -19.1) && (a[x] < -18.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
-                    // Input AND Output range failure
-                    if ((a[x] > -22.1) && (a[x] < -21.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
+                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
                     result[0][x] = opixel[0][x];
                 }
 
@@ -993,19 +981,7 @@ public class WaterProcessor extends Processor {
                 }
                 recallBCK.lrecall_run38_C2_040_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
                 for (int x = 0; x < productWidth; x++) {
-                    // Input range failure
-                    if ((a[x] > -2.1) && (a[x] < -1.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                    }
-                    // Output range failure
-                    if ((a[x] > -19.1) && (a[x] < -18.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
-                    // Input AND Output range failure
-                    if ((a[x] > -22.1) && (a[x] < -21.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
+                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
                     result[1][x] = opixel[0][x];
                 }
                 // Run the 1-step total suspended matter network;
@@ -1019,19 +995,7 @@ public class WaterProcessor extends Processor {
                 }
                 recallBCK.lrecall_run39_C2_080_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
                 for (int x = 0; x < productWidth; x++) {
-                    // Input range failure
-                    if ((a[x] > -2.1) && (a[x] < -1.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                    }
-                    // Output range failure
-                    if ((a[x] > -19.1) && (a[x] < -18.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
-                    // Input AND Output range failure
-                    if ((a[x] > -22.1) && (a[x] < -21.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
+                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
                     result[2][x] = opixel[0][x];
                 }
 
@@ -1049,22 +1013,7 @@ public class WaterProcessor extends Processor {
 
                 recallBCK.lrecall_run19_C2_080_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
                 for (int x = 0; x < productWidth; x++) {
-                    //System.out.print("--" + y + "--" + x + "--> " + a[x] + " : " + resultFlagsNN[x]);
-                    // Input range failure
-                    if ((a[x] > -2.1) && (a[x] < -1.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                    }
-                    // Output range failure
-                    if ((a[x] > -19.1) && (a[x] < -18.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
-                    // Input AND Output range failure
-                    if ((a[x] > -22.1) && (a[x] < -21.9)) {
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage - 1];
-                        resultFlagsNN[x] |= RESULT_ERROR_VALUE[2 * stage];
-                    }
-                    //System.out.println(" --> " + resultFlagsNN[x]);
-
+                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
                     // The aots
                     for (int i = num_msl; i < onodes; i++) {
                         result[numOfConcentrationBands + i - num_msl][x] = opixel[i][x];
@@ -1113,6 +1062,23 @@ public class WaterProcessor extends Processor {
         }
 
     } // processWater
+
+    private int appendFlags(int resultFlagNN, float ax, int stage) {
+        // Input range failure
+        if ((ax > -2.1) && (ax < -1.9)) {
+            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage - 1];
+        }
+        // Output range failure
+        if ((ax > -19.1) && (ax < -18.9)) {
+            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage];
+        }
+        // Input AND Output range failure
+        if ((ax > -22.1) && (ax < -21.9)) {
+            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage - 1];
+            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage];
+        }
+        return resultFlagNN;
+    }
 
     private RasterDataNode getTiePointGrid(String rasterName) throws ProcessorException {
         RasterDataNode latGrid = _inputProduct.getRasterDataNode(rasterName);

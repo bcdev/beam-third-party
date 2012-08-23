@@ -15,7 +15,20 @@ package wew.water.gpf;
 
 import com.bc.ceres.core.ProgressMonitor;
 import com.bc.ceres.core.SubProgressMonitor;
-import java.awt.Color;
+import org.esa.beam.dataio.envisat.EnvisatConstants;
+import org.esa.beam.framework.dataio.ProductIO;
+import org.esa.beam.framework.dataio.ProductWriter;
+import org.esa.beam.framework.datamodel.*;
+import org.esa.beam.framework.processor.*;
+import org.esa.beam.framework.processor.ui.ProcessorUI;
+import org.esa.beam.processor.smac.SmacConstants;
+import org.esa.beam.util.ProductUtils;
+import org.esa.beam.util.SystemUtils;
+import org.esa.beam.util.io.FileUtils;
+import wew.water.WaterProcessorOzone;
+import wew.water.WaterProcessorUI;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,32 +38,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.esa.beam.dataio.envisat.EnvisatConstants;
-import org.esa.beam.framework.dataio.ProductIO;
-import org.esa.beam.framework.dataio.ProductWriter;
-import org.esa.beam.framework.datamodel.Band;
-import org.esa.beam.framework.datamodel.FlagCoding;
-import org.esa.beam.framework.datamodel.Mask;
-import org.esa.beam.framework.datamodel.MetadataAttribute;
-import org.esa.beam.framework.datamodel.MetadataElement;
-import org.esa.beam.framework.datamodel.Product;
-import org.esa.beam.framework.datamodel.ProductData;
-import org.esa.beam.framework.datamodel.ProductNodeGroup;
-import org.esa.beam.framework.datamodel.RasterDataNode;
-import org.esa.beam.framework.processor.Processor;
-import org.esa.beam.framework.processor.ProcessorConstants;
-import org.esa.beam.framework.processor.ProcessorException;
-import org.esa.beam.framework.processor.ProcessorUtils;
-import org.esa.beam.framework.processor.ProductRef;
-import org.esa.beam.framework.processor.Request;
-import org.esa.beam.framework.processor.ui.ProcessorUI;
-import org.esa.beam.processor.smac.SmacConstants;
-import org.esa.beam.util.ProductUtils;
-import org.esa.beam.util.SystemUtils;
-import org.esa.beam.util.io.FileUtils;
-import wew.water.RecallBCK;
-import wew.water.WaterProcessorOzone;
-import wew.water.WaterProcessorUI;
 
 /*
  * The <code>WaterProcessor</code> implements all specific functionality to calculate a RESULT
@@ -82,40 +69,40 @@ public class WaterProcessorRefactored extends Processor {
     public static final int RESULT_ERROR_NUM = 9;
 
     public static final String[] RESULT_ERROR_TEXT = {
-                "Pixel was a priori masked out",
-                "CHL retrieval failure (input)",
-                "CHL retrieval failure (output)",
-                "YEL retrieval failure (input)",
-                "YEL retrieval failure (output)",
-                "TSM retrieval failure (input)",
-                "TSM retrieval failure (output)",
-                "Atmospheric correction failure (input)",
-                "Atmospheric correction failure (output)"
+            "Pixel was a priori masked out",
+            "CHL retrieval failure (input)",
+            "CHL retrieval failure (output)",
+            "YEL retrieval failure (input)",
+            "YEL retrieval failure (output)",
+            "TSM retrieval failure (input)",
+            "TSM retrieval failure (output)",
+            "Atmospheric correction failure (input)",
+            "Atmospheric correction failure (output)"
     };
 
     public static final String[] RESULT_ERROR_NAME = {
-                "LEVEL1b_MASKED",
-                "CHL_IN",
-                "CHL_OUT",
-                "YEL_IN",
-                "YEL_OUT",
-                "TSM_IN",
-                "TSM_OUT",
-                "ATM_IN",
-                "ATM_OUT"
+            "LEVEL1b_MASKED",
+            "CHL_IN",
+            "CHL_OUT",
+            "YEL_IN",
+            "YEL_OUT",
+            "TSM_IN",
+            "TSM_OUT",
+            "ATM_IN",
+            "ATM_OUT"
     };
 
 
     public static final int[] RESULT_ERROR_VALUE = {
-                0x00000001,
-                0x00000002,
-                0x00000004,
-                0x00000008,
-                0x00000010,
-                0x00000020,
-                0x00000040,
-                0x00000080,
-                0x00000100,
+            0x00000001,
+            0x00000002,
+            0x00000004,
+            0x00000008,
+            0x00000010,
+            0x00000020,
+            0x00000040,
+            0x00000080,
+            0x00000100,
     };
 
     public static final String L1FLAGS_INPUT_BAND_NAME = "l1_flags";
@@ -135,9 +122,9 @@ public class WaterProcessorRefactored extends Processor {
     private static final String O3_GRID_NAME = EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13];
 
     static final String[] REQUIRED_TIE_POINT_GRID_NAMES = new String[]{
-                SZA_GRID_NAME, SAA_GRID_NAME, VZA_GRID_NAME,
-                VAA_GRID_NAME, ZW_GRID_NAME, MW_GRID_NAME,
-                PRESS_GRID_NAME, O3_GRID_NAME
+            SZA_GRID_NAME, SAA_GRID_NAME, VZA_GRID_NAME,
+            VAA_GRID_NAME, ZW_GRID_NAME, MW_GRID_NAME,
+            PRESS_GRID_NAME, O3_GRID_NAME
     };
 
     // Fields
@@ -166,84 +153,84 @@ public class WaterProcessorRefactored extends Processor {
 
     // ID strings for all possible output bands
     private static String[] _outputBandName = {
-                "algal_2",
-                "yellow_subs",
-                "total_susp",
-                "aero_opt_thick_440",
-                "aero_opt_thick_550",
-                "aero_opt_thick_670",
-                "aero_opt_thick_870",
-                "reflec_1",
-                "reflec_2",
-                "reflec_3",
-                "reflec_4",
-                "reflec_5",
-                "reflec_6",
-                "reflec_7",
-                "reflec_9"
+            "algal_2",
+            "yellow_subs",
+            "total_susp",
+            "aero_opt_thick_440",
+            "aero_opt_thick_550",
+            "aero_opt_thick_670",
+            "aero_opt_thick_870",
+            "reflec_1",
+            "reflec_2",
+            "reflec_3",
+            "reflec_4",
+            "reflec_5",
+            "reflec_6",
+            "reflec_7",
+            "reflec_9"
     };
 
     // Descriptive strings for all possible output bands
     private static String[] _outputBandDescription = {
-                "Chlorophyll 2 content",
-                "Yellow substance",
-                "Total suspended matter",
-                "Aerosol optical thickness",
-                "Aerosol optical thickness",
-                "Aerosol optical thickness",
-                "Aerosol optical thickness",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance"
+            "Chlorophyll 2 content",
+            "Yellow substance",
+            "Total suspended matter",
+            "Aerosol optical thickness",
+            "Aerosol optical thickness",
+            "Aerosol optical thickness",
+            "Aerosol optical thickness",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance"
     };
 
     // Unit strings for all possible output bands
     private static String[] _outputBandUnit = {
-                "log10(mg/m^3)",
-                "log10(1/m)",
-                "log10(g/m^3)",
-                "1",
-                "1",
-                "1",
-                "1",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr"
+            "log10(mg/m^3)",
+            "log10(1/m)",
+            "log10(g/m^3)",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr"
     };
 
     // Wavelengths for the water leaving reflectances rho_w
     private static float[] tau_lambda = {
-                440.00f, 550.00f, 670.00f, 870.00f
+            440.00f, 550.00f, 670.00f, 870.00f
     };
 
     // Wavelengths for the water leaving reflectances rho_w
     private static float[] rho_w_lambda = {
-                412.50f, 442.50f, 490.00f, 510.00f,
-                560.00f, 620.00f, 665.00f, 708.75f
+            412.50f, 442.50f, 490.00f, 510.00f,
+            560.00f, 620.00f, 665.00f, 708.75f
     };
 
     // Bandwidth for the water leaving reflectances rho_w
     private static float[] rho_w_bandw = {
-                10.00f, 10.00f, 10.00f, 10.00f,
-                10.00f, 10.00f, 10.00f, 10.00f
+            10.00f, 10.00f, 10.00f, 10.00f,
+            10.00f, 10.00f, 10.00f, 10.00f
     };
 
     private static final double[] DEFSOL = new double[]{
-                1670.5964, 1824.1444, 1874.9883,
-                1877.6682, 1754.7749, 1606.6401,
-                1490.0026, 1431.8726, 1369.2035,
-                1231.7164, 1220.0767, 1144.9675,
-                932.3497, 904.8193, 871.0908
+            1670.5964, 1824.1444, 1874.9883,
+            1877.6682, 1754.7749, 1606.6401,
+            1490.0026, 1431.8726, 1369.2035,
+            1231.7164, 1220.0767, 1144.9675,
+            932.3497, 904.8193, 871.0908
     };
 
     // Mask value to be written if inversion fails
@@ -694,7 +681,7 @@ public class WaterProcessorRefactored extends Processor {
 
         float[] sunZenithAngles = new float[productWidth];
         float[] sunAzimuthAngles = new float[productWidth];
-        float[] viewZenithAngles= new float[productWidth];
+        float[] viewZenithAngles = new float[productWidth];
         float[] viewAzimuthAngles = new float[productWidth];
         float[] zonalWinds = new float[productWidth];
         float[] meridianWinds = new float[productWidth];
@@ -720,24 +707,16 @@ public class WaterProcessorRefactored extends Processor {
         //
         double degreeToRadian;
         float azimuthDiff;
-        int k;
         int l;
         int ls = 0;
         int n;
-        float[] a = new float[productWidth];
 
         int inodes = 1;
-        int onodes = 1;
-        int inodes_1;
         int onodes_1;
         int onodes_2;
-        int stage;
 
-        float[][] ipixel = new float[2][1];
-        float[][] ipixels = new float[2][1];
-        float[][] opixel = new float[2][1];
-
-        RecallBCK recallBCK = new RecallBCK();
+        float[][] ipixel;
+        float[][] ipixels;
 
         // Load the wavelengths and ozone spectral extinction coefficients
         //
@@ -761,12 +740,10 @@ public class WaterProcessorRefactored extends Processor {
 
         // Get the number of I/O nodes in advance
         // implicit atm.corr.
-        inodes_1 = recallBCK.lrecall_run38_C2_040_nn(ipixel, -1, opixel, 1, productWidth, resultFlags, 0, a);
-        onodes_1 = recallBCK.lrecall_run38_C2_040_nn(ipixel, 1, opixel, -1, productWidth, resultFlags, 0, a);
-
+        inodes = ChlorophyllNetworkOperation.getNumberOfInputNodes();
+        onodes_1 = ChlorophyllNetworkOperation.getNumberOfOutputNodes();
         // explicit atm.corr.
-        recallBCK.lrecall_run19_C2_080_nn(ipixel, -1, opixel, 1, productWidth, resultFlags, 0, a);
-        onodes_2 = recallBCK.lrecall_run19_C2_080_nn(ipixel, 1, opixel, -1, productWidth, resultFlags, 0, a);
+        onodes_2 = AtmosphericCorrectionNetworkOperation.getNumberOfOutputNodes();
 
         float[][] top = new float[numTopOfAtmosphereBands][productWidth];
         float[][] tops = new float[numTopOfAtmosphereBands][productWidth];
@@ -841,14 +818,19 @@ public class WaterProcessorRefactored extends Processor {
                 pressGrid.readPixels(0, y, productWidth, 1, airPressures);
                 o3Grid.readPixels(0, y, productWidth, 1, ozones);
 
+
                 // process the complete scanline
                 //
+                ipixel = new float[inodes][productWidth];
+                final float[] nnIpixel = new float[inodes];
+                float[] nnOpixel1 = new float[onodes_1];
+                float[] nnOpixel2 = new float[onodes_2];
                 for (int x = 0; x < productWidth; x++) {
                     resultFlags[x] = 0;
                     resultFlagsNN[x] = 0;
 
                     // Exclude pixels from processing if the following l1flags mask becomes true
-                    k = l1Flags[x] & mask_to_be_used;
+                    int k = l1Flags[x] & mask_to_be_used;
                     if (k != 0) {
                         resultFlags[x] = RESULT_ERROR_VALUE[0];
                     }
@@ -866,7 +848,7 @@ public class WaterProcessorRefactored extends Processor {
                         sof[l][x] = solarFlux[n];
                         top[l][x] = topOfAtmosphere[n][x] / solarFlux[n];
                         o3f[l][x] = Math.exp(-(TOTAL_OZONE_DU_MOMO - ozones[x]) * exO3[n] / 1000.0 * (1.0 / Math.cos(
-                                    (double) viewZenithAngles[x] * degreeToRadian) + 1.0 / Math.cos((double) sunZenithAngles[x] * degreeToRadian)));
+                                (double) viewZenithAngles[x] * degreeToRadian) + 1.0 / Math.cos((double) sunZenithAngles[x] * degreeToRadian)));
                         top[l][x] *= o3f[l][x];
                     }
                     for (n = 8; n <= 9; n++, l++) {
@@ -874,7 +856,7 @@ public class WaterProcessorRefactored extends Processor {
                         sof[l][x] = solarFlux[n];
                         top[l][x] = topOfAtmosphere[n][x] / solarFlux[n];
                         o3f[l][x] = Math.exp(-(TOTAL_OZONE_DU_MOMO - ozones[x]) * exO3[n] / 1000.0 * (1.0 / Math.cos(
-                                    (double) viewZenithAngles[x] * degreeToRadian) + 1.0 / Math.cos((double) sunZenithAngles[x] * degreeToRadian)));
+                                (double) viewZenithAngles[x] * degreeToRadian) + 1.0 / Math.cos((double) sunZenithAngles[x] * degreeToRadian)));
                         top[l][x] *= o3f[l][x];
                     }
                     for (n = 11; n <= 13; n++, l++) {
@@ -882,7 +864,7 @@ public class WaterProcessorRefactored extends Processor {
                         sof[l][x] = solarFlux[n];
                         top[l][x] = topOfAtmosphere[n][x] / solarFlux[n];
                         o3f[l][x] = Math.exp(-(TOTAL_OZONE_DU_MOMO - ozones[x]) * exO3[n] / 1000.0 * (1.0 / Math.cos(
-                                    (double) viewZenithAngles[x] * degreeToRadian) + 1.0 / Math.cos((double) sunZenithAngles[x] * degreeToRadian)));
+                                (double) viewZenithAngles[x] * degreeToRadian) + 1.0 / Math.cos((double) sunZenithAngles[x] * degreeToRadian)));
                         top[l][x] *= o3f[l][x];
                     }
 
@@ -918,20 +900,13 @@ public class WaterProcessorRefactored extends Processor {
                     geo[1][x] = (float) (Math.sin((double) viewZenithAngles[x] * degreeToRadian) * Math.cos((double) azimuthDiff * degreeToRadian)); // obs_x
                     geo[2][x] = (float) (Math.sin((double) viewZenithAngles[x] * degreeToRadian) * Math.sin((double) azimuthDiff * degreeToRadian)); // obs_y
                     geo[3][x] = (float) (Math.cos((double) viewZenithAngles[x] * degreeToRadian));                            // obs_z
-                } // x
 
                 // *********************
                 // * STAGE 1-4
                 // *********************
 
-                inodes = inodes_1; // They are all the same !!
-                onodes = onodes_1; // They differ !!
 
-                ipixel = new float[inodes][productWidth];
-                ipixels = new float[inodes][productWidth];
-                opixel = new float[onodes][productWidth];
 
-                for (int x = 0; x < productWidth; x++) {
                     // load the TOA reflectances
                     for (l = 0; l < numTopOfAtmosphereBands; l++) {
                         ipixel[l][x] = top[l][x];
@@ -947,85 +922,40 @@ public class WaterProcessorRefactored extends Processor {
                     ipixel[l++][x] = geo[2][x];
                     ipixel[l++][x] = geo[3][x];
 
-                    // Check against range limits inside the network
-                    // recall if the value of a[x] is set to -1.0f.
-                    //
-                    // This results in the application of the flag
-                    // 'RESULT_ERROR_VALUE[]' to the 'resultFlagsNN'
-                    a[x] = aset;
-
-                    // Save input pixel
-                    ls = l;
-                    for (l = 0; l < ls; l++) {
-                        ipixels[l][x] = ipixel[l][x];
+                    // Run the 1-step chlorophyll, yellow substance and total suspended matter network;
+                    for (int i = 0; i < nnIpixel.length; i++) {
+                        nnIpixel[i] = ipixel[i][x];
                     }
+                    resultFlagsNN[x] |= ChlorophyllNetworkOperation.compute(nnIpixel, nnOpixel1);
+                    result[0][x] = nnOpixel1[0];
 
-                }
-
-                // Run the 1-step chlorophyll network;
-                stage = 1;
-                recallBCK.lrecall_run46_C2_100_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
-                for (int x = 0; x < productWidth; x++) {
-                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
-                    result[0][x] = opixel[0][x];
-                }
-
-                // Run the 1-step yellow substance network;
-                stage = 2;
-                for (int x = 0; x < productWidth; x++) {
-                    // reload the pixel
-                    for (l = 0; l < ls; l++) {
-                        ipixel[l][x] = ipixels[l][x];
+                    for (int i = 0; i < nnIpixel.length; i++) {
+                        nnIpixel[i] = ipixel[i][x];
                     }
-                    a[x] = aset;
-                }
-                recallBCK.lrecall_run38_C2_040_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
-                for (int x = 0; x < productWidth; x++) {
-                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
-                    result[1][x] = opixel[0][x];
-                }
-                // Run the 1-step total suspended matter network;
-                stage = 3;
-                for (int x = 0; x < productWidth; x++) {
-                    // reload the pixel
-                    for (l = 0; l < ls; l++) {
-                        ipixel[l][x] = ipixels[l][x];
-                    }
-                    a[x] = aset;
-                }
-                recallBCK.lrecall_run39_C2_080_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
-                for (int x = 0; x < productWidth; x++) {
-                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
-                    result[2][x] = opixel[0][x];
-                }
+                    resultFlagsNN[x] |= YellowSubstanceNetworkOperation.compute(nnIpixel, nnOpixel1);
+                    result[1][x] = nnOpixel1[0];
 
-                // Run part 1 of the 2-step atm.corr. network;
-                stage = 4;
-                onodes = onodes_2;
-                opixel = new float[onodes][productWidth];
-                for (int x = 0; x < productWidth; x++) {
-                    // reload the pixel
-                    for (l = 0; l < ls; l++) {
-                        ipixel[l][x] = ipixels[l][x];
+                    for (int i = 0; i < nnIpixel.length; i++) {
+                        nnIpixel[i] = ipixel[i][x];
                     }
-                    a[x] = aset;
-                }
+                    resultFlagsNN[x] |= TotalSuspendedMatterNetworkOperation.compute(nnIpixel, nnOpixel1);
+                    result[2][x] = nnOpixel1[0];
 
-                recallBCK.lrecall_run19_C2_080_nn(ipixel, inodes, opixel, onodes, productWidth, resultFlags, 0, a);
-                for (int x = 0; x < productWidth; x++) {
-                    resultFlagsNN[x] = appendFlags(resultFlagsNN[x], a[x], stage);
+                    // Run part 1 of the 2-step atm.corr. network;
+                    for (int i = 0; i < nnIpixel.length; i++) {
+                        nnIpixel[i] = ipixel[i][x];
+                    }
+                    resultFlagsNN[x] |= AtmosphericCorrectionNetworkOperation.compute(nnIpixel, nnOpixel2);
                     // The aots
-                    for (int i = num_msl; i < onodes; i++) {
-                        result[numOfConcentrationBands + i - num_msl][x] = opixel[i][x];
+                    for (int i = num_msl; i < nnOpixel2.length; i++) {
+                        result[numOfConcentrationBands + i - num_msl][x] = nnOpixel2[i];
                     }
                     for (int i = 0; i < num_msl; i++) {
-                        result[numOfConcentrationBands + numOfSpectralAerosolOpticalDepths + i][x] = opixel[i][x];
+                        result[numOfConcentrationBands + numOfSpectralAerosolOpticalDepths + i][x] = nnOpixel2[i];
                     }
-                }
 
-                // OK, the whole scanline had been processed. Now check for error flags !
-                // If set, set output vector to mask value !
-                for (int x = 0; x < productWidth; x++) {
+                    // OK, the whole scanline had been processed. Now check for error flags !
+                    // If set, set output vector to mask value !
                     if (resultFlags[x] != 0) {
                         for (n = 0; n < output_planes; n++) {
                             result[n][x] = (float) RESULT_MASK_VALUE;
@@ -1034,6 +964,7 @@ public class WaterProcessorRefactored extends Processor {
                     // Combine result flags
                     resultFlags[x] |= resultFlagsNN[x];
                 }
+
 
                 // Write the result planes
                 //
@@ -1063,21 +994,21 @@ public class WaterProcessorRefactored extends Processor {
 
     } // processWater
 
-    private int appendFlags(int resultFlagNN, float ax, int stage) {
+    private int getErrorFlags(float errorIndicator, int offset) {
+        final int errorOffset = 2 * offset;
         // Input range failure
-        if ((ax > -2.1) && (ax < -1.9)) {
-            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage - 1];
+        if (errorIndicator == -2f) {
+            return RESULT_ERROR_VALUE[errorOffset - 1];
         }
         // Output range failure
-        if ((ax > -19.1) && (ax < -18.9)) {
-            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage];
+        if (errorIndicator == -19f) {
+            return RESULT_ERROR_VALUE[errorOffset];
         }
         // Input AND Output range failure
-        if ((ax > -22.1) && (ax < -21.9)) {
-            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage - 1];
-            resultFlagNN |= RESULT_ERROR_VALUE[2 * stage];
+        if (errorIndicator == -22f) {
+            return RESULT_ERROR_VALUE[errorOffset - 1] | RESULT_ERROR_VALUE[errorOffset];
         }
-        return resultFlagNN;
+        return 0;
     }
 
     private RasterDataNode getTiePointGrid(String rasterName) throws ProcessorException {

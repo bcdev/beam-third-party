@@ -1,16 +1,19 @@
 package wew.water.gpf;
 
-public class YellowSubstanceNetworkOperation implements NeuralNetworkOperation {
+public class YellowSubstanceNetworkOperation   {
 
-    @Override
-    public void compute(float[] in, float[] out, int mask, int errMask, float a) {
+    public static int compute(float[] in, float[] out) {
         if (in.length != getNumberOfInputNodes()) {
             throw new IllegalArgumentException("Wrong input array size");
         }
         if (out.length != getNumberOfOutputNodes()) {
             throw new IllegalArgumentException("Wrong output array size");
         }
-        NeuralNetworkComputer.compute(in, out, mask, errMask, a,
+        final int[] rangeCheckErrorMasks = {
+                WaterProcessorOp.RESULT_ERROR_VALUES[3],
+                WaterProcessorOp.RESULT_ERROR_VALUES[4]
+        };
+        return NeuralNetworkComputer.compute(in, out, rangeCheckErrorMasks,
                                       NeuralNetworkConstants.INPUT_SCALE_LIMITS,
                                       NeuralNetworkConstants.INPUT_SCALE_OFFSET_FACTORS,
                                       NeuralNetworkConstants.INPUT_SCALE_FLAG,
@@ -25,13 +28,11 @@ public class YellowSubstanceNetworkOperation implements NeuralNetworkOperation {
         );
     }
 
-    @Override
-    public int getNumberOfInputNodes() {
+    public static int getNumberOfInputNodes() {
         return 18;
     }
 
-    @Override
-    public int getNumberOfOutputNodes() {
+    public static int getNumberOfOutputNodes() {
         return 1;
     }
 

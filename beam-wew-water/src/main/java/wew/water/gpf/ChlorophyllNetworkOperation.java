@@ -2,17 +2,20 @@ package wew.water.gpf;
 
 import org.esa.beam.framework.gpf.OperatorException;
 
-public class ChlorophyllNetworkOperation implements NeuralNetworkOperation {
+public class ChlorophyllNetworkOperation  {
 
-    @Override
-    public void compute(float[] in, float[] out, int mask, int errMask, float a) {
+    public static int compute(float[] in, float[] out) {
         if(in.length != getNumberOfInputNodes()) {
             throw new IllegalArgumentException("Wrong input array size");
         }
         if(out.length != getNumberOfOutputNodes()) {
             throw new IllegalArgumentException("Wrong output array size");
         }
-        NeuralNetworkComputer.compute(in, out, mask, errMask, a,
+        final int[] rangeCheckErrorMasks = {
+                WaterProcessorOp.RESULT_ERROR_VALUES[1],
+                WaterProcessorOp.RESULT_ERROR_VALUES[2]
+        };
+        return NeuralNetworkComputer.compute(in, out, rangeCheckErrorMasks,
                                       NeuralNetworkConstants.INPUT_SCALE_LIMITS,
                                       NeuralNetworkConstants.INPUT_SCALE_OFFSET_FACTORS,
                                       NeuralNetworkConstants.INPUT_SCALE_FLAG,
@@ -27,18 +30,16 @@ public class ChlorophyllNetworkOperation implements NeuralNetworkOperation {
         );
     }
 
-    @Override
-    public int getNumberOfInputNodes() {
+    public static int getNumberOfInputNodes() {
         return 18;
     }
 
-    @Override
-    public int getNumberOfOutputNodes() {
+    public static int getNumberOfOutputNodes() {
         return 1;
     }
 
     // Eigenvectors (columnwise) for input PCA layer for run46_C2_100_nn
-    private final double[][] input_pca_eigenvectors = new double[][]{
+    private static final double[][] input_pca_eigenvectors = new double[][]{
                 {
                             +3.720327e-02, -6.549362e-03, +2.900080e-01, -2.011320e-01,
                             -2.636388e-01, +1.000999e-01, +1.988870e-01, +3.842379e-01,
@@ -102,7 +103,7 @@ public class ChlorophyllNetworkOperation implements NeuralNetworkOperation {
     };
 
     // Input connection weights for run46_C2_100_nn
-    private final double[][] input_hidden_weights = new double[][]{
+    private static final double[][] input_hidden_weights = new double[][]{
                 {
                             -5.127986e-01, +5.872741e-01, +4.411426e-01, +1.344507e+00,
                             -7.758738e-01, -7.235078e-01, +2.421909e+00, +1.923607e-02,
@@ -619,7 +620,7 @@ public class ChlorophyllNetworkOperation implements NeuralNetworkOperation {
     };
 
     // Intercept and slope for input layer for run46_C2_100_nn
-    private final double[][] input_intercept_and_slope = new double[][]{
+    private static  final double[][] input_intercept_and_slope = new double[][]{
                 {+4.165578e-02, +1.161174e-02},
                 {+3.520901e-02, +1.063665e-02},
                 {+2.920864e-02, +1.050035e-02},
@@ -641,7 +642,7 @@ public class ChlorophyllNetworkOperation implements NeuralNetworkOperation {
     };
 
     // Output connection weights from KOH file for run46_C2_100_nn
-    private final double[][] output_weights = new double[][]{
+    private static final double[][] output_weights = new double[][]{
                 {-6.498447e+00,},
                 {-1.118659e+01,},
                 {+7.141798e+00,},
@@ -746,15 +747,15 @@ public class ChlorophyllNetworkOperation implements NeuralNetworkOperation {
     };
 
     // Output limits (min/max) from training data set for run46_C2_100_nn
-    private final double[][] output_scale_limits = new double[][]{{-1.300000e+00, +1.700000e+00,},};
+    private static  final double[][] output_scale_limits = new double[][]{{-1.300000e+00, +1.700000e+00,},};
 
     // Intercept and slope for output layer for run46_C2_100_nn
-    private final double[][] output_intercept_and_slope = new double[][]{{-1.300000e+00, +3.750000e+00},};
+    private static final double[][] output_intercept_and_slope = new double[][]{{-1.300000e+00, +3.750000e+00},};
 
     // Output offset factors for run46_C2_100_nn
-    private final double[] output_scale_offset_factors = new double[]{+1.000000e-01,};
+    private static final double[] output_scale_offset_factors = new double[]{+1.000000e-01,};
 
     // Output scale flags for run46_C2_100_nn
-    private final int[] output_scale_flags = new int[]{+0,};
+    private static final int[] output_scale_flags = new int[]{+0,};
 
 }

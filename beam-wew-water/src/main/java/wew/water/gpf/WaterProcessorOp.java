@@ -115,10 +115,14 @@ public class WaterProcessorOp extends PixelOperator {
                 10.00f, 10.00f, 10.00f, 10.00f
     };
 
+    private int num_msl = 8;
+    private int numOfConcentrationBands = 3;
+    private int numOfSpectralAerosolOpticalDepths = 4;
+
     private static final String result_flags_name = "result_flags";
 
     // Mask value to be written if inversion fails
-    private static final double result_mask_value = +5.0;
+    private static final float result_mask_value = 5.0f;
 
     private static final String[] result_error_texts = {
                 "Pixel was a priori masked out",
@@ -143,7 +147,7 @@ public class WaterProcessorOp extends PixelOperator {
                 "ATM_IN",
                 "ATM_OUT"
     };
-    private static final int[] result_error_values = {
+    public static final int[] RESULT_ERROR_VALUES = {
                 0x00000001,
                 0x00000002,
                 0x00000004,
@@ -200,26 +204,37 @@ public class WaterProcessorOp extends PixelOperator {
                 EnvisatConstants.MERIS_L1B_RADIANCE_14_BAND_NAME, // source sample index 13   radiance_14
                 EnvisatConstants.MERIS_L1B_RADIANCE_15_BAND_NAME, // source sample index 14   radiance_15
                 EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME,         // source sample index 15   l1_flags
-                EnvisatConstants.MERIS_DETECTOR_INDEX_DS_NAME,    // source sample index 16   detector_index
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[6],   // source sample index 17   sun_zenith
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[7],   // source sample index 18   sun_azimuth
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[8],   // source sample index 19   view_zenith
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[9],   // source sample index 20   view_azimuth
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[10],  // source sample index 21   zonal_wind
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[11],  // source sample index 22   merid_wind
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12],  // source sample index 23   atm_press
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13]   // source sample index 24   ozone
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[6],   // source sample index 16   sun_zenith
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[7],   // source sample index 17   sun_azimuth
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[8],   // source sample index 18   view_zenith
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[9],   // source sample index 19   view_azimuth
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[10],  // source sample index 20   zonal_wind
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[11],  // source sample index 21   merid_wind
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12],  // source sample index 22   atm_press
+                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13]   // source sample index 23   ozone
     };
     private final static int source_sample_index_l1b_flags = 15;
-    private final static int source_sample_index_detector_index = 16;
-    private final static int source_sample_index_sun_zenith = 17;
-    private final static int source_sample_index_sun_azimuth = 18;
-    private final static int source_sample_index_view_zenith = 19;
-    private final static int source_sample_index_view_azimuth = 20;
-    private final static int source_sample_index_zonal_wind = 21;
-    private final static int source_sample_index_merid_wind = 22;
-    private final static int source_sample_index_atm_press = 23;
-    private final static int source_sample_index_ozone = 24;
+    private final static int source_sample_index_sun_zenith = 16;
+    private final static int source_sample_index_sun_azimuth = 17;
+    private final static int source_sample_index_view_zenith = 18;
+    private final static int source_sample_index_view_azimuth = 19;
+    private final static int source_sample_index_zonal_wind = 20;
+    private final static int source_sample_index_merid_wind = 21;
+    private final static int source_sample_index_atm_press = 22;
+    private final static int source_sample_index_ozone = 23;
+
+    // Get the number of I/O nodes in advance
+    private final static int numberOfInputNode = ChlorophyllNetworkOperation.getNumberOfInputNodes();
+    // implicit atm.corr.
+    private final static int numberOfOutputNodes_1 = ChlorophyllNetworkOperation.getNumberOfOutputNodes();
+    // explicit atm.corr.
+    private final static int numberOfOutputNodes_2 = AtmosphericCorrectionNetworkOperation.getNumberOfOutputNodes();
+
+    private final static float[] ipixel = new float[numberOfInputNode];
+    private final static float[] nnIpixel = new float[numberOfInputNode];
+    private final static float[] nnOpixel1 = new float[numberOfOutputNodes_1];
+    private final static float[] nnOpixel2 = new float[numberOfOutputNodes_2];
+
 
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
@@ -229,12 +244,19 @@ public class WaterProcessorOp extends PixelOperator {
         int resultFlagNN = 0;
 
         final Sample l1FlagsSample = sourceSamples[source_sample_index_l1b_flags];
+        float[] result = new float[output_concentration_band_names.length +
+                output_optical_depth_band_names.length + output_reflectance_band_names.length];
 
         // Exclude pixels from processing if the following l1flags mask becomes true
         int k = l1FlagsSample.getInt() & maskToBeUsed;
         if (k != 0) {
-            resultFlag = result_error_values[0];
+            for (int n = 0; n < result.length; n++) {
+                targetSamples[n].set(result_mask_value);
+            }
+            targetSamples[targetSamples.length-1].set(RESULT_ERROR_VALUES[0]);
+            return;
         }
+
 
         // *********************
         // * STAGE 0
@@ -244,7 +266,6 @@ public class WaterProcessorOp extends PixelOperator {
         // and normalize ozone
         //
 
-        int l = 0;
         double degreeToRadian = Math.acos(-1.0) / 180.0;
         int numTopOfAtmosphereBands = 12;
         float[] top = new float[numTopOfAtmosphereBands];
@@ -253,13 +274,19 @@ public class WaterProcessorOp extends PixelOperator {
         float[] sof = new float[numTopOfAtmosphereBands];
         float[] aux = new float[2];
         float[] geo = new float[4];
-        float[] result = new float[output_concentration_band_names.length +
-                                   output_optical_depth_band_names.length + output_reflectance_band_names.length];
         float[] topOfAtmosphere = new float[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
         double totalOzoneInDU = 344.0;
         float sunZenithAngle = sourceSamples[source_sample_index_sun_zenith].getFloat();
         float viewZenithAngle = sourceSamples[source_sample_index_view_zenith].getFloat();
         float ozone = sourceSamples[source_sample_index_ozone].getFloat();
+
+        float sunAzimuthAngle = sourceSamples[source_sample_index_sun_azimuth].getFloat();
+        float viewAzimuthAngle = sourceSamples[source_sample_index_view_azimuth].getFloat();
+        float zonalWind = sourceSamples[source_sample_index_zonal_wind].getFloat();
+        float meridianWind = sourceSamples[source_sample_index_merid_wind].getFloat();
+        float airPressure = sourceSamples[source_sample_index_atm_press].getFloat();
+
+        int l = 0;
         for (int n = 0; n <= 6; n++, l++) {
             tops[l] = topOfAtmosphere[n];
             sof[l] = solarFlux[n];
@@ -285,9 +312,86 @@ public class WaterProcessorOp extends PixelOperator {
             top[l] *= o3f[l];
         }
 
-        //todo continue shifting code from WaterProcessorRefactored
+        // Get the wind speed
+        aux[0] = (float) Math.sqrt((double) (zonalWind * zonalWind + meridianWind * meridianWind));
+        // Get the pressure
+        aux[1] = airPressure;
 
+        // Adjust the azimuth difference
+        float azimuthDiff = viewAzimuthAngle - sunAzimuthAngle;
 
+        while (azimuthDiff <= -180.0f) {
+            azimuthDiff += 360.0f;
+        }
+        while (azimuthDiff > 180.0f) {
+            azimuthDiff -= 360.0f;
+        }
+        float tmp = azimuthDiff;
+        if (tmp >= 0.0f) {
+            azimuthDiff = +180.0f - azimuthDiff;
+        }
+        if (tmp < 0.0f) {
+            azimuthDiff = -180.0f - azimuthDiff;
+        }
+
+        // Get cos(sunzen)
+        geo[0] = (float) Math.cos((double) sunZenithAngle * degreeToRadian);
+
+        // And now transform into cartesian coordinates
+        geo[1] = (float) (Math.sin((double) viewZenithAngle * degreeToRadian) * Math.cos((double) azimuthDiff * degreeToRadian)); // obs_x
+        geo[2] = (float) (Math.sin((double) viewZenithAngle * degreeToRadian) * Math.sin((double) azimuthDiff * degreeToRadian)); // obs_y
+        geo[3] = (float) (Math.cos((double) viewZenithAngle * degreeToRadian));                            // obs_z
+
+        // *********************
+        // * STAGE 1-4
+        // *********************
+
+        // load the TOA reflectances
+        for (l = 0; l < numTopOfAtmosphereBands; l++) {
+            ipixel[l] = top[l];
+        }
+
+        // get the wind speed and pressure
+        ipixel[l++] = aux[0];
+        ipixel[l++] = aux[1];
+
+        // get cos(sunzen), x, y, z
+        ipixel[l++] = geo[0];
+        ipixel[l++] = geo[1];
+        ipixel[l++] = geo[2];
+        ipixel[l] = geo[3];
+
+        // Run the 1-step chlorophyll, yellow substance and total suspended matter network;
+        loadNNInputPixel();
+        resultFlagNN |= ChlorophyllNetworkOperation.compute(nnIpixel, nnOpixel1);
+        result[0] = nnOpixel1[0];
+
+        loadNNInputPixel();
+        resultFlagNN |= YellowSubstanceNetworkOperation.compute(nnIpixel, nnOpixel1);
+        result[1] = nnOpixel1[0];
+
+        loadNNInputPixel();
+        resultFlagNN |= TotalSuspendedMatterNetworkOperation.compute(nnIpixel, nnOpixel1);
+        result[2] = nnOpixel1[0];
+
+        // Run part 1 of the 2-step atm.corr. network;
+        loadNNInputPixel();
+        resultFlagNN |= AtmosphericCorrectionNetworkOperation.compute(nnIpixel, nnOpixel2);
+        // The aots
+        for (int i = 0; i < nnOpixel2.length; i++) {
+            result[numOfConcentrationBands + i] = nnOpixel2[i];
+        }
+
+        for (int i = 0; i < result.length; i++) {
+            targetSamples[i].set(result[i]);
+        }
+        targetSamples[targetSamples.length-1].set(resultFlagNN);
+    }
+
+    private void loadNNInputPixel() {
+        for (int i = 0; i < nnIpixel.length; i++) {
+            nnIpixel[i] = ipixel[i];
+        }
     }
 
     /*
@@ -512,7 +616,6 @@ public class WaterProcessorOp extends PixelOperator {
         bandNames = StringUtils.addArrays(bandNames, output_concentration_band_names);
         bandNames = StringUtils.addArrays(bandNames, output_optical_depth_band_names);
         bandNames = StringUtils.addArrays(bandNames, output_reflectance_band_names);
-        bandNames = StringUtils.addToArray(bandNames, EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME);
         bandNames = StringUtils.addToArray(bandNames, result_flags_name);
         configureSamples(sampleConfigurer, bandNames);
     }
@@ -528,7 +631,7 @@ public class WaterProcessorOp extends PixelOperator {
         resultFlagCoding.setDescription("RESULT Flag Coding");
         for (int i = 0; i < result_error_names.length; i++) {
             MetadataAttribute attribute = new MetadataAttribute(result_error_names[i], ProductData.TYPE_INT32);
-            attribute.getData().setElemInt(result_error_values[i]);
+            attribute.getData().setElemInt(RESULT_ERROR_VALUES[i]);
             attribute.setDescription(result_error_texts[i]);
             resultFlagCoding.addAttribute(attribute);
         }
@@ -538,16 +641,16 @@ public class WaterProcessorOp extends PixelOperator {
     private int appendFlags(int resultFlagNN, float ax, int stage) {
         // Input range failure
         if ((ax > -2.1) && (ax < -1.9)) {
-            resultFlagNN |= result_error_values[2 * stage - 1];
+            resultFlagNN |= RESULT_ERROR_VALUES[2 * stage - 1];
         }
         // Output range failure
         if ((ax > -19.1) && (ax < -18.9)) {
-            resultFlagNN |= result_error_values[2 * stage];
+            resultFlagNN |= RESULT_ERROR_VALUES[2 * stage];
         }
         // Input AND Output range failure
         if ((ax > -22.1) && (ax < -21.9)) {
-            resultFlagNN |= result_error_values[2 * stage - 1];
-            resultFlagNN |= result_error_values[2 * stage];
+            resultFlagNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            resultFlagNN |= RESULT_ERROR_VALUES[2 * stage];
         }
         return resultFlagNN;
     }

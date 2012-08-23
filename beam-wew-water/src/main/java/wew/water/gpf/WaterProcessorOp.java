@@ -274,17 +274,19 @@ public class WaterProcessorOp extends PixelOperator {
         float[] sof = new float[numTopOfAtmosphereBands];
         float[] aux = new float[2];
         float[] geo = new float[4];
-        float[] topOfAtmosphere = new float[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
         double totalOzoneInDU = 344.0;
+        float[] topOfAtmosphere = new float[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
+        for(int i=0; i<EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS; i++) {
+            topOfAtmosphere[i] = sourceSamples[i].getFloat();
+        }
         float sunZenithAngle = sourceSamples[source_sample_index_sun_zenith].getFloat();
-        float viewZenithAngle = sourceSamples[source_sample_index_view_zenith].getFloat();
-        float ozone = sourceSamples[source_sample_index_ozone].getFloat();
-
         float sunAzimuthAngle = sourceSamples[source_sample_index_sun_azimuth].getFloat();
+        float viewZenithAngle = sourceSamples[source_sample_index_view_zenith].getFloat();
         float viewAzimuthAngle = sourceSamples[source_sample_index_view_azimuth].getFloat();
         float zonalWind = sourceSamples[source_sample_index_zonal_wind].getFloat();
         float meridianWind = sourceSamples[source_sample_index_merid_wind].getFloat();
         float airPressure = sourceSamples[source_sample_index_atm_press].getFloat();
+        float ozone = sourceSamples[source_sample_index_ozone].getFloat();
 
         int l = 0;
         for (int n = 0; n <= 6; n++, l++) {

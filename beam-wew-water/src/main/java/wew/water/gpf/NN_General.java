@@ -1,9 +1,9 @@
 package wew.water.gpf;
 
-public class NeuralNetworkConstants {
+public class NN_General {
 
     // Input limits (min/max) from training data set
-    public static final double[][] INPUT_SCALE_LIMITS = new double[][]{
+    public final static double[][] NODES_INPUT_SCALE_LIMITS = new double[][]{
                 {+1.702400e-02, +8.136440e-02,},
                 {+1.400690e-02, +7.919740e-02,},
                 {+1.013800e-02, +8.273180e-02,},
@@ -23,7 +23,9 @@ public class NeuralNetworkConstants {
                 {-6.613120e-01, +6.613120e-01,},
                 {+7.501110e-01, +1.000000e+00,},
     };
-    public static final double[] INPUT_SCALE_OFFSET_FACTORS = new double[]{
+
+    // Input offset factors
+    public final static double[] NODES_INPUT_SCALE_OFF = new double[]{
                 +0.000000e+00, +0.000000e+00, +0.000000e+00, +0.000000e+00,
                 +0.000000e+00, +0.000000e+00, +0.000000e+00, +0.000000e+00,
                 +0.000000e+00, +0.000000e+00, +0.000000e+00, +0.000000e+00,
@@ -32,9 +34,27 @@ public class NeuralNetworkConstants {
     };
 
     // Input scale flags
-    public static  final int[] INPUT_SCALE_FLAG = new int[]{
+    public final static int[] NODES_INPUT_SCALE_FLAG = new int[]{
                 +1, +1, +1, +1, +1, +1, +1, +1, +1, +1,
                 +1, +1, +0, +0, +0, +0, +0, +0,
     };
 
+
+    /*-------------------------------------------------------------------------*/
+
+    public static int lrecall_run19_C2_080_nn(float[][] in, int ni, float[][] out, int no, int w, int mask[], int errmask, float[] a) {
+        return NN_AtmCorr.compute(in, ni, out, no, w, mask, errmask, a);
+    }
+
+    public static int lrecall_run38_C2_040_nn(float[][] in, int ni, float[][] out, int no, int w, int mask[], int errmask, float[] a) {
+        return NN_YellowSubstance.compute(in, ni, out, no, w, mask, errmask, a);
+    }
+
+    public static int lrecall_run39_C2_080_nn(float[][] in, int ni, float[][] out, int no, int w, int mask[], int errmask, float[] a) {
+        return NN_TSM.compute(in, ni, out, no, w, mask, errmask, a);
+    }
+
+    public static int lrecall_run46_C2_100_nn(float[][] in, int ni, float[][] out, int no, int w, int mask[], int errmask, float[] a) {
+        return NN_CHL.compute(in, ni, out, no, w, mask, errmask, a);
+    }
 }

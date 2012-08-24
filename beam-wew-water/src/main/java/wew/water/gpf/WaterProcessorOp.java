@@ -10,7 +10,6 @@ import org.esa.beam.framework.gpf.pointop.*;
 import org.esa.beam.framework.processor.ProcessorConstants;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.StringUtils;
-import wew.water.*;
 import wew.water.WaterProcessorOzone;
 
 import java.awt.*;
@@ -213,12 +212,6 @@ public class WaterProcessorOp extends PixelOperator {
     private final static int source_sample_index_atm_press = 22;
     private final static int source_sample_index_ozone = 23;
 
-    // Get the number of I/O nodes in advance
-    private final static int numberOfInputNode = ChlorophyllNetworkOperation.getNumberOfInputNodes();
-
-    private final static float[] ipixel = new float[numberOfInputNode];
-    private final static float[] nnIpixel = new float[numberOfInputNode];
-
     private Band[] inputBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
 
 
@@ -243,35 +236,35 @@ public class WaterProcessorOp extends PixelOperator {
         float[] o3 = new float[width];
 
         // allocate memory for a multispectral scan line
-        //
         float[][] toa = new float[nbands][width];
         int[] l1Flags = new int[width];
 
         // allocate memory for the flags
-        //
         int[] resultFlags = new int[width];
         int[] resultFlagsNN = new int[width];
-        int mask_to_be_used;
 
         // Ozone data
-        //
         double[] wavelength = new double[nbands];
         double[] exO3 = new double[nbands];
 
         // local variables
-        //
         double d2r;
         float dazi;
-        int k, l, ls = 0, n;
+        int k;
+        int l;
+        int ls = 0;
+        int n;
         float[] a = new float[width];
 
-        int inodes = 1, onodes = 1, inodes_1, inodes_2, onodes_1, onodes_2, stage;
+        int inodes;
+        int onodes;
+        int onodes_1;
+        int onodes_2;
+        int stage;
 
         float[][] ipixel = new float[2][1];
         float[][] ipixels = new float[2][1];
         float[][] opixel = new float[2][1];
-
-        RecallBCK recallBCK = new RecallBCK();
 
         // Load the wavelengths and ozone spectral extinction coefficients
         //
@@ -283,13 +276,11 @@ public class WaterProcessorOp extends PixelOperator {
         d2r = Math.acos(-1.0) / 180.0;
 
         // Get the number of I/O nodes in advance
+        inodes = NN_YellowSubstance.compute(ipixel, -1, opixel, 1, width, resultFlags, 0, a);
         // implicit atm.corr.
-        inodes_1 = recallBCK.lrecall_run38_C2_040_nn(ipixel, -1, opixel, 1, width, resultFlags, 0, a);
-        onodes_1 = recallBCK.lrecall_run38_C2_040_nn(ipixel, 1, opixel, -1, width, resultFlags, 0, a);
-
+        onodes_1 = NN_YellowSubstance.compute(ipixel, 1, opixel, -1, width, resultFlags, 0, a);
         // explicit atm.corr.
-        inodes_2 = recallBCK.lrecall_run19_C2_080_nn(ipixel, -1, opixel, 1, width, resultFlags, 0, a);
-        onodes_2 = recallBCK.lrecall_run19_C2_080_nn(ipixel, 1, opixel, -1, width, resultFlags, 0, a);
+        onodes_2 = NN_AtmCorr.compute(ipixel, 1, opixel, -1, width, resultFlags, 0, a);
 
         int num_toa = 12;
         int output_planes = output_concentration_band_names.length +
@@ -413,7 +404,6 @@ public class WaterProcessorOp extends PixelOperator {
             // * STAGE 1-4
             // *********************
 
-            inodes = inodes_1; // They are all the same !!
             onodes = onodes_1; // They differ !!
 
             ipixel = new float[inodes][width];
@@ -453,7 +443,8 @@ public class WaterProcessorOp extends PixelOperator {
 
             // Run the 1-step chlorophyll network;
             stage = 1;
-            recallBCK.lrecall_run46_C2_100_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+            NN_CHL.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+//            recallBCK.lrecall_run46_C2_100_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
             for (x = 0; x < width; x++) {
                 // Input range failure
                 if ((a[x] > -2.1) && (a[x] < -1.9)) {
@@ -480,7 +471,8 @@ public class WaterProcessorOp extends PixelOperator {
                 }
                 a[x] = aset;
             }
-            recallBCK.lrecall_run38_C2_040_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+            NN_YellowSubstance.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+//            recallBCK.lrecall_run38_C2_040_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
             for (x = 0; x < width; x++) {
                 // Input range failure
                 if ((a[x] > -2.1) && (a[x] < -1.9)) {
@@ -506,7 +498,8 @@ public class WaterProcessorOp extends PixelOperator {
                 }
                 a[x] = aset;
             }
-            recallBCK.lrecall_run39_C2_080_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+            NN_TSM.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+//            recallBCK.lrecall_run39_C2_080_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
             for (x = 0; x < width; x++) {
                 // Input range failure
                 if ((a[x] > -2.1) && (a[x] < -1.9)) {
@@ -536,7 +529,8 @@ public class WaterProcessorOp extends PixelOperator {
                 a[x] = aset;
             }
 
-            recallBCK.lrecall_run19_C2_080_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+            NN_AtmCorr.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+//            recallBCK.lrecall_run19_C2_080_nn(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
             for (x = 0; x < width; x++) {
                 //System.out.print("--" + yPos + "--" + x + "--> " + a[x] + " : " + resultFlagsNN[x]);
                 // Input range failure

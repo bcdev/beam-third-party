@@ -1,42 +1,30 @@
 package wew.water.gpf;
 
-public class YellowSubstanceNetworkOperation   {
+public class NN_YellowSubstance {
 
-    public static int compute(float[] in, float[] out) {
-        if (in.length != getNumberOfInputNodes()) {
-            throw new IllegalArgumentException("Wrong input array size");
-        }
-        if (out.length != getNumberOfOutputNodes()) {
-            throw new IllegalArgumentException("Wrong output array size");
-        }
-        final int[] rangeCheckErrorMasks = {
-                WaterProcessorOp.RESULT_ERROR_VALUES[3],
-                WaterProcessorOp.RESULT_ERROR_VALUES[4]
-        };
-        return NeuralNetworkComputer.compute(in, out, rangeCheckErrorMasks,
-                                      NeuralNetworkConstants.INPUT_SCALE_LIMITS,
-                                      NeuralNetworkConstants.INPUT_SCALE_OFFSET_FACTORS,
-                                      NeuralNetworkConstants.INPUT_SCALE_FLAG,
-                                      input_pca_eigenvectors,
-                                      input_hidden_weights,
-                                      input_intercept_and_slope,
-                                      output_weights,
-                                      output_scale_limits,
-                                      output_intercept_and_slope,
-                                      output_scale_offset_factors,
-                                      output_scale_flags
-        );
-    }
-
-    public static int getNumberOfInputNodes() {
-        return 18;
-    }
-
-    public static int getNumberOfOutputNodes() {
-        return 1;
-    }
-
-    private static double[][] input_pca_eigenvectors = new double[][]{
+    // Intercept and slope for input layer for run38_C2_040_nn
+    private final static double[][] nodes_input_scale_run38 = new double[][]{
+                {+4.165613e-02, +1.161141e-02},
+                {+3.520922e-02, +1.063655e-02},
+                {+2.920890e-02, +1.050014e-02},
+                {+2.699925e-02, +1.067745e-02},
+                {+2.323022e-02, +1.168311e-02},
+                {+1.756687e-02, +1.029800e-02},
+                {+1.578185e-02, +9.680653e-03},
+                {+1.385503e-02, +8.916489e-03},
+                {+1.205271e-02, +8.339596e-03},
+                {+1.165659e-02, +8.278706e-03},
+                {+1.021741e-02, +7.993566e-03},
+                {+9.918990e-03, +7.898822e-03},
+                {+1.500000e+00, +6.362889e+00},
+                {+9.800000e+02, +6.666667e+01},
+                {+2.468300e-01, +8.368545e-01},
+                {-6.613120e-01, +1.469582e+00},
+                {-6.613120e-01, +1.469582e+00},
+                {+7.501110e-01, +2.776545e-01},
+    };
+    // Eigenvectors (columnwise) for input PCA layer for run38_C2_040_nn
+    private final static double[][] nodes_input_pca_evec_run38 = new double[][]{
                 {
                             +2.987128e-02, +5.012741e-02, +3.128965e-01, -1.839117e-01,
                             -2.515101e-01, +9.537556e-02, +1.951132e-01, +3.835905e-01,
@@ -98,8 +86,8 @@ public class YellowSubstanceNetworkOperation   {
                             -1.995428e-01, +1.797651e-01, -3.817992e-01, +2.854936e-01,
                 },
     };
-
-    private static double[][] input_hidden_weights = new double[][]{
+    // Input connection weights for run38_C2_040_nn
+    private final static double[][] nodes_hidden_weights_run38 = new double[][]{
                 {
                             -2.265821e+00, -7.312980e-01, +1.269876e+00, +8.434433e-01,
                             +1.180587e+00, +7.099967e+00, +4.453023e+00, -6.155079e+00,
@@ -329,29 +317,8 @@ public class YellowSubstanceNetworkOperation   {
                             -4.595136e-01, +2.275585e-01, -3.036588e-01, +1.114060e+00,
                 },
     };
-
-    private static double[][] input_intercept_and_slope = new double[][]{
-                {+4.165613e-02, +1.161141e-02},
-                {+3.520922e-02, +1.063655e-02},
-                {+2.920890e-02, +1.050014e-02},
-                {+2.699925e-02, +1.067745e-02},
-                {+2.323022e-02, +1.168311e-02},
-                {+1.756687e-02, +1.029800e-02},
-                {+1.578185e-02, +9.680653e-03},
-                {+1.385503e-02, +8.916489e-03},
-                {+1.205271e-02, +8.339596e-03},
-                {+1.165659e-02, +8.278706e-03},
-                {+1.021741e-02, +7.993566e-03},
-                {+9.918990e-03, +7.898822e-03},
-                {+1.500000e+00, +6.362889e+00},
-                {+9.800000e+02, +6.666667e+01},
-                {+2.468300e-01, +8.368545e-01},
-                {-6.613120e-01, +1.469582e+00},
-                {-6.613120e-01, +1.469582e+00},
-                {+7.501110e-01, +2.776545e-01},
-    };
-
-    private static double[][] output_weights = new double[][]{
+    // Output connection weights from KOH file for run38_C2_040_nn
+    private final static double[][] nodes_output_weights_run38 = new double[][]{
                 {-1.027912e+01,},
                 {-5.192022e+00,},
                 {+4.352206e+00,},
@@ -394,13 +361,182 @@ public class YellowSubstanceNetworkOperation   {
                 {+1.072083e+01,},
                 {+5.650157e+00,},
     };
+    // Intercept and slope for output layer for run38_C2_040_nn
+    private final static double[][] nodes_output_scale_run38 = new double[][]{
+                {-2.300000e+00, 2.875000e+00}
+    };
+    // Output offset factors for run38_C2_040_nn
+    private final static double[] nodes_output_scale_off_run38 = new double[]{
+                1.000000e-01,
+    };
+    // Output scale flags for run38_C2_040_nn
+    private final static int[] nodes_output_scale_flag_run38 = new int[]{
+                0,
+    };
+    // Output limits (min/max) from training data set for run38_C2_040_nn
+    private final static double[][] nodes_output_scale_limits_run38 = new double[][]{
+                {-2.300000e+00, +0.000000e+00,}
+    };
 
-    private static double[][] output_scale_limits = new double[][]{{-2.300000e+00, +0.000000e+00,},};
+    public static int compute(final float[][] in,
+                              final int getNumNodesInput,
+                              final float[][] out,
+                              final int getNumNodesOutput,
+                              final int width,
+                              final int[] mask,
+                              final int errmask,
+                              final float[] a) {
+        // (c) M. Schaale, WeW, 2002-2006
+        final int rcheck[];
+        final int nodes_input = 18;
+        final int nodes_output = 1;
+        final int nodes_input_bias = 1;
+        final int nodes_input_pca = 1;
+        final int nodes_hidden = 40;
+        final int nodes_hidden_bias = 1;
+        final double nodes_hidden_temperature = 1.000000;
+        final double t_input = nodes_hidden_temperature / (double) (nodes_input);
+        final double t_hidden = nodes_hidden_temperature / (double) (nodes_hidden);
+        final double[] vt;
+        final double[] vt1;
+        //double limexp = -Math.log(Float.MIN_VALUE), dh, dhr, dhe, dhmax=Float.MAX_VALUE, expo;
 
-    private static double[][] output_intercept_and_slope = new double[][]{{-2.300000e+00, +2.875000e+00},};
+        // Return dimensions on request
+        if (getNumNodesInput <= 0) {
+            return (nodes_input);
+        }
+        if (getNumNodesOutput <= 0) {
+            return (nodes_output);
+        }
 
-    private static double[] output_scale_offset_factors = new double[]{+1.000000e-01,};
+        // Crude compatibility checks
+        if (getNumNodesInput != nodes_input) {
+            return (-1);
+        }
+        if (getNumNodesOutput != nodes_output) {
+            return (-2);
+        }
 
-    private static int[] output_scale_flags = new int[]{+0,};
+        vt = new double[nodes_input + nodes_input_bias];
+        vt1 = new double[nodes_hidden + nodes_hidden_bias];
 
+        // Range check ??
+        rcheck = new int[width];
+        for (int x = 0; x < width; x++) {
+            rcheck[x] = 0;
+            if (a[x] < 0.0f) {
+                rcheck[x] = 1;
+            }
+            a[x] = 1.0f;
+        }
+
+        for (int x = 0; x < width; x++) {
+            if (mask[x] == 0) {
+                // Check input range
+                if (rcheck[x] != 0) {
+                    for (int i = 0; i < nodes_input && a[x] > 0.0f; i++) {
+                        if ((in[i][x] < (float) NN_General.NODES_INPUT_SCALE_LIMITS[i][0]) || (in[i][x] > (float) NN_General.NODES_INPUT_SCALE_LIMITS[i][1])) {
+                            a[x] -= 3.0f;
+                        }
+                    }
+                    if (a[x] < 0.0f) {
+                        mask[x] |= errmask;
+                    }
+                }
+
+                //if(mask[x] == 0) {
+                // Apply input transformation
+                for (int i = 0; i < nodes_input; i++) {
+                    if (NN_General.NODES_INPUT_SCALE_FLAG[i] == -1) {
+                        in[i][x] = (float) Math.log((double) in[i][x]);
+                    }
+                    if (NN_General.NODES_INPUT_SCALE_FLAG[i] == -2) {
+                        in[i][x] = (float) Math.exp((double) in[i][x]);
+                    }
+                }
+
+                // Apply input scale layer parameters
+                for (int i = 0; i < nodes_input; i++) {
+                    in[i][x] = (float) NN_General.NODES_INPUT_SCALE_OFF[i] + (in[i][x] - (float) nodes_input_scale_run38[i][0]) / (float) nodes_input_scale_run38[i][1];
+                }
+
+                // Apply input PCA layer parameters
+                if (nodes_input_pca != 0) {
+                    for (int i = 0; i < nodes_input; i++) {
+                        vt[i] = (double) in[i][x];
+                        if (NN_General.NODES_INPUT_SCALE_FLAG[i] == 1) {
+                            vt[i] = 0.0;
+                            for (int j = 0; j < nodes_input; j++) {
+                                if (NN_General.NODES_INPUT_SCALE_FLAG[j] == 1) {
+                                    vt[i] += (double) in[j][x] * nodes_input_pca_evec_run38[j][i];
+                                }
+                            }
+                        }
+                    }
+                    for (int i = 0; i < nodes_input; i++) {
+                        in[i][x] = (float) vt[i];
+                    }
+                }
+
+                // Pump through the first layer
+                for (int i = 0; i < nodes_input; i++) {
+                    vt[i] = (double) in[i][x];
+                }
+                for (int i = nodes_input; i < nodes_input + nodes_input_bias; i++) {
+                    vt[i] = 1.0;
+                }
+
+                for (int i = 0; i < nodes_hidden; i++) {
+                    vt1[i] = 0.0;
+                    for (int j = 0; j < nodes_input + nodes_input_bias; j++) {
+                        vt1[i] += vt[j] * nodes_hidden_weights_run38[j][i];
+                    }
+                }
+                // Pump through sigmoid
+                for (int i = 0; i < nodes_hidden; i++) {
+                    vt1[i] = 1.0 / (1.0 + Math.exp(-t_input * vt1[i]));
+                }
+
+                // Pump through the second layer
+                for (int i = nodes_hidden; i < nodes_hidden + nodes_hidden_bias; i++) {
+                    vt1[i] = 1.0f;
+                }
+                for (int i = 0; i < nodes_output; i++) {
+                    out[i][x] = 0.0f;
+                    for (int j = 0; j < nodes_hidden + nodes_hidden_bias; j++) {
+                        out[i][x] += (float) (vt1[j] * nodes_output_weights_run38[j][i]);
+                    }
+                }
+                for (int i = 0; i < nodes_output; i++) {
+                    // Pump through sigmoid
+                    out[i][x] = (float) (1.0 / (1.0 + Math.exp(-t_hidden * out[i][x])));
+                    // Apply output scale layer parameters
+                    out[i][x] = (float) nodes_output_scale_run38[i][0] + (out[i][x] - (float) nodes_output_scale_off_run38[i]) * (float) nodes_output_scale_run38[i][1];
+
+                    // Apply output transformation
+                    if (nodes_output_scale_flag_run38[i] == -1) {
+                        out[i][x] = (float) Math.log((double) out[i][x]);
+                    }
+                    if (nodes_output_scale_flag_run38[i] == -2) {
+                        out[i][x] = (float) Math.exp((double) out[i][x]);
+                    }
+                }
+
+                // Check output range
+                if (rcheck[x] != 0) {
+                    for (int i = 0; i < nodes_output && a[x] >= -2.0f; i++) {
+                        if ((out[i][x] < (float) nodes_output_scale_limits_run38[i][0]) || (out[i][x] > (float) nodes_output_scale_limits_run38[i][1])) {
+                            a[x] -= 20.0f;
+                        }
+                    }
+                    if (a[x] < 0.0f) {
+                        mask[x] |= errmask;
+                    }
+                }
+
+                //} // mask
+            } // mask
+        } // x
+        return 0;
+    }
 }

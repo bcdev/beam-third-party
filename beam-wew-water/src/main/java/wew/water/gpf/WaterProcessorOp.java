@@ -25,7 +25,7 @@ import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.StringUtils;
 import wew.water.WaterProcessorOzone;
 
-@OperatorMetadata(alias = "WaterProcessorOp",
+@OperatorMetadata(alias = "FUB.Water",
                   version = "1.0",
                   description = "FUB/WeW WATER Processor GPF-Operator")
 public class WaterProcessorOp extends PixelOperator {
@@ -684,7 +684,6 @@ public class WaterProcessorOp extends PixelOperator {
 
         String flagNamePrefix = result_flags_name + ".";
         addMasksToTargetProduct(targetProduct, sceneWidth, sceneHeight, flagNamePrefix);
-        productConfigurer.copyMetadata();
     }
 
     private void addMasksToTargetProduct(Product targetProduct, int sceneWidth, int sceneHeight, String flagNamePrefix) {

@@ -175,13 +175,6 @@ public class WaterProcessorOp extends PixelOperator {
 
     private static final int mask_to_be_used = (glint_risk | bright | invalid);
 
-    @SourceProduct(label = "Select source product",
-                   description = "The MERIS L1b source product used for the processing.")
-    private Product sourceProduct;
-
-    private int maskToBeUsed;
-    private float[] solarFlux;
-
     private final static String[] source_raster_names = new String[]{
                 EnvisatConstants.MERIS_L1B_RADIANCE_1_BAND_NAME,  // source sample index  0   radiance_1
                 EnvisatConstants.MERIS_L1B_RADIANCE_2_BAND_NAME,  // source sample index  1   radiance_2
@@ -217,6 +210,14 @@ public class WaterProcessorOp extends PixelOperator {
     private final static int source_sample_index_merid_wind = 21;
     private final static int source_sample_index_atm_press = 22;
     private final static int source_sample_index_ozone = 23;
+
+    @SourceProduct(label = "Select source product",
+                   description = "The MERIS L1b source product used for the processing.")
+    private Product sourceProduct;
+
+    private int maskToBeUsed;
+    private float[] solarFlux;
+
 
     private Band[] inputBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
 

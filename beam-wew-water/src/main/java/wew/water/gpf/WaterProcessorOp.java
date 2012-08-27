@@ -26,7 +26,7 @@ import org.esa.beam.util.StringUtils;
 import wew.water.WaterProcessorOzone;
 
 @OperatorMetadata(alias = "FUB.Water",
-                  version = "1.0",
+                  version = "1.2.10",
                   description = "FUB/WeW WATER Processor GPF-Operator")
 public class WaterProcessorOp extends PixelOperator {
 

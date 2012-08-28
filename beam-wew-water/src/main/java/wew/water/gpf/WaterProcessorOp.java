@@ -1,7 +1,5 @@
 package wew.water.gpf;
 
-import java.awt.Color;
-import java.io.IOException;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
@@ -25,95 +23,99 @@ import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.StringUtils;
 import wew.water.WaterProcessorOzone;
 
+import java.awt.Color;
+import java.io.IOException;
+
 @OperatorMetadata(alias = "FUB.Water",
                   version = "1.2.10",
                   description = "FUB/WeW WATER Processor GPF-Operator")
+
 public class WaterProcessorOp extends PixelOperator {
 
     private final static String[] output_concentration_band_names = {
-                "algal_2",
-                "yellow_subs",
-                "total_susp"
+            "algal_2",
+            "yellow_subs",
+            "total_susp"
     };
     private final static String[] output_optical_depth_band_names = {
-                "aero_opt_thick_440",
-                "aero_opt_thick_550",
-                "aero_opt_thick_670",
-                "aero_opt_thick_870"
+            "aero_opt_thick_440",
+            "aero_opt_thick_550",
+            "aero_opt_thick_670",
+            "aero_opt_thick_870"
     };
     private final static String[] output_reflectance_band_names = {
-                "reflec_1",
-                "reflec_2",
-                "reflec_3",
-                "reflec_4",
-                "reflec_5",
-                "reflec_6",
-                "reflec_7",
-                "reflec_9"
+            "reflec_1",
+            "reflec_2",
+            "reflec_3",
+            "reflec_4",
+            "reflec_5",
+            "reflec_6",
+            "reflec_7",
+            "reflec_9"
     };
 
     private static String[] output_concentration_band_descriptions = {
-                "Chlorophyll 2 content",
-                "Yellow substance",
-                "Total suspended matter"
+            "Chlorophyll 2 content",
+            "Yellow substance",
+            "Total suspended matter"
     };
     private static String[] output_optical_depth_band_descriptions = {
-                "Aerosol optical thickness",
-                "Aerosol optical thickness",
-                "Aerosol optical thickness",
-                "Aerosol optical thickness"
+            "Aerosol optical thickness",
+            "Aerosol optical thickness",
+            "Aerosol optical thickness",
+            "Aerosol optical thickness"
     };
 
     private static String[] output_reflectance_band_descriptions = {
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance",
-                "RS reflectance"
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance",
+            "RS reflectance"
     };
 
     private static String[] output_concentration_band_units = {
-                "log10(mg/m^3)",
-                "log10(1/m)",
-                "log10(g/m^3)"
+            "log10(mg/m^3)",
+            "log10(1/m)",
+            "log10(g/m^3)"
     };
 
     private static String[] output_optical_depth_band_units = {
-                "1",
-                "1",
-                "1",
-                "1"
+            "1",
+            "1",
+            "1",
+            "1"
     };
 
     private static String[] output_reflectance_band_units = {
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr",
-                "1/sr"
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr",
+            "1/sr"
     };
 
     // Wavelengths for the water leaving reflectances rho_w
     private static float[] tau_lambda = {
-                440.00f, 550.00f, 670.00f, 870.00f
+            440.00f, 550.00f, 670.00f, 870.00f
     };
 
     // Wavelengths for the water leaving reflectances rho_w
     private static float[] rho_w_lambda = {
-                412.50f, 442.50f, 490.00f, 510.00f,
-                560.00f, 620.00f, 665.00f, 708.75f
+            412.50f, 442.50f, 490.00f, 510.00f,
+            560.00f, 620.00f, 665.00f, 708.75f
     };
 
     // Bandwidth for the water leaving reflectances rho_w
     private static float[] rho_w_bandw = {
-                10.00f, 10.00f, 10.00f, 10.00f,
-                10.00f, 10.00f, 10.00f, 10.00f
+            10.00f, 10.00f, 10.00f, 10.00f,
+            10.00f, 10.00f, 10.00f, 10.00f
     };
 
     private static final String result_flags_name = "result_flags";
@@ -122,50 +124,50 @@ public class WaterProcessorOp extends PixelOperator {
     private static final float result_mask_value = 5.0f;
 
     private static final String[] result_error_texts = {
-                "Pixel was a priori masked out",
-                "CHL retrieval failure (input)",
-                "CHL retrieval failure (output)",
-                "YEL retrieval failure (input)",
-                "YEL retrieval failure (output)",
-                "TSM retrieval failure (input)",
-                "TSM retrieval failure (output)",
-                "Atmospheric correction failure (input)",
-                "Atmospheric correction failure (output)"
+            "Pixel was a priori masked out",
+            "CHL retrieval failure (input)",
+            "CHL retrieval failure (output)",
+            "YEL retrieval failure (input)",
+            "YEL retrieval failure (output)",
+            "TSM retrieval failure (input)",
+            "TSM retrieval failure (output)",
+            "Atmospheric correction failure (input)",
+            "Atmospheric correction failure (output)"
     };
 
     private static final String[] result_error_names = {
-                "LEVEL1b_MASKED",
-                "CHL_IN",
-                "CHL_OUT",
-                "YEL_IN",
-                "YEL_OUT",
-                "TSM_IN",
-                "TSM_OUT",
-                "ATM_IN",
-                "ATM_OUT"
+            "LEVEL1b_MASKED",
+            "CHL_IN",
+            "CHL_OUT",
+            "YEL_IN",
+            "YEL_OUT",
+            "TSM_IN",
+            "TSM_OUT",
+            "ATM_IN",
+            "ATM_OUT"
     };
     public static final int[] RESULT_ERROR_VALUES = {
-                0x00000001,
-                0x00000002,
-                0x00000004,
-                0x00000008,
-                0x00000010,
-                0x00000020,
-                0x00000040,
-                0x00000080,
-                0x00000100
+            0x00000001,
+            0x00000002,
+            0x00000004,
+            0x00000008,
+            0x00000010,
+            0x00000020,
+            0x00000040,
+            0x00000080,
+            0x00000100
     };
 
     private static final float[] result_error_transparencies = {
-                0.0f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f
+            0.0f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.5f
     };
 
     private static final int glint_risk = 0x00000004;
@@ -176,30 +178,30 @@ public class WaterProcessorOp extends PixelOperator {
     private static final int mask_to_be_used = (glint_risk | bright | invalid);
 
     private final static String[] source_raster_names = new String[]{
-                EnvisatConstants.MERIS_L1B_RADIANCE_1_BAND_NAME,  // source sample index  0   radiance_1
-                EnvisatConstants.MERIS_L1B_RADIANCE_2_BAND_NAME,  // source sample index  1   radiance_2
-                EnvisatConstants.MERIS_L1B_RADIANCE_3_BAND_NAME,  // source sample index  2   radiance_3
-                EnvisatConstants.MERIS_L1B_RADIANCE_4_BAND_NAME,  // source sample index  3   radiance_4
-                EnvisatConstants.MERIS_L1B_RADIANCE_5_BAND_NAME,  // source sample index  4   radiance_5
-                EnvisatConstants.MERIS_L1B_RADIANCE_6_BAND_NAME,  // source sample index  5   radiance_6
-                EnvisatConstants.MERIS_L1B_RADIANCE_7_BAND_NAME,  // source sample index  6   radiance_7
-                EnvisatConstants.MERIS_L1B_RADIANCE_8_BAND_NAME,  // source sample index  7   radiance_8
-                EnvisatConstants.MERIS_L1B_RADIANCE_9_BAND_NAME,  // source sample index  8   radiance_9
-                EnvisatConstants.MERIS_L1B_RADIANCE_10_BAND_NAME, // source sample index  9   radiance_10
-                EnvisatConstants.MERIS_L1B_RADIANCE_11_BAND_NAME, // source sample index 10   radiance_11
-                EnvisatConstants.MERIS_L1B_RADIANCE_12_BAND_NAME, // source sample index 11   radiance_12
-                EnvisatConstants.MERIS_L1B_RADIANCE_13_BAND_NAME, // source sample index 12   radiance_13
-                EnvisatConstants.MERIS_L1B_RADIANCE_14_BAND_NAME, // source sample index 13   radiance_14
-                EnvisatConstants.MERIS_L1B_RADIANCE_15_BAND_NAME, // source sample index 14   radiance_15
-                EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME,         // source sample index 15   l1_flags
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[6],   // source sample index 16   sun_zenith
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[7],   // source sample index 17   sun_azimuth
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[8],   // source sample index 18   view_zenith
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[9],   // source sample index 19   view_azimuth
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[10],  // source sample index 20   zonal_wind
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[11],  // source sample index 21   merid_wind
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12],  // source sample index 22   atm_press
-                EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13]   // source sample index 23   ozone
+            EnvisatConstants.MERIS_L1B_RADIANCE_1_BAND_NAME,  // source sample index  0   radiance_1
+            EnvisatConstants.MERIS_L1B_RADIANCE_2_BAND_NAME,  // source sample index  1   radiance_2
+            EnvisatConstants.MERIS_L1B_RADIANCE_3_BAND_NAME,  // source sample index  2   radiance_3
+            EnvisatConstants.MERIS_L1B_RADIANCE_4_BAND_NAME,  // source sample index  3   radiance_4
+            EnvisatConstants.MERIS_L1B_RADIANCE_5_BAND_NAME,  // source sample index  4   radiance_5
+            EnvisatConstants.MERIS_L1B_RADIANCE_6_BAND_NAME,  // source sample index  5   radiance_6
+            EnvisatConstants.MERIS_L1B_RADIANCE_7_BAND_NAME,  // source sample index  6   radiance_7
+            EnvisatConstants.MERIS_L1B_RADIANCE_8_BAND_NAME,  // source sample index  7   radiance_8
+            EnvisatConstants.MERIS_L1B_RADIANCE_9_BAND_NAME,  // source sample index  8   radiance_9
+            EnvisatConstants.MERIS_L1B_RADIANCE_10_BAND_NAME, // source sample index  9   radiance_10
+            EnvisatConstants.MERIS_L1B_RADIANCE_11_BAND_NAME, // source sample index 10   radiance_11
+            EnvisatConstants.MERIS_L1B_RADIANCE_12_BAND_NAME, // source sample index 11   radiance_12
+            EnvisatConstants.MERIS_L1B_RADIANCE_13_BAND_NAME, // source sample index 12   radiance_13
+            EnvisatConstants.MERIS_L1B_RADIANCE_14_BAND_NAME, // source sample index 13   radiance_14
+            EnvisatConstants.MERIS_L1B_RADIANCE_15_BAND_NAME, // source sample index 14   radiance_15
+            EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME,         // source sample index 15   l1_flags
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[6],   // source sample index 16   sun_zenith
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[7],   // source sample index 17   sun_azimuth
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[8],   // source sample index 18   view_zenith
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[9],   // source sample index 19   view_azimuth
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[10],  // source sample index 20   zonal_wind
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[11],  // source sample index 21   merid_wind
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12],  // source sample index 22   atm_press
+            EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13]   // source sample index 23   ozone
     };
     private final static int source_sample_index_l1b_flags = 15;
     private final static int source_sample_index_sun_zenith = 16;
@@ -279,7 +281,7 @@ public class WaterProcessorOp extends PixelOperator {
 
         int num_toa = 12;
         int output_planes = output_concentration_band_names.length +
-                            output_optical_depth_band_names.length + output_reflectance_band_names.length;
+                output_optical_depth_band_names.length + output_reflectance_band_names.length;
         float[] top = new float[num_toa];
         float[] tops = new float[num_toa];
         double[] o3f = new double[num_toa];
@@ -331,7 +333,7 @@ public class WaterProcessorOp extends PixelOperator {
             sof[l] = solarFlux[n];
             top[l] = toa[n] / solarFlux[n];
             o3f[l] = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3) * exO3[n] / 1000.0 * (1.0 / Math.cos(
-                        (double) vza * d2r) + 1.0 / Math.cos((double) sza * d2r)));
+                    (double) vza * d2r) + 1.0 / Math.cos((double) sza * d2r)));
             top[l] *= o3f[l];
         }
         for (n = 8; n <= 9; n++, l++) {
@@ -339,7 +341,7 @@ public class WaterProcessorOp extends PixelOperator {
             sof[l] = solarFlux[n];
             top[l] = toa[n] / solarFlux[n];
             o3f[l] = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3) * exO3[n] / 1000.0 * (1.0 / Math.cos(
-                        (double) vza * d2r) + 1.0 / Math.cos((double) sza * d2r)));
+                    (double) vza * d2r) + 1.0 / Math.cos((double) sza * d2r)));
             top[l] *= o3f[l];
         }
         for (n = 11; n <= 13; n++, l++) {
@@ -347,7 +349,7 @@ public class WaterProcessorOp extends PixelOperator {
             sof[l] = solarFlux[n];
             top[l] = toa[n] / solarFlux[n];
             o3f[l] = Math.exp(-(TOTAL_OZONE_DU_MOMO - o3) * exO3[n] / 1000.0 * (1.0 / Math.cos(
-                        (double) vza * d2r) + 1.0 / Math.cos((double) sza * d2r)));
+                    (double) vza * d2r) + 1.0 / Math.cos((double) sza * d2r)));
             top[l] *= o3f[l];
         }
 
@@ -543,8 +545,7 @@ public class WaterProcessorOp extends PixelOperator {
         for (n = 0; n < output_planes; n++) {
             targetSamples[n].set(result[n]);
         }
-        targetSamples[output_planes].set(l1Flags);
-        targetSamples[output_planes + 1].set(resultFlags[0]);
+        targetSamples[output_planes].set(resultFlags[0]);
     }
 
     private void checkWhetherSuspectIsValid() {
@@ -608,11 +609,11 @@ public class WaterProcessorOp extends PixelOperator {
         if (dsf == null) {
             dsf = new float[bands.length];
             final double[] defsol = new double[]{
-                        1670.5964, 1824.1444, 1874.9883,
-                        1877.6682, 1754.7749, 1606.6401,
-                        1490.0026, 1431.8726, 1369.2035,
-                        1231.7164, 1220.0767, 1144.9675,
-                        932.3497, 904.8193, 871.0908
+                    1670.5964, 1824.1444, 1874.9883,
+                    1877.6682, 1754.7749, 1606.6401,
+                    1490.0026, 1431.8726, 1369.2035,
+                    1231.7164, 1220.0767, 1144.9675,
+                    932.3497, 904.8193, 871.0908
             };
             for (int i = 0; i < bands.length; i++) {
                 Band band = bands[i];
@@ -669,9 +670,13 @@ public class WaterProcessorOp extends PixelOperator {
         addConcentrationBands(targetProduct, sceneWidth, sceneHeight);
         addOpticalDepthBands(targetProduct, sceneWidth, sceneHeight);
         addReflectanceBands(targetProduct, sceneWidth, sceneHeight);
-        ProductUtils.copyFlagBands(sourceProduct, targetProduct, false);
-        productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LATITUDE_BAND_NAME);
-        productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME);
+        ProductUtils.copyFlagBands(sourceProduct, targetProduct, true);
+        if (!targetProduct.containsBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME)) {
+            productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME);
+        }
+        if (!targetProduct.containsBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LATITUDE_BAND_NAME)) {
+            productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LATITUDE_BAND_NAME);
+        }
         productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_ALTIUDE_BAND_NAME);
 
         FlagCoding resultFlagCoding = createResultFlagCoding();
@@ -689,8 +694,8 @@ public class WaterProcessorOp extends PixelOperator {
     private void addMasksToTargetProduct(Product targetProduct, int sceneWidth, int sceneHeight, String flagNamePrefix) {
         ProductNodeGroup<Mask> maskGroup = targetProduct.getMaskGroup();
         Color[] colors = new Color[]{
-                    Color.cyan, Color.green, Color.green, Color.yellow, Color.yellow,
-                    Color.orange, Color.orange, Color.blue, Color.blue
+                Color.cyan, Color.green, Color.green, Color.yellow, Color.yellow,
+                Color.orange, Color.orange, Color.blue, Color.blue
         };
         for (int i = 0; i < result_error_names.length; i++) {
             maskGroup.add(Mask.BandMathsType.create(result_error_names[i].toLowerCase(), result_error_texts[i],
@@ -755,7 +760,6 @@ public class WaterProcessorOp extends PixelOperator {
         bandNames = StringUtils.addArrays(bandNames, output_concentration_band_names);
         bandNames = StringUtils.addArrays(bandNames, output_optical_depth_band_names);
         bandNames = StringUtils.addArrays(bandNames, output_reflectance_band_names);
-        bandNames = StringUtils.addToArray(bandNames, EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME);
         bandNames = StringUtils.addToArray(bandNames, result_flags_name);
         configureSamples(sampleConfigurer, bandNames);
     }

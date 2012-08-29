@@ -99,7 +99,7 @@
         </action>
         <action>
             <id>FUB-WeW</id>
-            <helpId>WATERProcessorPlugIn</helpId>
+            <helpId>fubWeWTool</helpId>
             <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
             <text>FUB/WeW WATER Processor OP (MERIS)...</text>
             <shortDescr>Invoke the FUB/WeW WATER Processor Plugin.</shortDescr>
@@ -107,6 +107,13 @@
             <dialogTitle>FUB Water Processor</dialogTitle>
             <targetProductNameSuffix>_FUB_WeW</targetProductNameSuffix>
         </action>
+    </extension>
+
+    <extension point="beam-ui:helpSets">
+        <helpSet>
+            <parent>beam-help</parent>
+            <path>doc/help/fubwew.hs</path>
+        </helpSet>
     </extension>
 
 </module>

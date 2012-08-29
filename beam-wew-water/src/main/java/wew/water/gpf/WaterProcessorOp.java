@@ -26,7 +26,8 @@ import wew.water.WaterProcessorOzone;
 import java.awt.Color;
 import java.io.IOException;
 
-@OperatorMetadata(alias = "FUB.Water",
+@OperatorMetadata(alias = "FUB.Water", authors = "Thomas Schroeder, Michael Schaale",
+                  copyright = "Institute for Space Sciences (WeW), Freie Universitaet Berlin",
                   version = "1.2.10",
                   description = "FUB/WeW WATER Processor GPF-Operator")
 

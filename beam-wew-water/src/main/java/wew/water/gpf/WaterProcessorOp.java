@@ -12,6 +12,7 @@ import org.esa.beam.framework.datamodel.ProductNodeGroup;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
+import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.pointop.PixelOperator;
 import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
@@ -218,6 +219,18 @@ public class WaterProcessorOp extends PixelOperator {
                    description = "The MERIS L1b source product used for the processing.")
     private Product sourceProduct;
 
+    @Parameter(description = "Whether Chlorophyll-a concentration band shall be computed", defaultValue = "true")
+    private boolean computeCHL;
+
+    @Parameter(description = "Whether yellow substances band shall be computed", defaultValue = "true")
+    private boolean computeYS;
+
+    @Parameter(description = "Whether total suspended matter band shall be computed", defaultValue = "true")
+    private boolean computeTSM;
+
+    @Parameter(description = "Whether atmospheric correction bands shall be computed", defaultValue = "true")
+    private boolean computeAtmCorr;
+
     private int maskToBeUsed;
     private float[] solarFlux;
 
@@ -281,8 +294,19 @@ public class WaterProcessorOp extends PixelOperator {
         onodes_2 = NN_AtmCorr.compute(ipixel, 1, opixel, -1, width, resultFlags, 0, a);
 
         int num_toa = 12;
-        int output_planes = output_concentration_band_names.length +
-                output_optical_depth_band_names.length + output_reflectance_band_names.length;
+        int output_planes = 0;
+        if (computeCHL) {
+            output_planes++;
+        }
+        if (computeYS) {
+            output_planes++;
+        }
+        if (computeTSM) {
+            output_planes++;
+        }
+        if (computeAtmCorr) {
+            output_planes += output_optical_depth_band_names.length + output_reflectance_band_names.length;
+        }
         float[] top = new float[num_toa];
         float[] tops = new float[num_toa];
         double[] o3f = new double[num_toa];
@@ -422,115 +446,120 @@ public class WaterProcessorOp extends PixelOperator {
             ipixels[l][x] = ipixel[l][x];
         }
 
-        // Run the 1-step chlorophyll network;
-        stage = 1;
-        NN_CHL.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+        int resultCounter = 0;
 
-        // Input range failure
-        if ((a[x] > -2.1) && (a[x] < -1.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
-        }
-        // Output range failure
-        if ((a[x] > -19.1) && (a[x] < -18.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        // Input AND Output range failure
-        if ((a[x] > -22.1) && (a[x] < -21.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        result[0] = opixel[0][x];
+        if (computeCHL) {
+            // Run the 1-step chlorophyll network;
+            stage = 1;
+            NN_CHL.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
 
-        // Run the 1-step yellow substance network;
-        stage = 2;
-        // reload the pixel
-        for (l = 0; l < ls; l++) {
-            ipixel[l][x] = ipixels[l][x];
+            // Input range failure
+            if ((a[x] > -2.1) && (a[x] < -1.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            }
+            // Output range failure
+            if ((a[x] > -19.1) && (a[x] < -18.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            // Input AND Output range failure
+            if ((a[x] > -22.1) && (a[x] < -21.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            result[resultCounter++] = opixel[0][x];
         }
-        a[x] = aset;
+        if (computeYS) {
+            // Run the 1-step yellow substance network;
+            stage = 2;
+            // reload the pixel
+            for (l = 0; l < ls; l++) {
+                ipixel[l][x] = ipixels[l][x];
+            }
+            a[x] = aset;
 
-        NN_YellowSubstance.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+            NN_YellowSubstance.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
 
-        // Input range failure
-        if ((a[x] > -2.1) && (a[x] < -1.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            // Input range failure
+            if ((a[x] > -2.1) && (a[x] < -1.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            }
+            // Output range failure
+            if ((a[x] > -19.1) && (a[x] < -18.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            // Input AND Output range failure
+            if ((a[x] > -22.1) && (a[x] < -21.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            result[resultCounter++] = opixel[0][x];
         }
-        // Output range failure
-        if ((a[x] > -19.1) && (a[x] < -18.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        // Input AND Output range failure
-        if ((a[x] > -22.1) && (a[x] < -21.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        result[1] = opixel[0][x];
+        if (computeTSM) {
+            // Run the 1-step total suspended matter network;
+            stage = 3;
 
-        // Run the 1-step total suspended matter network;
-        stage = 3;
+            // reload the pixel
+            for (l = 0; l < ls; l++) {
+                ipixel[l][x] = ipixels[l][x];
+            }
+            a[x] = aset;
 
-        // reload the pixel
-        for (l = 0; l < ls; l++) {
-            ipixel[l][x] = ipixels[l][x];
-        }
-        a[x] = aset;
+            NN_TSM.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
 
-        NN_TSM.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
+            // Input range failure
+            if ((a[x] > -2.1) && (a[x] < -1.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            }
+            // Output range failure
+            if ((a[x] > -19.1) && (a[x] < -18.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            // Input AND Output range failure
+            if ((a[x] > -22.1) && (a[x] < -21.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            result[resultCounter++] = opixel[0][x];
+        }
+        if (computeAtmCorr) {
+            // Run part 1 of the 2-step atm.corr. network;
+            stage = 4;
+            onodes = onodes_2;
+            opixel = new float[onodes][width];
 
-        // Input range failure
-        if ((a[x] > -2.1) && (a[x] < -1.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
-        }
-        // Output range failure
-        if ((a[x] > -19.1) && (a[x] < -18.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        // Input AND Output range failure
-        if ((a[x] > -22.1) && (a[x] < -21.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        result[2] = opixel[0][x];
+            // reload the pixel
+            for (l = 0; l < ls; l++) {
+                ipixel[l][x] = ipixels[l][x];
+            }
+            a[x] = aset;
 
-        // Run part 1 of the 2-step atm.corr. network;
-        stage = 4;
-        onodes = onodes_2;
-        opixel = new float[onodes][width];
+            NN_AtmCorr.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
 
-        // reload the pixel
-        for (l = 0; l < ls; l++) {
-            ipixel[l][x] = ipixels[l][x];
-        }
-        a[x] = aset;
+            // Input range failure
+            if ((a[x] > -2.1) && (a[x] < -1.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            }
+            // Output range failure
+            if ((a[x] > -19.1) && (a[x] < -18.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            // Input AND Output range failure
+            if ((a[x] > -22.1) && (a[x] < -21.9)) {
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+                resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
+            }
+            //System.out.println(" --> " + resultFlagsNN[x]);
 
-        NN_AtmCorr.compute(ipixel, inodes, opixel, onodes, width, resultFlags, 0, a);
-
-        // Input range failure
-        if ((a[x] > -2.1) && (a[x] < -1.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
+            // The aots
+            final int num_msl = 8;
+            for (int i = num_msl; i < onodes; i++) {
+                result[resultCounter + i - num_msl] = opixel[i][x];
+            }
+            for (int i = 0; i < num_msl; i++) {
+                final int numOfSpectralAerosolOpticalDepths = 4;
+                result[resultCounter + numOfSpectralAerosolOpticalDepths + i] = opixel[i][x];
+            }
         }
-        // Output range failure
-        if ((a[x] > -19.1) && (a[x] < -18.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        // Input AND Output range failure
-        if ((a[x] > -22.1) && (a[x] < -21.9)) {
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage - 1];
-            resultFlagsNN |= RESULT_ERROR_VALUES[2 * stage];
-        }
-        //System.out.println(" --> " + resultFlagsNN[x]);
-
-        // The aots
-        final int num_msl = 8;
-        final int numOfConcentrationBands = 3;
-        for (int i = num_msl; i < onodes; i++) {
-            result[numOfConcentrationBands + i - num_msl] = opixel[i][x];
-        }
-        for (int i = 0; i < num_msl; i++) {
-            final int numOfSpectralAerosolOpticalDepths = 4;
-            result[numOfConcentrationBands + numOfSpectralAerosolOpticalDepths + i] = opixel[i][x];
-        }
-
         // Now check for error flags !
         // If set, set output vector to mask value !
         if (resultFlags[x] != 0) {
@@ -668,9 +697,19 @@ public class WaterProcessorOp extends PixelOperator {
         int sceneWidth = sourceProduct.getSceneRasterWidth();
         int sceneHeight = sourceProduct.getSceneRasterHeight();
 
-        addConcentrationBands(targetProduct, sceneWidth, sceneHeight);
-        addOpticalDepthBands(targetProduct, sceneWidth, sceneHeight);
-        addReflectanceBands(targetProduct, sceneWidth, sceneHeight);
+        if (computeCHL) {
+            addConcentrationBand(targetProduct, sceneWidth, sceneHeight, 0);
+        }
+        if (computeYS) {
+            addConcentrationBand(targetProduct, sceneWidth, sceneHeight, 1);
+        }
+        if (computeTSM) {
+            addConcentrationBand(targetProduct, sceneWidth, sceneHeight, 2);
+        }
+        if (computeAtmCorr) {
+            addOpticalDepthBands(targetProduct, sceneWidth, sceneHeight);
+            addReflectanceBands(targetProduct, sceneWidth, sceneHeight);
+        }
         ProductUtils.copyFlagBands(sourceProduct, targetProduct, true);
         if (!targetProduct.containsBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME)) {
             productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME);
@@ -733,13 +772,11 @@ public class WaterProcessorOp extends PixelOperator {
         }
     }
 
-    private void addConcentrationBands(Product targetProduct, int sceneWidth, int sceneHeight) {
-        for (int i = 0; i < output_concentration_band_names.length; i++) {
-            final Band band = createBand(output_concentration_band_names[i], sceneWidth, sceneHeight);
-            band.setDescription(output_concentration_band_descriptions[i]);
-            band.setUnit(output_concentration_band_units[i]);
-            targetProduct.addBand(band);
-        }
+    private void addConcentrationBand(Product targetProduct, int sceneWidth, int sceneHeight, int concentrationBandIndex) {
+        final Band band = createBand(output_concentration_band_names[concentrationBandIndex], sceneWidth, sceneHeight);
+        band.setDescription(output_concentration_band_descriptions[concentrationBandIndex]);
+        band.setUnit(output_concentration_band_units[concentrationBandIndex]);
+        targetProduct.addBand(band);
     }
 
     private Band createBand(String bandName, int sceneWidth, int sceneHeight) {
@@ -758,9 +795,19 @@ public class WaterProcessorOp extends PixelOperator {
     @Override
     protected void configureTargetSamples(SampleConfigurer sampleConfigurer) throws OperatorException {
         String[] bandNames = new String[0];
-        bandNames = StringUtils.addArrays(bandNames, output_concentration_band_names);
-        bandNames = StringUtils.addArrays(bandNames, output_optical_depth_band_names);
-        bandNames = StringUtils.addArrays(bandNames, output_reflectance_band_names);
+        if (computeCHL) {
+            bandNames = StringUtils.addToArray(bandNames, output_concentration_band_names[0]);
+        }
+        if (computeYS) {
+            bandNames = StringUtils.addToArray(bandNames, output_concentration_band_names[1]);
+        }
+        if (computeTSM) {
+            bandNames = StringUtils.addToArray(bandNames, output_concentration_band_names[2]);
+        }
+        if (computeAtmCorr) {
+            bandNames = StringUtils.addArrays(bandNames, output_optical_depth_band_names);
+            bandNames = StringUtils.addArrays(bandNames, output_reflectance_band_names);
+        }
         bandNames = StringUtils.addToArray(bandNames, result_flags_name);
         configureSamples(sampleConfigurer, bandNames);
     }

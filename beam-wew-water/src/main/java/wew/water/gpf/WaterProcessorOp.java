@@ -221,16 +221,20 @@ public class WaterProcessorOp extends PixelOperator {
                    description = "The MERIS L1b or L1P source product used for the processing.")
     private Product sourceProduct;
 
-    @Parameter(description = "Whether Chlorophyll-a concentration band shall be computed", defaultValue = "true")
+    @Parameter(description = "Whether Chlorophyll-a concentration band shall be computed", defaultValue = "true",
+               label = "Compute chlorophyll-a concentration band")
     private boolean computeCHL;
 
-    @Parameter(description = "Whether yellow substances band shall be computed", defaultValue = "true")
+    @Parameter(description = "Whether yellow substances band shall be computed", defaultValue = "true",
+               label = "Compute yellow substances band")
     private boolean computeYS;
 
-    @Parameter(description = "Whether total suspended matter band shall be computed", defaultValue = "true")
+    @Parameter(description = "Whether total suspended matter band shall be computed", defaultValue = "true",
+               label = "Compute total suspended matter band")
     private boolean computeTSM;
 
-    @Parameter(description = "Whether atmospheric correction bands shall be computed", defaultValue = "true")
+    @Parameter(description = "Whether atmospheric correction bands shall be computed", defaultValue = "true",
+               label = "Compute atmospheric correction bands")
     private boolean computeAtmCorr;
 
     @Parameter(description = "Performs a check whether the 'suspect' flag shall be considered in an expression." +
@@ -238,7 +242,7 @@ public class WaterProcessorOp extends PixelOperator {
                defaultValue = "true", label = "Check whether 'suspect' flag is valid")
     private boolean checkWhetherSuspectIsValid;
 
-    @Parameter(description = "Band maths expression which defines valid pixels. If no expression is given," +
+    @Parameter(description = "Band maths expression which defines valid pixels. If the expression is empty," +
             "all pixels will be considered.",
                defaultValue = "not glint_risk and not bright and not invalid and not suspect")
     private String expression;
@@ -580,7 +584,7 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private void checkWhetherSuspectIsValid() {
-        if(!expression.contains(" and not suspect")) {
+        if (!expression.contains(" and not suspect")) {
             return;
         }
         final int height = sourceProduct.getSceneRasterHeight();
@@ -687,7 +691,7 @@ public class WaterProcessorOp extends PixelOperator {
             inputBands[i] = radianceBand;
         }
         solarFlux = getSolarFlux(sourceProduct, inputBands);
-        if(checkWhetherSuspectIsValid) {
+        if (checkWhetherSuspectIsValid) {
             checkWhetherSuspectIsValid();
         }
         final PlanarImage validMaskImage = createValidMaskImage(sourceProduct, expression);

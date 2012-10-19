@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>1.2.10</version>
+    <version>2.0</version>
     <name>WeW Water Processor</name>
     <description>
         <![CDATA[
@@ -32,6 +32,9 @@
 
     <changelog>
         <![CDATA[
+        From 1.2.10 to 2.0<br/>
+        Added operator to make processor accessible via Graph Processing Framework
+        Added parameters to operator
         From 1.2.9 to 1.2.10<br/>
         Adapted to BEAM 4.10
         From 1.2.8 to 1.2.9<br/>

@@ -20,11 +20,16 @@ import org.esa.beam.framework.gpf.pointop.Sample;
 import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
 import org.esa.beam.framework.processor.ProcessorConstants;
+import org.esa.beam.jai.ResolutionLevel;
+import org.esa.beam.jai.VirtualBandOpImage;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.StringUtils;
 import wew.water.WaterProcessorOzone;
 
+import javax.media.jai.PlanarImage;
+import javax.media.jai.operator.ConstantDescriptor;
 import java.awt.Color;
+import java.awt.image.Raster;
 import java.io.IOException;
 
 @OperatorMetadata(alias = "FUB.Water", authors = "Thomas Schroeder, Michael Schaale",
@@ -172,13 +177,6 @@ public class WaterProcessorOp extends PixelOperator {
             0.5f
     };
 
-    private static final int glint_risk = 0x00000004;
-    private static final int suspect = 0x00000008;
-    private static final int bright = 0x00000020;
-    private static final int invalid = 0x00000080;
-
-    private static final int mask_to_be_used = (glint_risk | bright | invalid);
-
     private final static String[] source_raster_names = new String[]{
             EnvisatConstants.MERIS_L1B_RADIANCE_1_BAND_NAME,  // source sample index  0   radiance_1
             EnvisatConstants.MERIS_L1B_RADIANCE_2_BAND_NAME,  // source sample index  1   radiance_2
@@ -205,7 +203,6 @@ public class WaterProcessorOp extends PixelOperator {
             EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12],  // source sample index 22   atm_press
             EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13]   // source sample index 23   ozone
     };
-    private final static int source_sample_index_l1b_flags = 15;
     private final static int source_sample_index_sun_zenith = 16;
     private final static int source_sample_index_sun_azimuth = 17;
     private final static int source_sample_index_view_zenith = 18;
@@ -215,8 +212,13 @@ public class WaterProcessorOp extends PixelOperator {
     private final static int source_sample_index_atm_press = 22;
     private final static int source_sample_index_ozone = 23;
 
+    private float[] solarFlux;
+
+    private Band[] inputBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
+    private Raster validMaskData;
+
     @SourceProduct(label = "Select source product",
-                   description = "The MERIS L1b source product used for the processing.")
+                   description = "The MERIS L1b or L1P source product used for the processing.")
     private Product sourceProduct;
 
     @Parameter(description = "Whether Chlorophyll-a concentration band shall be computed", defaultValue = "true")
@@ -231,12 +233,15 @@ public class WaterProcessorOp extends PixelOperator {
     @Parameter(description = "Whether atmospheric correction bands shall be computed", defaultValue = "true")
     private boolean computeAtmCorr;
 
-    private int maskToBeUsed;
-    private float[] solarFlux;
+    @Parameter(description = "Performs a check whether the 'suspect' flag shall be considered in an expression." +
+            "This parameter is only considered when the expression contains the term 'and not suspect'",
+               defaultValue = "true", label = "Check whether 'suspect' flag is valid")
+    private boolean checkWhetherSuspectIsValid;
 
-
-    private Band[] inputBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
-
+    @Parameter(description = "Band maths expression which defines valid pixels. If no expression is given," +
+            "all pixels will be considered.",
+               defaultValue = "not glint_risk and not bright and not invalid and not suspect")
+    private String expression;
 
     @Override
     protected void computePixel(final int xpos, final int ypos, Sample[] sourceSamples, WritableSample[] targetSamples) {
@@ -320,10 +325,7 @@ public class WaterProcessorOp extends PixelOperator {
             toa[n] = sourceSamples[n].getFloat();
         } // n
 
-        // Second the flags
-        int l1Flags = sourceSamples[source_sample_index_l1b_flags].getInt();
-
-        // Third the auxiliary data
+        // Second the auxiliary data
         float sza = sourceSamples[source_sample_index_sun_zenith].getFloat();
         float saa = sourceSamples[source_sample_index_sun_azimuth].getFloat();
         float vza = sourceSamples[source_sample_index_view_zenith].getFloat();
@@ -339,8 +341,7 @@ public class WaterProcessorOp extends PixelOperator {
         int resultFlagsNN = 0;
 
         // Exclude pixels from processing if the following l1flags mask becomes true
-        k = l1Flags & maskToBeUsed;
-        if (k != 0) {
+        if (validMaskData.getSample(xpos, ypos, 0) == 0) {
             resultFlags[x] = RESULT_ERROR_VALUES[0];
         }
 
@@ -579,6 +580,9 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private void checkWhetherSuspectIsValid() {
+        if(!expression.contains(" and not suspect")) {
+            return;
+        }
         final int height = sourceProduct.getSceneRasterHeight();
         final int width = sourceProduct.getSceneRasterWidth();
 
@@ -591,8 +595,9 @@ public class WaterProcessorOp extends PixelOperator {
         // Grab a line in the middle of the scene
         final Band l1FlagsInputBand = sourceProduct.getBand(EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME);
         int[] l1Flags = new int[width];
+        final int halfHeight = height / 2;
         try {
-            l1FlagsInputBand.readPixels(0, height / 2, width, 1, l1Flags);
+            l1FlagsInputBand.readPixels(0, halfHeight, width, 1, l1Flags);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -600,26 +605,25 @@ public class WaterProcessorOp extends PixelOperator {
         final String ICOL_PATTERN = "MER_.*1N";
         boolean icolMode = sourceProduct.getProductType().matches(ICOL_PATTERN);
         if (icolMode) {
-            maskToBeUsed = mask_to_be_used;
+            expression = expression.replace(" and not suspect", "");
             System.out.println("--- Input product is of type icol ---");
             System.out.println("--- Switching to relaxed mask. ---");
         } else {
-            maskToBeUsed = suspect;
+            final PlanarImage validMaskImage = createValidMaskImage(sourceProduct, "suspect");
+            final Raster validData = validMaskImage.getData();
             k = 0;
             // Now sum up the cases which signal a suspect behaviour
             for (int i = 0; i < width; i++) {
-                if ((l1Flags[i] & maskToBeUsed) != 0) {
+                if (validData.getSample(i, halfHeight, 0) != 0) {
                     k++;
                 }
             }
-            // lower than 50 percent ?
-            if (k < width / 2)
-            // Make use of the suspect flag
+            // more than than 50 percent ?
+            if (k >= width / 2)
             {
-                maskToBeUsed = mask_to_be_used | suspect;
-            } else {
-                // Forget it ....
-                maskToBeUsed = mask_to_be_used;
+                // Do not make use of the suspect flag
+                expression = expression.replace(" and not suspect", "");
+//                maskToBeUsed = mask_to_be_used;
                 final float percent = (float) k / (float) width * 100.0f;
                 System.out.println("--- " + percent + " % of the scan line are marked as suspect ---");
                 System.out.println("--- Switching to relaxed mask. ---");
@@ -683,7 +687,11 @@ public class WaterProcessorOp extends PixelOperator {
             inputBands[i] = radianceBand;
         }
         solarFlux = getSolarFlux(sourceProduct, inputBands);
-        checkWhetherSuspectIsValid();
+        if(checkWhetherSuspectIsValid) {
+            checkWhetherSuspectIsValid();
+        }
+        final PlanarImage validMaskImage = createValidMaskImage(sourceProduct, expression);
+        validMaskData = validMaskImage.getData();
     }
 
     @Override
@@ -710,7 +718,9 @@ public class WaterProcessorOp extends PixelOperator {
             addOpticalDepthBands(targetProduct, sceneWidth, sceneHeight);
             addReflectanceBands(targetProduct, sceneWidth, sceneHeight);
         }
+
         ProductUtils.copyFlagBands(sourceProduct, targetProduct, true);
+
         if (!targetProduct.containsBand(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME)) {
             productConfigurer.copyBands(EnvisatConstants.MERIS_AMORGOS_L1B_CORR_LONGITUDE_BAND_NAME);
         }
@@ -851,6 +861,17 @@ public class WaterProcessorOp extends PixelOperator {
         }
 
         return productType + "_FLH_MCI";
+    }
+
+    private PlanarImage createValidMaskImage(Product product, String expressionToBeEvaluated) {
+        if (expressionToBeEvaluated != null && product.isCompatibleBandArithmeticExpression(expressionToBeEvaluated)) {
+            return VirtualBandOpImage.create(expressionToBeEvaluated, ProductData.TYPE_UINT8, 0,
+                                             product, ResolutionLevel.MAXRES);
+        } else {
+            return ConstantDescriptor.create((float) product.getSceneRasterWidth(),
+                                             (float) product.getSceneRasterHeight(),
+                                             new Byte[]{-1}, null);
+        }
     }
 
 }

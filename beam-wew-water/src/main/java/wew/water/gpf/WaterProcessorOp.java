@@ -790,6 +790,7 @@ public class WaterProcessorOp extends PixelOperator {
         final Band band = createBand(output_concentration_band_names[concentrationBandIndex], sceneWidth, sceneHeight);
         band.setDescription(output_concentration_band_descriptions[concentrationBandIndex]);
         band.setUnit(output_concentration_band_units[concentrationBandIndex]);
+        band.setNoDataValue(5.0);
         targetProduct.addBand(band);
     }
 

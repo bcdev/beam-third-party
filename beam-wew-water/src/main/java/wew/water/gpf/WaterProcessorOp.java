@@ -234,7 +234,7 @@ public class WaterProcessorOp extends PixelOperator {
     private boolean computeTSM;
 
     @Parameter(description = "Whether atmospheric correction bands shall be computed", defaultValue = "true",
-               label = "Compute atmospheric correction bands")
+               label = "Compute water leaving reflectances and AOT bands")
     private boolean computeAtmCorr;
 
     @Parameter(description = "Performs a check whether the 'suspect' flag shall be considered in an expression." +
@@ -244,7 +244,8 @@ public class WaterProcessorOp extends PixelOperator {
 
     @Parameter(description = "Band maths expression which defines valid pixels. If the expression is empty," +
             "all pixels will be considered.",
-               defaultValue = "not glint_risk and not bright and not invalid and not suspect")
+               defaultValue = "not glint_risk and not bright and not invalid and not suspect",
+               label = "Use valid pixel expression")
     private String expression;
 
     @Override
@@ -623,8 +624,7 @@ public class WaterProcessorOp extends PixelOperator {
                 }
             }
             // more than than 50 percent ?
-            if (k >= width / 2)
-            {
+            if (k >= width / 2) {
                 // Do not make use of the suspect flag
                 expression = expression.replace(" and not suspect", "");
 //                maskToBeUsed = mask_to_be_used;
@@ -790,6 +790,7 @@ public class WaterProcessorOp extends PixelOperator {
         final Band band = createBand(output_concentration_band_names[concentrationBandIndex], sceneWidth, sceneHeight);
         band.setDescription(output_concentration_band_descriptions[concentrationBandIndex]);
         band.setUnit(output_concentration_band_units[concentrationBandIndex]);
+        band.setNoDataValueUsed(true);
         band.setNoDataValue(5.0);
         targetProduct.addBand(band);
     }
@@ -869,14 +870,21 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private PlanarImage createValidMaskImage(Product product, String expressionToBeEvaluated) {
-        if (expressionToBeEvaluated != null && product.isCompatibleBandArithmeticExpression(expressionToBeEvaluated)) {
+        if (expressionToBeEvaluated == null) {
+            return createEmptyMask(product);
+        }
+        if (product.isCompatibleBandArithmeticExpression(expressionToBeEvaluated)) {
             return VirtualBandOpImage.create(expressionToBeEvaluated, ProductData.TYPE_UINT8, 0,
                                              product, ResolutionLevel.MAXRES);
         } else {
-            return ConstantDescriptor.create((float) product.getSceneRasterWidth(),
-                                             (float) product.getSceneRasterHeight(),
-                                             new Byte[]{-1}, null);
+            throw new OperatorException("Invalid parameter 'expression'");
         }
+    }
+
+    private PlanarImage createEmptyMask(Product product) {
+        return ConstantDescriptor.create((float) product.getSceneRasterWidth(),
+                                         (float) product.getSceneRasterHeight(),
+                                         new Byte[]{-1}, null);
     }
 
 }

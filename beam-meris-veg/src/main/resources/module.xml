@@ -86,6 +86,16 @@
             <placeAfter>tocVegetationProcessor</placeAfter>
         </action>
         <action>
+            <id>toaVegetationProcessorNew</id>
+            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <operatorName>ToaVeg</operatorName>
+            <text>TOA Vegetation Processor NEW (MERIS)...</text>
+            <mnemonic>A</mnemonic>
+            <helpID>ToaVegOverview</helpID>
+            <parent>MerisVeg</parent>
+            <placeAfter>toaVegetationProcessor</placeAfter>
+        </action>
+        <action>
             <id>baerProcessor</id>
             <class>org.esa.beam.visat.actions.ProcessorAction</class>
             <processor>org.esa.beam.processor.baer.BaerProcessor</processor>

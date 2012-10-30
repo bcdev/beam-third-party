@@ -16,7 +16,6 @@
 
 package org.esa.beam.processor.toa;
 
-import com.bc.ceres.core.NullProgressMonitor;
 import com.bc.ceres.core.ProgressMonitor;
 import com.bc.jnn.JnnException;
 import org.esa.beam.dataio.envisat.EnvisatConstants;

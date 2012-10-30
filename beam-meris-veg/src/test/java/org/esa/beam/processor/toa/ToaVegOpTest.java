@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests compoutePixel method of LAI operator against values generated with old ToaVeg processor.
+ * Tests computePixel method of LAI operator against values generated with old ToaVeg processor.
  *
  * @author Martin Boettcher
  */
@@ -63,15 +63,16 @@ public class ToaVegOpTest {
         op.setSolarSpecFlux(962.6538f, 12);
         op.computePixel(0, 0, sourceSamples, targetSamples);
 
-        // compare with values generated with old ToaVeg processor  1.4706547	0.22243302	64.181	0.46277326	0.72667503	0.06573455	0.077173844	29.809309
-        assertEquals(1.4706547f, targetSamples[0].getFloat(), 0.0f);
-        assertEquals(0.22243302f, targetSamples[1].getFloat(), 0.0f);
-        assertEquals(64.181f, targetSamples[2].getFloat(), 0.0f);
-        assertEquals(0.46277326f, targetSamples[3].getFloat(), 0.0f);
-        assertEquals(0.72667503f, targetSamples[4].getFloat(), 0.0f);
-        assertEquals(0.06573455f, targetSamples[5].getFloat(), 0.0f);
-        assertEquals(0.077173844f, targetSamples[6].getFloat(), 0.0f);
-        assertEquals(29.809309f, targetSamples[7].getFloat(), 0.0f);
+        // compare with values generated with old ToaVeg processor
+        // 1.4711345	0.22234405	64.2048110	0.46284386	0.72667503	0.065715327	0.077173844	29.809309
+        assertEquals(1.4711345f, targetSamples[0].getFloat(), 1.0e-6f);
+        assertEquals(0.22234405f, targetSamples[1].getFloat(), 1.0e-6f);
+        assertEquals(64.2048110f, targetSamples[2].getFloat(), 1.0e-6f);
+        assertEquals(0.46284386f, targetSamples[3].getFloat(), 1.0e-6f);
+        assertEquals(0.72687703f, targetSamples[4].getFloat(), 1.0e-6f);
+        assertEquals(0.065715327f, targetSamples[5].getFloat(), 1.0e-6f);
+        assertEquals(0.077174343f, targetSamples[6].getFloat(), 1.0e-6f);
+        assertEquals(29.81902503f, targetSamples[7].getFloat(), 1.0e-6f);
         assertEquals(0, targetSamples[8].getInt());
     }
 

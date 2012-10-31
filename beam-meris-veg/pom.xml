@@ -7,7 +7,7 @@
 
     <groupId>org.esa.beam</groupId>
     <artifactId>beam-meris-veg</artifactId>
-    <name>Meris Veg</name>
+    <name>MERIS Vegetation Processors</name>
     <version>2.1-SNAPSHOT</version>
     <url>http://envisat.esa.int/beam/</url>
 

@@ -701,6 +701,7 @@ public class WaterProcessorOp extends PixelOperator {
     @Override
     protected void configureTargetProduct(ProductConfigurer productConfigurer) {
         super.configureTargetProduct(productConfigurer);
+        productConfigurer.copyMetadata();
         final Product sourceProduct = productConfigurer.getSourceProduct();
         final Product targetProduct = productConfigurer.getTargetProduct();
 

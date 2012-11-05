@@ -871,7 +871,7 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private PlanarImage createValidMaskImage(Product product, String expressionToBeEvaluated) {
-        if (expressionToBeEvaluated == null) {
+        if (StringUtils.isNullOrEmpty(expressionToBeEvaluated)) {
             return createEmptyMask(product);
         }
         if (product.isCompatibleBandArithmeticExpression(expressionToBeEvaluated)) {

@@ -103,7 +103,7 @@
         <action>
             <id>FUB-WeW</id>
             <helpId>fubWeWTool</helpId>
-            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <class>wew.water.gpf.ui.WaterProcessorOpAction</class>
             <text>FUB/WeW WATER Processor OP (MERIS)...</text>
             <shortDescr>Invoke the FUB/WeW WATER Processor Plugin.</shortDescr>
             <operatorName>FUB.Water</operatorName>

@@ -36,21 +36,20 @@ import java.io.IOException;
                   copyright = "Institute for Space Sciences (WeW), Freie Universitaet Berlin",
                   version = "2.0",
                   description = "FUB/WeW WATER Processor GPF-Operator")
-
 public class WaterProcessorOp extends PixelOperator {
 
-    private final static String[] output_concentration_band_names = {
+    public static final String[] OUTPUT_CONCENTRATION_BAND_NAMES = {
             "algal_2",
             "yellow_subs",
             "total_susp"
     };
-    private final static String[] output_optical_depth_band_names = {
+    public static final String[] OUTPUT_OPTICAL_DEPTH_BAND_NAMES = {
             "aero_opt_thick_440",
             "aero_opt_thick_550",
             "aero_opt_thick_670",
             "aero_opt_thick_870"
     };
-    private final static String[] output_reflectance_band_names = {
+    public static final String[] OUTPUT_REFLECTANCE_BAND_NAMES = {
             "reflec_1",
             "reflec_2",
             "reflec_3",
@@ -177,7 +176,7 @@ public class WaterProcessorOp extends PixelOperator {
             0.5f
     };
 
-    private final static String[] source_raster_names = new String[]{
+    private static final String[] source_raster_names = new String[]{
             EnvisatConstants.MERIS_L1B_RADIANCE_1_BAND_NAME,  // source sample index  0   radiance_1
             EnvisatConstants.MERIS_L1B_RADIANCE_2_BAND_NAME,  // source sample index  1   radiance_2
             EnvisatConstants.MERIS_L1B_RADIANCE_3_BAND_NAME,  // source sample index  2   radiance_3
@@ -203,14 +202,14 @@ public class WaterProcessorOp extends PixelOperator {
             EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[12],  // source sample index 22   atm_press
             EnvisatConstants.MERIS_TIE_POINT_GRID_NAMES[13]   // source sample index 23   ozone
     };
-    private final static int source_sample_index_sun_zenith = 16;
-    private final static int source_sample_index_sun_azimuth = 17;
-    private final static int source_sample_index_view_zenith = 18;
-    private final static int source_sample_index_view_azimuth = 19;
-    private final static int source_sample_index_zonal_wind = 20;
-    private final static int source_sample_index_merid_wind = 21;
-    private final static int source_sample_index_atm_press = 22;
-    private final static int source_sample_index_ozone = 23;
+    private static final int source_sample_index_sun_zenith = 16;
+    private static final int source_sample_index_sun_azimuth = 17;
+    private static final int source_sample_index_view_zenith = 18;
+    private static final int source_sample_index_view_azimuth = 19;
+    private static final int source_sample_index_zonal_wind = 20;
+    private static final int source_sample_index_merid_wind = 21;
+    private static final int source_sample_index_atm_press = 22;
+    private static final int source_sample_index_ozone = 23;
 
     private float[] solarFlux;
 
@@ -315,7 +314,7 @@ public class WaterProcessorOp extends PixelOperator {
             output_planes++;
         }
         if (computeAtmCorr) {
-            output_planes += output_optical_depth_band_names.length + output_reflectance_band_names.length;
+            output_planes += OUTPUT_OPTICAL_DEPTH_BAND_NAMES.length + OUTPUT_REFLECTANCE_BAND_NAMES.length;
         }
         float[] top = new float[num_toa];
         float[] tops = new float[num_toa];
@@ -761,8 +760,8 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private void addReflectanceBands(Product targetProduct, int sceneWidth, int sceneHeight) {
-        for (int i = 0; i < output_reflectance_band_names.length; i++) {
-            final Band band = createBand(output_reflectance_band_names[i], sceneWidth, sceneHeight);
+        for (int i = 0; i < OUTPUT_REFLECTANCE_BAND_NAMES.length; i++) {
+            final Band band = createBand(OUTPUT_REFLECTANCE_BAND_NAMES[i], sceneWidth, sceneHeight);
             band.setDescription(output_reflectance_band_descriptions[i]);
             band.setUnit(output_reflectance_band_units[i]);
             band.setSpectralWavelength(rho_w_lambda[i]);
@@ -775,8 +774,8 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private void addOpticalDepthBands(Product targetProduct, int sceneWidth, int sceneHeight) {
-        for (int i = 0; i < output_optical_depth_band_names.length; i++) {
-            final Band band = createBand(output_optical_depth_band_names[i], sceneWidth, sceneHeight);
+        for (int i = 0; i < OUTPUT_OPTICAL_DEPTH_BAND_NAMES.length; i++) {
+            final Band band = createBand(OUTPUT_OPTICAL_DEPTH_BAND_NAMES[i], sceneWidth, sceneHeight);
             band.setDescription(output_optical_depth_band_descriptions[i]);
             band.setUnit(output_optical_depth_band_units[i]);
             band.setSpectralWavelength(tau_lambda[i]);
@@ -788,7 +787,7 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private void addConcentrationBand(Product targetProduct, int sceneWidth, int sceneHeight, int concentrationBandIndex) {
-        final Band band = createBand(output_concentration_band_names[concentrationBandIndex], sceneWidth, sceneHeight);
+        final Band band = createBand(OUTPUT_CONCENTRATION_BAND_NAMES[concentrationBandIndex], sceneWidth, sceneHeight);
         band.setDescription(output_concentration_band_descriptions[concentrationBandIndex]);
         band.setUnit(output_concentration_band_units[concentrationBandIndex]);
         band.setNoDataValueUsed(true);
@@ -813,17 +812,17 @@ public class WaterProcessorOp extends PixelOperator {
     protected void configureTargetSamples(SampleConfigurer sampleConfigurer) throws OperatorException {
         String[] bandNames = new String[0];
         if (computeCHL) {
-            bandNames = StringUtils.addToArray(bandNames, output_concentration_band_names[0]);
+            bandNames = StringUtils.addToArray(bandNames, OUTPUT_CONCENTRATION_BAND_NAMES[0]);
         }
         if (computeYS) {
-            bandNames = StringUtils.addToArray(bandNames, output_concentration_band_names[1]);
+            bandNames = StringUtils.addToArray(bandNames, OUTPUT_CONCENTRATION_BAND_NAMES[1]);
         }
         if (computeTSM) {
-            bandNames = StringUtils.addToArray(bandNames, output_concentration_band_names[2]);
+            bandNames = StringUtils.addToArray(bandNames, OUTPUT_CONCENTRATION_BAND_NAMES[2]);
         }
         if (computeAtmCorr) {
-            bandNames = StringUtils.addArrays(bandNames, output_optical_depth_band_names);
-            bandNames = StringUtils.addArrays(bandNames, output_reflectance_band_names);
+            bandNames = StringUtils.addArrays(bandNames, OUTPUT_OPTICAL_DEPTH_BAND_NAMES);
+            bandNames = StringUtils.addArrays(bandNames, OUTPUT_REFLECTANCE_BAND_NAMES);
         }
         bandNames = StringUtils.addToArray(bandNames, result_flags_name);
         configureSamples(sampleConfigurer, bandNames);

@@ -146,7 +146,16 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
         @Override
         public void selectionChanged(SelectionChangeEvent event) {
             Selection selection = event.getSelection();
-            if (selection != null) {
+            if(selection.equals(Selection.EMPTY)) {
+                if (currentProduct != null) {
+                    currentProduct.removeProductNodeListener(this);
+                    currentProduct = null;
+                }
+                updateTargetProductname();
+                updateValueSets(currentProduct);
+                setSourceProductProperty(new Product[]{});
+            }
+            else {
                 final Product selectedProduct = (Product) selection.getSelectedValue();
                 if (selectedProduct != currentProduct) {
                     if (currentProduct != null) {
@@ -158,18 +167,22 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
                     }
                     updateTargetProductname();
                     updateValueSets(currentProduct);
-                    try {
-                        if(!bindingContext.getPropertySet().isPropertyDefined(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT)) {
-                            final PropertyDescriptor descriptor = new PropertyDescriptor(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT, Product[].class);
-                            final Property property = new Property(descriptor, new DefaultPropertyAccessor());
-                            bindingContext.getPropertySet().addProperty(property);
-                        }
-                        bindingContext.getPropertySet().getProperty(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT).setValue(new Product[]{selectedProduct});
-                    } catch (ValidationException e) {
-                        final String msg = String.format("Cannot display source product.\n%s", e.getMessage());
-                        getAppContext().handleError(msg, e);
-                    }
+                    setSourceProductProperty(new Product[]{selectedProduct});
                 }
+            }
+        }
+
+        private void setSourceProductProperty(Product[] products) {
+            try {
+                if(!bindingContext.getPropertySet().isPropertyDefined(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT)) {
+                    final PropertyDescriptor descriptor = new PropertyDescriptor(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT, Product[].class);
+                    final Property property = new Property(descriptor, new DefaultPropertyAccessor());
+                    bindingContext.getPropertySet().addProperty(property);
+                }
+                bindingContext.getPropertySet().getProperty(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT).setValue(products);
+            } catch (ValidationException e) {
+                final String msg = String.format("Cannot display source product." + "\n%s", e.getMessage());
+                getAppContext().handleError(msg, e);
             }
         }
 

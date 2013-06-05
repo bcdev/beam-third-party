@@ -6,7 +6,7 @@
     <groupId>uk.ac.ucl.mssl</groupId>
     <artifactId>mssl-stereomatcher</artifactId>
     <name>ATSR Cloud Stereo Matcher</name>
-    <version>0.11</version>
+    <version>0.12</version>
 
     <packaging>jar</packaging>
 
@@ -14,22 +14,22 @@
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-core</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-gpf</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-visat</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-envisat-reader</artifactId>
-            <version>1.5</version>
+            <version>1.5.2</version>
         </dependency>
     </dependencies>
 

@@ -1195,6 +1195,8 @@ public class BaerProcessor extends Processor {
                 return;
             }
         } // end of line loop
+        _inputProduct.getMaskGroup().remove(bitmask);
+        _inputProduct.getMaskGroup().remove(bitmaskCloud);
         pm.done();
 
     }

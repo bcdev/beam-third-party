@@ -22,6 +22,7 @@ import com.bc.jexp.Term;
 import com.bc.jnn.JnnException;
 import org.esa.beam.framework.dataio.ProductWriter;
 import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.framework.datamodel.Product;
@@ -53,6 +54,7 @@ import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.ResourceInstaller;
 import org.esa.beam.util.io.FileUtils;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -600,6 +602,9 @@ public class TocVegProcessor extends Processor {
 
         copyDuplicatedBands(SubProgressMonitor.create(pm, 1));
 
+        Mask bitmask = Mask.BandMathsType.create("bitmask", "description", width, height, _bitmaskExpression, Color.BLACK, 0.0);
+        _inputProduct.getMaskGroup().add(bitmask);
+
         for (int line = 0; line < height; line++) {
 
             // read input data
@@ -619,7 +624,11 @@ public class TocVegProcessor extends Processor {
             // evaluate bitmask
             // ----------------
             if (_bitMaskTerm != null) {
-                _inputProduct.readBitmask(0, line, width, 1, _bitMaskTerm, process);
+                int[] temp = new int[width];
+                bitmask.getSourceImage().getData().getSamples(0, line, width, 1, 0, temp);
+                for (int i = 0; i < temp.length; i++) {
+                    process[i] = temp[i] == 255;
+                }
             }
 
             for (int x = 0; x < width; x++) {
@@ -678,6 +687,7 @@ public class TocVegProcessor extends Processor {
                 return;
             }
         }
+        _inputProduct.getMaskGroup().remove(bitmask);
 
         pm.done();
     }

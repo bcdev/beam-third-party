@@ -33,7 +33,6 @@ public class ToaVegAllTests extends TestCase {
         suite.addTest(ToaVegMerisPixelTest.suite());
         suite.addTest(ToaVegFlagsManagerTest.suite());
         suite.addTest(ToaVegProcessorConfigurationTest.suite());
-        suite.addTest(ToaVegProcessorConfigurationParserTest.suite());
 
         return suite;
     }

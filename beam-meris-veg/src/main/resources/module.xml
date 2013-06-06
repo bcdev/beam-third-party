@@ -76,16 +76,6 @@
             <parent>MerisVeg</parent>
         </action>
         <action>
-            <id>toaVegetationProcessor</id>
-            <class>org.esa.beam.visat.actions.ProcessorAction</class>
-            <processor>org.esa.beam.processor.toa.ToaVegProcessor</processor>
-            <text>TOA Vegetation Processor (MERIS)...</text>
-            <mnemonic>A</mnemonic>
-            <helpID>ToaVegOverview</helpID>
-            <parent>MerisVeg</parent>
-            <placeAfter>tocVegetationProcessor</placeAfter>
-        </action>
-        <action>
             <id>toaVegetationProcessorNew</id>
             <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
             <operatorName>ToaVeg</operatorName>

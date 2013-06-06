@@ -35,7 +35,6 @@ public class ToaVegAllTests extends TestCase {
         TestSuite suite = new TestSuite();
 
         suite.addTest(ToaVegConstantsTest.suite());
-        suite.addTest(ToaVegProcessorTest.suite());
         suite.addTest(ToaVegRequestElementFactoryTest.suite());
         
         suite.addTest(org.esa.beam.processor.toa.algorithm.ToaVegAlgorithmTest.suite());

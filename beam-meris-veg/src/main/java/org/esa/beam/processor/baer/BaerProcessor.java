@@ -7,6 +7,7 @@ import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.dataio.ProductWriter;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.MetadataElement;
 import org.esa.beam.framework.datamodel.Product;
@@ -22,7 +23,17 @@ import org.esa.beam.framework.processor.Request;
 import org.esa.beam.framework.processor.RequestElementFactory;
 import org.esa.beam.framework.processor.ui.ProcessorUI;
 import org.esa.beam.processor.baer.algorithm.BaerAlgorithm;
-import org.esa.beam.processor.baer.auxdata.*;
+import org.esa.beam.processor.baer.auxdata.AerDiffTransmLoader;
+import org.esa.beam.processor.baer.auxdata.AerPhaseLoader;
+import org.esa.beam.processor.baer.auxdata.AuxFileLoader;
+import org.esa.beam.processor.baer.auxdata.AuxFilePropsLoader;
+import org.esa.beam.processor.baer.auxdata.F_TuningLoader;
+import org.esa.beam.processor.baer.auxdata.GroundReflectanceLoader;
+import org.esa.beam.processor.baer.auxdata.HemisphReflecLoader;
+import org.esa.beam.processor.baer.auxdata.NdviLoader;
+import org.esa.beam.processor.baer.auxdata.RelAerPhaseLoader;
+import org.esa.beam.processor.baer.auxdata.SmacCoefficientsManager;
+import org.esa.beam.processor.baer.auxdata.SoilFractionLoader;
 import org.esa.beam.processor.baer.ui.BaerUi;
 import org.esa.beam.processor.baer.utils.AerPixel;
 import org.esa.beam.processor.baer.utils.FlagsManager;
@@ -33,6 +44,7 @@ import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.ResourceInstaller;
 import org.esa.beam.util.io.FileUtils;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -993,8 +1005,12 @@ public class BaerProcessor extends Processor {
 
         copyFlagBands(_inputProduct, _outputProduct);
 
-        for (int line = 0; line < height; line++) {
+        Mask bitmask = Mask.BandMathsType.create("bitmask", "description", width, height, _bitmaskExpression, Color.BLACK, 0.0);
+        Mask bitmaskCloud = Mask.BandMathsType.create("bitmaskCloud", "description", width, height, _bitmaskL2CloudExpr, Color.BLACK, 0.0);
+        _inputProduct.getMaskGroup().add(bitmask);
+        _inputProduct.getMaskGroup().add(bitmaskCloud);
 
+        for (int line = 0; line < height; line++) {
             // read input data
             // ---------------
             for (int n = 0; n < BaerConstants.NUM_IN_REFLEC_BANDS; n++) {
@@ -1015,8 +1031,15 @@ public class BaerProcessor extends Processor {
             // evaluate bitmask
             // ----------------
             if (_bitMaskTerm != null) {
-                _inputProduct.readBitmask(0, line, width, 1, _bitMaskTerm, process);
-                _inputProduct.readBitmask(0, line, width, 1, _bitMaskL2Cloud, process_cloud);
+                int[] temp = new int[width];
+                bitmask.getSourceImage().getData().getSamples(0, line, width, 1, 0, temp);
+                for (int i = 0; i < temp.length; i++) {
+                    process[i] = temp[i] == 255;
+                }
+                bitmaskCloud.getSourceImage().getData().getSamples(0, line, width, 1, 0, temp);
+                for (int i = 0; i < temp.length; i++) {
+                    process_cloud[i] = temp[i] == 255;
+                }
             }
 
             // loop over line, assemble pixel and dispatch to processing classes

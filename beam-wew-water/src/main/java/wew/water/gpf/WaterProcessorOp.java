@@ -59,6 +59,8 @@ public class WaterProcessorOp extends PixelOperator {
             "reflec_7",
             "reflec_9"
     };
+    private static final String SUSPECT_FLAG_NAME = "l1_flags.SUSPECT";
+    private static final String SUSPECT_EXPRESSION_TERM = " and not " + SUSPECT_FLAG_NAME;
 
     private static String[] output_concentration_band_descriptions = {
             "Chlorophyll 2 content",
@@ -236,14 +238,14 @@ public class WaterProcessorOp extends PixelOperator {
                label = "Compute water leaving reflectances and AOT bands")
     private boolean computeAtmCorr;
 
-    @Parameter(description = "Performs a check whether the 'suspect' flag shall be considered in an expression." +
+    @Parameter(description = "Performs a check whether the '" + SUSPECT_FLAG_NAME + "' shall be considered in an expression." +
             "This parameter is only considered when the expression contains the term 'and not suspect'",
-               defaultValue = "true", label = "Check whether 'suspect' flag is valid")
+               defaultValue = "true", label = "Check whether '" + SUSPECT_FLAG_NAME + "' is valid")
     private boolean checkWhetherSuspectIsValid;
 
     @Parameter(description = "Band maths expression which defines valid pixels. If the expression is empty," +
             "all pixels will be considered.",
-               defaultValue = "not glint_risk and not bright and not invalid and not suspect",
+               defaultValue = "not l1_flags.GLINT_RISK and not l1_flags.BRIGHT and not l1_flags.INVALID and not " + SUSPECT_FLAG_NAME,
                label = "Use valid pixel expression")
     private String expression;
 
@@ -584,7 +586,7 @@ public class WaterProcessorOp extends PixelOperator {
     }
 
     private void checkWhetherSuspectIsValid() {
-        if (!expression.contains(" and not suspect")) {
+        if (!expression.contains(SUSPECT_EXPRESSION_TERM)) {
             return;
         }
         final int height = sourceProduct.getSceneRasterHeight();
@@ -609,11 +611,11 @@ public class WaterProcessorOp extends PixelOperator {
         final String ICOL_PATTERN = "MER_.*1N";
         boolean icolMode = sourceProduct.getProductType().matches(ICOL_PATTERN);
         if (icolMode) {
-            expression = expression.replace(" and not suspect", "");
+            expression = expression.replace(SUSPECT_EXPRESSION_TERM, "");
             System.out.println("--- Input product is of type icol ---");
             System.out.println("--- Switching to relaxed mask. ---");
         } else {
-            final PlanarImage validMaskImage = createValidMaskImage(sourceProduct, "suspect");
+            final PlanarImage validMaskImage = createValidMaskImage(sourceProduct, SUSPECT_FLAG_NAME);
             final Raster validData = validMaskImage.getData();
             k = 0;
             // Now sum up the cases which signal a suspect behaviour
@@ -622,10 +624,10 @@ public class WaterProcessorOp extends PixelOperator {
                     k++;
                 }
             }
-            // more than than 50 percent ?
+            // more than 50 percent ?
             if (k >= width / 2) {
                 // Do not make use of the suspect flag
-                expression = expression.replace(" and not suspect", "");
+                expression = expression.replace(SUSPECT_EXPRESSION_TERM, "");
 //                maskToBeUsed = mask_to_be_used;
                 final float percent = (float) k / (float) width * 100.0f;
                 System.out.println("--- " + percent + " % of the scan line are marked as suspect ---");

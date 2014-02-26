@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>2.1</version>
+    <version>2.1.1</version>
     <name>WeW Water Processor</name>
     <description>
         <![CDATA[
@@ -32,6 +32,8 @@
 
     <changelog>
         <![CDATA[
+        Changes in 2.1.1<br/>
+            [BEAM-1571] BEAM-1613 FUB/WeW processor suffers from Java bug<br/>
         Changes in 2.1<br/>
             [BEAM-1571] FUB/WeW processor adds two actions to the tools menu<br/>
             [BEAM-1570] Default valid expression should use flags instead of masks<br/>

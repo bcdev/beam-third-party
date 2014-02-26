@@ -75,6 +75,9 @@ public class WaterVariablesPanel extends JPanel {
         });
         final Property property = bindingContext.getPropertySet().getProperty(WaterFormConstants.PROPERTY_KEY_EXPRESSION);
         final JTextField textField = new JTextField();
+        // workaround for http://bugs.java.com/bugdatabase/view_bug.do?bug_id=7027598
+        textField.setDropTarget(null);
+
         textField.setText(property.getDescriptor().getDefaultValue().toString());
         bindingContext.bind(property.getDescriptor().getName(), textField);
         button.addActionListener(new ActionListener() {

@@ -27,6 +27,7 @@ import org.esa.beam.framework.datamodel.ProductNodeFilter;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
+import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.pointop.PixelOperator;
 import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
@@ -57,6 +58,9 @@ import java.net.URL;
                   version = "1.1.2",
                   description = "Computes LAI from MERIS products.")
 public class ToaVegOp extends PixelOperator {
+
+    @Parameter(defaultValue = "false", label = "If set to true, Lai will be multiplied by 10000 and written as int")
+    private boolean outputLaiAsInt = false;
 
     @SourceProduct(alias = "source",
                    description = "The path of the MERIS source product",
@@ -107,7 +111,11 @@ public class ToaVegOp extends PixelOperator {
             }
         }
 
-        targetSamples[0].set(outPixel.getBand_LAI());
+        if (outputLaiAsInt) {
+            targetSamples[0].set((int) (outPixel.getBand_LAI() * 10000.0f));
+        } else {
+            targetSamples[0].set(outPixel.getBand_LAI());
+        }
         targetSamples[1].set(outPixel.getBand_fCover());
         targetSamples[2].set(outPixel.getBand_CabxLAI());
         targetSamples[3].set(outPixel.getBand_fAPAR());
@@ -168,7 +176,11 @@ public class ToaVegOp extends PixelOperator {
                                     EnvisatConstants.MERIS_AMORGOS_L1B_ALTIUDE_BAND_NAME);
         productConfigurer.copyGeoCoding();
 
-        final Band laiBand = productConfigurer.addBand(ToaVegConstants.LAI_BAND_NAME, ProductData.TYPE_FLOAT32);
+        int laiProductType = ProductData.TYPE_FLOAT32;
+        if (outputLaiAsInt) {
+            laiProductType = ProductData.TYPE_INT16;
+        }
+        final Band laiBand = productConfigurer.addBand(ToaVegConstants.LAI_BAND_NAME, laiProductType);
         laiBand.setDescription(ToaVegConstants.LAI_BAND_DESCRIPTION);
         laiBand.setUnit(ToaVegConstants.LAI_BAND_UNIT);
         laiBand.setValidPixelExpression(

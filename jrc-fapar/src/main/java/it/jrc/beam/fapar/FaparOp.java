@@ -23,6 +23,7 @@ import org.esa.beam.framework.datamodel.ProductData;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
+import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.pointop.PixelOperator;
 import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
@@ -38,6 +39,10 @@ import java.awt.Color;
                   version = "2.3",
                   description = "Computes FAPAR from MERIS products.")
 public class FaparOp extends PixelOperator {
+
+    @Parameter(defaultValue = "false", label = "If set to true, Fapar will be multiplied by 10000 and written as int")
+    private boolean outputFaparAsInt = false;
+
 
     private static final String SOURCE_BAND_NAME_BLUE = "radiance_2";
     private static final String SOURCE_BAND_NAME_GREEN = "radiance_5";
@@ -337,7 +342,11 @@ public class FaparOp extends PixelOperator {
 
         switch (process) {
             case 0:
-                targetSamples[0].set(fapar);
+                if (outputFaparAsInt) {
+                    targetSamples[0].set((int) (fapar * 10000.0f));
+                } else {
+                    targetSamples[0].set(fapar);
+                }
                 break;
             case 4:
                 targetSamples[0].set(0.0f);
@@ -349,7 +358,11 @@ public class FaparOp extends PixelOperator {
                 targetSamples[0].set(1.0f);
                 break;
             default:
-                targetSamples[0].set(-1.0f / 65534.0f);
+                if (outputFaparAsInt) {
+                    targetSamples[0].set(-1);
+                } else {
+                    targetSamples[0].set(-1.0f / 65534.0f);
+                }
         }
 
         if (process != 0) {
@@ -434,11 +447,17 @@ public class FaparOp extends PixelOperator {
                               new Color(255, 102, 255), 0.5);
 
         final Band faparBand = targetProduct.addBand(TARGET_BAND_NAME_FAPAR, ProductData.TYPE_UINT16);
-        faparBand.setNoDataValue(0.0);
+
+        if (outputFaparAsInt) {
+            faparBand.setNoDataValue(0);
+        } else {
+            faparBand.setNoDataValue(0.0);
+            faparBand.setScalingFactor(1.0 / 65534.0);
+            faparBand.setScalingOffset(-1.0 / 65534.0);
+        }
         faparBand.setNoDataValueUsed(true);
         faparBand.setValidPixelExpression(FAPAR_VALID_EXPRESSION);
-        faparBand.setScalingFactor(1.0 / 65534.0);
-        faparBand.setScalingOffset(-1.0 / 65534.0);
+
         faparBand.setDescription("Fraction of photosynthetically absorbed radiation computed by the MGVI algorithm");
 
         addReflectanceTargetBand(sourceProduct, targetProduct, SOURCE_BAND_NAME_BLUE, TARGET_BAND_NAME_BLUE,

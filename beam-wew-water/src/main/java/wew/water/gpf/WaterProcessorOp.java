@@ -35,7 +35,7 @@ import java.io.IOException;
 @OperatorMetadata(alias = "FUB.Water", authors = "Thomas Schroeder, Michael Schaale",
                   copyright = "Institute for Space Sciences (WeW), Freie Universitaet Berlin",
                   version = "2.1",
-                  description = "FUB/WeW WATER Processor GPF-Operator")
+                  description = "FUB/WeW WATER Processor to retrieve case II water properties and atmospheric properties")
 public class WaterProcessorOp extends PixelOperator {
 
     public static final String[] OUTPUT_CONCENTRATION_BAND_NAMES = {

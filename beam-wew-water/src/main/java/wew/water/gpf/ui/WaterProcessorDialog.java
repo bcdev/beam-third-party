@@ -176,6 +176,7 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
             try {
                 if(!bindingContext.getPropertySet().isPropertyDefined(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT)) {
                     final PropertyDescriptor descriptor = new PropertyDescriptor(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT, Product[].class);
+                    descriptor.setTransient(true);
                     final Property property = new Property(descriptor, new DefaultPropertyAccessor());
                     bindingContext.getPropertySet().addProperty(property);
                 }

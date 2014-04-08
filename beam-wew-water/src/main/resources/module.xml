@@ -35,6 +35,7 @@
         Changes in 2.1.1<br/>
             [BEAM-1571] BEAM-1613 FUB/WeW processor suffers from Java bug<br/>
         Changes in 2.1<br/>
+            [BEAM-1640] FUB/WeW processor treats source product as a parameter<br/>
             [BEAM-1571] FUB/WeW processor adds two actions to the tools menu<br/>
             [BEAM-1570] Default valid expression should use flags instead of masks<br/>
         Changes in 2.0<br/>

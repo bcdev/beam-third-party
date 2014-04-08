@@ -19,7 +19,6 @@ import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
 import org.esa.beam.framework.gpf.pointop.Sample;
 import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
-import org.esa.beam.framework.processor.ProcessorConstants;
 import org.esa.beam.jai.ResolutionLevel;
 import org.esa.beam.jai.VirtualBandOpImage;
 import org.esa.beam.util.ProductUtils;
@@ -706,7 +705,7 @@ public class WaterProcessorOp extends PixelOperator {
         final Product sourceProduct = productConfigurer.getSourceProduct();
         final Product targetProduct = productConfigurer.getTargetProduct();
 
-        targetProduct.setProductType(getOutputProductTypeSafe());
+        targetProduct.setProductType(getOutputProductType());
 
         int sceneWidth = sourceProduct.getSceneRasterWidth();
         int sceneHeight = sourceProduct.getSceneRasterHeight();
@@ -855,31 +854,24 @@ public class WaterProcessorOp extends PixelOperator {
         }
     }
 
-    /*
-    * Retrieves the output product type from the input product type by appending "_FLH_MCI" to the type string.
-    *
-    * @throws org.esa.beam.framework.processor.ProcessorException
-    *          when an error occurs
-    */
-    private String getOutputProductTypeSafe() throws OperatorException {
-        String productType = sourceProduct.getProductType();
-        if (productType == null) {
-//            @todo retrieve message not from ProcessorConstants
-            throw new OperatorException(ProcessorConstants.LOG_MSG_NO_INPUT_TYPE);
+    private String getOutputProductType() throws OperatorException {
+        String sourceType = sourceProduct.getProductType();
+        if (sourceType != null) {
+            return String.format("%s_FLH_MCI", sourceType);
+        }else {
+            return "FLH_MCI";
         }
-
-        return productType + "_FLH_MCI";
     }
 
-    private PlanarImage createValidMaskImage(Product product, String expressionToBeEvaluated) {
-        if (StringUtils.isNullOrEmpty(expressionToBeEvaluated)) {
+    private PlanarImage createValidMaskImage(Product product, String expression) {
+        if (StringUtils.isNullOrEmpty(expression)) {
             return createEmptyMask(product);
         }
-        if (product.isCompatibleBandArithmeticExpression(expressionToBeEvaluated)) {
-            return VirtualBandOpImage.create(expressionToBeEvaluated, ProductData.TYPE_UINT8, 0,
-                                             product, ResolutionLevel.MAXRES);
+        if (product.isCompatibleBandArithmeticExpression(expression)) {
+            return VirtualBandOpImage.create(expression, ProductData.TYPE_UINT8, 0, product, ResolutionLevel.MAXRES);
         } else {
-            throw new OperatorException("Invalid parameter 'expression'");
+            String msg = String.format("Parameter 'expression' is not compatible with the source product. Expression is '%s'", expression);
+            throw new OperatorException(msg);
         }
     }
 

@@ -218,11 +218,11 @@ public class WaterProcessorOp extends PixelOperator {
     private Band[] inputBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
     private Raster validMaskData;
 
-    @SourceProduct(label = "Select source product",
+    @SourceProduct(label = "Source product",
                    description = "The MERIS L1b or L1P source product used for the processing.")
     private Product sourceProduct;
 
-    @Parameter(description = "Whether Chlorophyll-a concentration band shall be computed", defaultValue = "true",
+    @Parameter(description = "Whether chlorophyll-a concentration band shall be computed", defaultValue = "true",
                label = "Compute chlorophyll-a concentration band")
     private boolean computeCHL;
 

@@ -23,7 +23,6 @@ import org.esa.beam.jai.ResolutionLevel;
 import org.esa.beam.jai.VirtualBandOpImage;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.StringUtils;
-import wew.water.WaterProcessorOzone;
 
 import javax.media.jai.PlanarImage;
 import javax.media.jai.operator.ConstantDescriptor;

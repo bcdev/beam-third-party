@@ -6,7 +6,17 @@
             <executableName>FUB.Water</executableName>
             <processorName>FUB/WeW Water</processorName>
             <processorVersion>${version}</processorVersion>
-            <defaultParameters/>
+            <defaultParameters>
+                <![CDATA[
+<parameters>
+    <computeCHL>true</computeCHL>
+    <computeYS>true</computeYS>
+    <computeTSM>true</computeTSM>
+    <computeAtmCorr>true</computeAtmCorr>
+    <checkWhetherSuspectIsValid>true</checkWhetherSuspectIsValid>
+    <expression>not l1_flags.GLINT_RISK and not l1_flags.BRIGHT and not l1_flags.INVALID and not l1_flags.SUSPECT</expression>
+</parameters>]]>
+            </defaultParameters>
             <outputFormats>BEAM-DIMAP,NetCDF,GeoTIFF</outputFormats>
             <descriptionHtml>
                 <![CDATA[<p>Retrieves case II water properties and atmospheric properties above case II waters.</p>]]></descriptionHtml>

@@ -17,11 +17,14 @@
 //#                               #
 */
 
-package wew.water;
+package wew.water.gpf;
 
 public class WaterProcessorOzone {
 
-    public static double O3tau(double l, double O3du) 
+    private WaterProcessorOzone() {
+    }
+
+    public static double O3tau(double l, double O3du)
 	{
 	return(O3du/1000.0*O3excoeff(l));
 	}
@@ -31,7 +34,7 @@ public class WaterProcessorOzone {
 	int no3data=69;
     
 	// Wavelength [nm]
-	double lambda[] ={
+	double[] lambda ={
 		 +2.050000e+02,  +2.100000e+02,  +2.150000e+02,  +2.200000e+02, 
 		 +2.250000e+02,  +2.300000e+02,  +2.350000e+02,  +2.400000e+02, 
 		 +2.450000e+02,  +2.500000e+02,  +2.550000e+02,  +2.600000e+02, 
@@ -52,7 +55,7 @@ public class WaterProcessorOzone {
 		 +1.800000e+03 };
 
 	// Ozone extinction coefficient [1/cm]
-	double excoeff[] = {
+	double[] excoeff = {
 		 +9.500000e+00,  +1.450000e+01,  +2.600000e+01,  +4.590000e+01, 
 		 +7.580000e+01,  +1.162000e+02,  +1.615000e+02,  +2.111000e+02, 
 		 +2.560000e+02,  +2.839000e+02,  +2.929000e+02,  +2.829000e+02, 

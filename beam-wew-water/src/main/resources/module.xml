@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-wew-water</symbolicName>
-    <version>2.1.1</version>
+    <version>2.2</version>
     <name>WeW Water Processor</name>
     <description>
         <![CDATA[
@@ -32,7 +32,7 @@
 
     <changelog>
         <![CDATA[
-        Changes in 2.1.1<br/>
+        Changes in 2.2<br/>
             [BEAM-1640] FUB/WeW processor treats source product as a parameter<br/>
             [BEAM-1613] BEAM-1613 FUB/WeW processor suffers from Java bug<br/>
         Changes in 2.1<br/>
@@ -79,12 +79,6 @@
         <module>beam-ui</module>
     </dependency>
     <dependency>
-        <module>beam-meris-smac</module>
-    </dependency>
-    <dependency>
-        <module>beam-processing</module>
-    </dependency>
-    <dependency>
         <module>beam-visat</module>
         <optional>true</optional>
     </dependency>
@@ -96,6 +90,7 @@
 
     <extension point="beam-ui:actions">
         <action>
+            <parent>processing.thematicWater</parent>
             <id>FUB-WeW</id>
             <helpId>fubWeWTool</helpId>
             <class>wew.water.gpf.ui.WaterProcessorOpAction</class>

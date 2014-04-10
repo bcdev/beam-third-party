@@ -36,11 +36,6 @@
             <artifactId>beam-envisat-reader</artifactId>
             <version>1.5.3.${beam.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.esa.beam</groupId>-->
-            <!--<artifactId>beam-meris-smac</artifactId>-->
-            <!--<version>1.5.205.${beam.version}</version>-->
-        <!--</dependency>-->
     </dependencies>
 
     <repositories>

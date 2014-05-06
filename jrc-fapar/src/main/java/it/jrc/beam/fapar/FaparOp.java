@@ -35,8 +35,8 @@ import org.esa.beam.util.math.RsMathUtils;
 
 import java.awt.Color;
 
-@OperatorMetadata(alias = "Fapar", authors = "Martin Boettcher, Ralf Quast", copyright = "Brockmann Consult GmbH",
-                  version = "2.3",
+@OperatorMetadata(alias = "Fapar", authors = "Nadine Gobron (JRC), Ralf Quast (BC)",
+                  copyright = "Brockmann Consult GmbH", version = "2.3",
                   description = "Computes FAPAR from MERIS products.")
 public class FaparOp extends PixelOperator {
 

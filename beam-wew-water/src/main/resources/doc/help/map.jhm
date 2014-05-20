@@ -6,5 +6,7 @@
 <map version="2.0">
 
     <mapID target="fubWeWTool" url="fub_wew/FubWeWTool.html"/>
+    <mapID target="fubWeWProcessorDesc" url="fub_wew/FubWeWProcessorUI.html"/>
+    <mapID target="fubWeWAlgorithmSpec" url="fub_wew/FubWeWAlgoSpecification.html"/>
 
 </map>

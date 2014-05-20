@@ -34,7 +34,7 @@
         <![CDATA[
         Changes in 2.2<br/>
             [BEAM-1640] FUB/WeW processor treats source product as a parameter<br/>
-            [BEAM-1613] BEAM-1613 FUB/WeW processor suffers from Java bug<br/>
+            [BEAM-1613] FUB/WeW processor suffers from Java bug<br/>
         Changes in 2.1<br/>
             [BEAM-1571] FUB/WeW processor adds two actions to the tools menu<br/>
             [BEAM-1570] Default valid expression should use flags instead of masks<br/>
@@ -94,8 +94,8 @@
             <id>FUB-WeW</id>
             <helpId>fubWeWTool</helpId>
             <class>wew.water.gpf.ui.WaterProcessorOpAction</class>
-            <text>FUB/WeW WATER Processor OP (MERIS)...</text>
-            <shortDescr>Invoke the FUB/WeW WATER Processor Plugin.</shortDescr>
+            <text>MERIS FUB/WeW Water Processor...</text>
+            <shortDescr>Retrieve case II water properties and atmospheric properties over case II water.</shortDescr>
             <operatorName>FUB.Water</operatorName>
             <dialogTitle>FUB Water Processor</dialogTitle>
             <targetProductNameSuffix>_FUB_WeW</targetProductNameSuffix>

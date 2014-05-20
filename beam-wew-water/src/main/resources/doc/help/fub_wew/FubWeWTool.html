@@ -16,7 +16,7 @@
 
 <html xmlns="http://www.w3.org/1999/html">
 <head>
-    <title>BEAM Data Processors - FUB/WeW Processor Operator</title>
+    <title>BEAM Data Processors - FUB/WeW Water Processor</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link rel="stylesheet" href="../style.css">
 </head>
@@ -25,202 +25,24 @@
 <table class="header">
     <tr class="header">
         <td class="header">&nbsp;
-            FUB/Wew Water Processor Op
+            FUB/Wew Water Processor - Overview
         </td>
-        <td class="header" align="right"><a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg"
-                                                                                     border=0></a>
+        <td class="header" align="right"><a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
         </td>
     </tr>
 </table>
 
-<h3>Operator description</h3>
+<h3>Overview</h3>
 
 <p>
-    The FUB/WeW Water Processor Op makes use of MERIS Level-1b TOA radiances in the
+    The FUB/WeW Water Processor makes use of MERIS Level-1b TOA radiances in the
     bands 1-7, 9-10 and 12-14 to retrieve the following case II water properties and
-    atmospheric properties above case II waters :
+    atmospheric properties above case II waters.
 </p>
 
-<ul>
-    <li>chlorophyll-a concentration (log scale, mg/m^3)</li>
-    <li>yellow substance absorption @ 443 nm (log scale, 1/m)</li>
-    <li>total suspended matter concentration (log scale, g/m^3)</li>
-    <li>yellow substance absorption @ 443 nm (log scale, 1/m)</li>
-    <li>aerosol optical depth @ 440 nm</li>
-    <li>aerosol optical depth @ 550 nm</li>
-    <li>aerosol optical depth @ 670 nm</li>
-    <li>aerosol optical depth @ 870 nm</li>
-    <li>water-leaving RS reflectance @ 412 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 442 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 490 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 510 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 560 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 620 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 665 nm (1/sr)</li>
-    <li>water-leaving RS reflectance @ 708 nm (1/sr)</li>
-</ul>
+<p><a href="FubWeWAlgoSpecification.html">FUB/WeW Water Algorithm Specification</a></p>
 
-<p>
-The retrieval is based on four separate artificial neural networks which
-were trained on the basis of the results of extensive radiative transfer
-simulations with the MOMO code by taking varying atmospheric and oceanic
-conditions into account. All networks were validated against in-situ
-measurements.
-</p>
-
-<p>
-During the Plugin processing the MERIS Level-1b data are masked prior to
-the retrival by applying the following combination mask :
-</p>
-
-<ul>
-    <li>GLINT_RISK</li>
-    <li>BRIGHT</li>
-    <li>INVALID</li>
-    <li>SUSPECT (only when not masking out almost all pixels)</li>
-</ul>
-
-<p>
-The masked pixel's values are set to 5.
-</p>
-
-<p>
-Non-masked pixels are then normalized for an atmosphere's ozone contents of
-344 Dobson units by calculating transmission correction factors.
-</p>
-
-<p>
-Notice that the AOT wavelengths 440, 670 and 870 nm correspond to the
-AERONET data wavelengths for a convenient direct comparison with in situ data.
-</p>
-
-<p>
-Each pixel is checked against the input and output values margin of the
-trained networks. Additional flags are set in case of a neural network
-failure for input and output separately.
-</p>
-
-<p>
-The radiative transfer simulation code and the retrieval algorithm are
-described in detail in the papers cited in the references section below.
-We would like to stress the fact that the operator is applicable over
-case II only, thus it is likely to fail over the open ocean by producing
-negative remote sensing (RS) water-leaving reflectances.
-</p>
-
-<h3>User Interface</h3>
-
-<p>
-    The FUB/WeW water processor op can be invoked from the VISAT tool menu by selecting
-    the <b>FUB/WeW WATER Processor Op (MERIS)</b> command. On the command line the FUB/WeW water processor op is
-    available by means of the Graph Processing Tool <code>gpt</code> which is located in the BEAM <code>bin</code>
-    directory. Typing <code>gpt FUB.Water -h</code> displays further information.
-</p>
-
-<p>
-    Selecting the <b>FUB/WeW WATER Processor Op (MERIS)</b> command from the VISAT tool menu pops up the
-    following dialog:
-</p>
-
-<p align="center"><img src="images/FUBWeW.png"></p>
-
-<h5>Source Product Group</h5>
-
-<p class="i1">
-    <b>Source product:</b>
-    Here the user specifies the source product. The combo box presents
-    a list of all products open in VISAT. The user may select one of these
-    or, by clicking on the button next to the combo box, choose a product
-    from the file system.
-</p>
-
-<h5>Target Product Group</h5>
-
-<p class="i1">
-    <b>Name:</b>
-    Used to specify the name of the target product.
-</p>
-
-<p class="i1">
-    <b>Save as:</b>
-    Used to specify whether the target product should be saved to the file system. The
-    combo box presents a list of available file formats.
-    The text field or the button next to it allow to specify a target directory.
-</p>
-
-<p class="i1">
-    <b>Open in VISAT:</b>
-    Used to specify whether the target product should be opened in VISAT. When the
-    the target product is not saved, it is opened in VISAT automatically.
-</p>
-
-<h5>Button Group</h5>
-
-<p class="i1">
-    <b>Run</b>
-    Creates the target product. The FUB/WeW water processing is actually deferred until its band data are accessed, either by
-    writing the product to a file or by viewing its band data. When the <b>Save as</b> option is checked, the
-    processing is triggered automatically.
-</p>
-
-<p class="i1">
-    <b>Close</b>
-    Closes the dialog.
-</p>
-
-<h5>Menu Group</h5>
-
-<p class="i1">
-    <b>File</b>
-    The entries found in this menu allow to save the current processing parameters to disk and to open a saved parameter
-    set from disk.
-</p>
-
-<p class="i1">
-    <b>Help</b>
-    Displays this help page.
-</p>
-
-<h3>References</h3>
-<p>
-Fischer J., and Grassl H., "Radiative transfer in an atmosphere-ocean system:
-an azimuthally dependent matrixoperator approach",
-Applied Optics, 23, 1032-1039, 1984.
-</p>
-
-<p>
-Fell F., and Fischer J., "Numerical simulation of the light field in the
-atmosphere-ocean system using the matrixoperator method", Journal of
-Quantitative Spectroscopy & Radiative Transfer, 69, 351-388, 2001.
-</p>
-
-<p>
-Schroeder Th., Schaale M., Fell F. and Fischer J., "Atmospheric correction
-algorithm for MERIS data: A neural network approach", In: Proceedings of the
-Ocean Optics XVI Conference, Santa Fe, New Mexico, USA, published on CD ROM, 2002.
-</p>
-
-<p>
-Schroeder Th., Fischer J., Schaale M. and Fell F., "Artificial neural network
-based atmospheric correction algorithm: Application to MERIS data", In: P
-roceedings of the International Society for Optical Engineering (SPIE),
-Vol. 4892, Hangzhou, China, 2002.
-</p>
-
-<p>
-Schroeder Th., and Fischer J., "Atmospheric correction of MERIS imagery above
-case-2 waters", In: Proceedings of the 2003 MERIS User Workshop, ESA ESRIN,
-Frascati, Italy, 2003.
-</p>
-
-<p>
-Schroeder, Th., "Fernerkundung von Wasserinhaltsstoffen in Kuestengeweassern
-mit MERIS unter Anwendung expliziter und impliziter Atmosphaerenkorrektur-
-verfahren", Ph.D. Dissertation, Freie Universitatet Berlin,
-Berlin (Germany), 2005, http:/www.diss.fu-berlin.de/2005/78
-</p>
-
-<br>
+<p><a href="FubWeWProcessorUI.html">FUB/WeW Water Processor Documentation</a></p>
 <hr>
 </body>
 </html>

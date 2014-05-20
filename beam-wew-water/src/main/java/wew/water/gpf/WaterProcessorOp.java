@@ -32,7 +32,7 @@ import java.io.IOException;
 
 @OperatorMetadata(alias = "FUB.Water", authors = "Thomas Schroeder, Michael Schaale",
                   copyright = "Institute for Space Sciences (WeW), Freie Universitaet Berlin",
-                  version = "2.1",
+                  version = "2.2",
                   description = "FUB/WeW WATER Processor to retrieve case II water properties and atmospheric properties")
 public class WaterProcessorOp extends PixelOperator {
 
@@ -58,7 +58,7 @@ public class WaterProcessorOp extends PixelOperator {
             "reflec_9"
     };
     private static final String SUSPECT_FLAG_NAME = "l1_flags.SUSPECT";
-    private static final String SUSPECT_EXPRESSION_TERM = " and not " + SUSPECT_FLAG_NAME;
+    private static final String SUSPECT_EXPRESSION_TERM = "and not " + SUSPECT_FLAG_NAME;
 
     private static String[] output_concentration_band_descriptions = {
             "Chlorophyll 2 content",
@@ -237,13 +237,13 @@ public class WaterProcessorOp extends PixelOperator {
     private boolean computeAtmCorr;
 
     @Parameter(description = "Performs a check whether the '" + SUSPECT_FLAG_NAME + "' shall be considered in an expression." +
-            "This parameter is only considered when the expression contains the term 'and not suspect'",
+                             "This parameter is only considered when the expression contains the term '" + SUSPECT_EXPRESSION_TERM + "'",
                defaultValue = "true", label = "Check whether '" + SUSPECT_FLAG_NAME + "' is valid")
     private boolean checkWhetherSuspectIsValid;
 
     @Parameter(description = "Band maths expression which defines valid pixels. If the expression is empty," +
-            "all pixels will be considered.",
-               defaultValue = "not l1_flags.GLINT_RISK and not l1_flags.BRIGHT and not l1_flags.INVALID and not " + SUSPECT_FLAG_NAME,
+                             "all pixels will be considered.",
+               defaultValue = "not l1_flags.GLINT_RISK and not l1_flags.BRIGHT and not l1_flags.INVALID " + SUSPECT_EXPRESSION_TERM,
                label = "Use valid pixel expression")
     private String expression;
 
@@ -857,7 +857,7 @@ public class WaterProcessorOp extends PixelOperator {
         String sourceType = sourceProduct.getProductType();
         if (sourceType != null) {
             return String.format("%s_FLH_MCI", sourceType);
-        }else {
+        } else {
             return "FLH_MCI";
         }
     }

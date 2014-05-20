@@ -48,7 +48,8 @@ public class WaterProcessorOpAction extends DefaultOperatorAction {
     @Override
     public void actionPerformed(CommandEvent event) {
         if (dialog == null) {
-            WaterProcessorDialog waterProcessorDialog = new WaterProcessorDialog(operatorName, getAppContext(), "FUB.Water", event.getCommand().getHelpId());
+            WaterProcessorDialog waterProcessorDialog = new WaterProcessorDialog(operatorName, getAppContext(), "FUB/WeW Water Processor",
+                                                                                 event.getCommand().getHelpId());
             if (targetProductNameSuffix != null) {
                 waterProcessorDialog.setTargetProductNameSuffix(targetProductNameSuffix);
             }

@@ -88,6 +88,8 @@
 
     <categories>Visat,Processor,Water,Case 2</categories>
 
+    <activator>wew.water.ModuleActivator</activator>
+
     <extension point="beam-ui:actions">
         <action>
             <parent>processing.thematicWater</parent>

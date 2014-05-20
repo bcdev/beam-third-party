@@ -236,7 +236,7 @@ public class WaterProcessorOp extends PixelOperator {
                label = "Compute water leaving reflectances and AOT bands")
     private boolean computeAtmCorr;
 
-    @Parameter(description = "Performs a check whether the '" + SUSPECT_FLAG_NAME + "' shall be considered in an expression." +
+    @Parameter(description = "Expert parameter. Performs a check whether the '" + SUSPECT_FLAG_NAME + "' shall be considered in an expression." +
                              "This parameter is only considered when the expression contains the term '" + SUSPECT_EXPRESSION_TERM + "'",
                defaultValue = "true", label = "Check whether '" + SUSPECT_FLAG_NAME + "' is valid")
     private boolean checkWhetherSuspectIsValid;

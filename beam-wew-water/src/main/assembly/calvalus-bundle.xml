@@ -20,7 +20,6 @@
             <scope>runtime</scope>
             <includes>
                 <include>*:beam-wew-water*</include>
-                <include>*:beam-meris-smac*</include>
             </includes>
         </dependencySet>
     </dependencySets>

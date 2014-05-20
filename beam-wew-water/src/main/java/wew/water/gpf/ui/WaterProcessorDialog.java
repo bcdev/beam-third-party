@@ -16,6 +16,7 @@ import org.esa.beam.framework.datamodel.ProductNodeListener;
 import org.esa.beam.framework.datamodel.RasterDataNode;
 import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.OperatorSpi;
+import org.esa.beam.framework.gpf.descriptor.OperatorDescriptor;
 import org.esa.beam.framework.gpf.internal.RasterDataNodeValues;
 import org.esa.beam.framework.gpf.ui.DefaultIOParametersPanel;
 import org.esa.beam.framework.gpf.ui.OperatorMenu;
@@ -58,17 +59,18 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
             throw new IllegalArgumentException("operatorName");
         }
 
-        ioParametersPanel = new DefaultIOParametersPanel(getAppContext(), operatorSpi, getTargetProductSelector());
+        OperatorDescriptor operatorDescriptor = operatorSpi.getOperatorDescriptor();
+        ioParametersPanel = new DefaultIOParametersPanel(getAppContext(), operatorDescriptor, getTargetProductSelector());
 
-        parameterSupport = new OperatorParameterSupport(operatorSpi.getOperatorClass());
+        parameterSupport = new OperatorParameterSupport(operatorDescriptor);
         final ArrayList<SourceProductSelector> sourceProductSelectorList = ioParametersPanel.getSourceProductSelectorList();
-        final PropertySet propertyContainer = parameterSupport.getPopertySet();
+        final PropertySet propertyContainer = parameterSupport.getPropertySet();
         bindingContext = new BindingContext(propertyContainer);
 
         if (propertyContainer.getProperties().length > 0) {
             if (!sourceProductSelectorList.isEmpty()) {
                 Property[] properties = propertyContainer.getProperties();
-                List<PropertyDescriptor> rdnTypeProperties = new ArrayList<PropertyDescriptor>(properties.length);
+                List<PropertyDescriptor> rdnTypeProperties = new ArrayList<>(properties.length);
                 for (Property property : properties) {
                     PropertyDescriptor parameterDescriptor = property.getDescriptor();
                     if (parameterDescriptor.getAttribute(RasterDataNodeValues.ATTRIBUTE_NAME) != null) {
@@ -126,10 +128,8 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
     }
 
     private OperatorMenu createDefaultMenuBar() {
-        return new OperatorMenu(getJDialog(),
-                                operatorSpi.getOperatorClass(),
-                                parameterSupport,
-                                getHelpID());
+        return new OperatorMenu(getJDialog(), operatorSpi.getOperatorDescriptor(), parameterSupport,
+                                getAppContext(), getHelpID());
     }
 
     private class ProductChangedHandler extends AbstractSelectionChangeListener implements ProductNodeListener {
@@ -146,16 +146,15 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
         @Override
         public void selectionChanged(SelectionChangeEvent event) {
             Selection selection = event.getSelection();
-            if(selection.equals(Selection.EMPTY)) {
+            if (selection.equals(Selection.EMPTY)) {
                 if (currentProduct != null) {
                     currentProduct.removeProductNodeListener(this);
                     currentProduct = null;
                 }
-                updateTargetProductname();
+                updateTargetProductName();
                 updateValueSets(currentProduct);
                 setSourceProductProperty(new Product[]{});
-            }
-            else {
+            } else {
                 final Product selectedProduct = (Product) selection.getSelectedValue();
                 if (selectedProduct != currentProduct) {
                     if (currentProduct != null) {
@@ -165,7 +164,7 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
                     if (currentProduct != null) {
                         currentProduct.addProductNodeListener(this);
                     }
-                    updateTargetProductname();
+                    updateTargetProductName();
                     updateValueSets(currentProduct);
                     setSourceProductProperty(new Product[]{selectedProduct});
                 }
@@ -174,7 +173,7 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
 
         private void setSourceProductProperty(Product[] products) {
             try {
-                if(!bindingContext.getPropertySet().isPropertyDefined(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT)) {
+                if (!bindingContext.getPropertySet().isPropertyDefined(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT)) {
                     final PropertyDescriptor descriptor = new PropertyDescriptor(WaterFormConstants.PROPERTY_KEY_SOURCE_PRODUCT, Product[].class);
                     descriptor.setTransient(true);
                     final Property property = new Property(descriptor, new DefaultPropertyAccessor());
@@ -207,7 +206,7 @@ public class WaterProcessorDialog extends SingleTargetProductDialog {
             handleProductNodeEvent(event);
         }
 
-        private void updateTargetProductname() {
+        private void updateTargetProductName() {
             String productName = "";
             if (currentProduct != null) {
                 productName = currentProduct.getName();

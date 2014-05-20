@@ -6,7 +6,7 @@
     <groupId>wew.water</groupId>
     <artifactId>beam-wew-water</artifactId>
     <name>WeW Water Processor</name>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.2</version>
 
     <packaging>jar</packaging>
 

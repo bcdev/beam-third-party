@@ -1,4 +1,4 @@
-File name:	Readme_FUB-WeW-Water_Beam.txt
+File name:	readme.txt
 
 Authors:	Thomas Schroeder and Michael Schaale
 
@@ -13,8 +13,6 @@ E-mails:	Thomas.Schroeder@wew.fu-berlin.de
 
 Document title:	Brief Documentation of the FUB/WeW WATER Processor
 		A plug-in for MERIS/(A)ATSR Toolbox (BEAM)
-
-Release date:	23 March 2005
 
 
 Introduction
@@ -85,89 +83,34 @@ ASAR data products of the ESA ENVISAT satellite.
 
 It can be freely downloaded from:
 
-http://scipc3.scicon.gkss.de/services/beam2/software/
-
+http://www.brockmann-consult.de/cms/web/beam/downloads
 
 
 Installation
 ------------
 
-The BEAM package (here : BEAM VISAT Version 3.2) is installed within a
+The BEAM package (here : BEAM VISAT Version 5.0) is installed within a
 particular, user-selectable, directory. For the purpose of this documentation
 file, that directory will be denoted $BEAM_HOME$. After installation of the
 BEAM package, this directory should contain the following subdirectories
 and files:
 
 	$BEAM_HOME$
-                |- auxdata/
-		|- bin/
-		|- docs/
-		|- extensions/
+        |- bin/
+        |- config/
 		|- jre/
 		|- lib/
-		|- license/
-		|- log/
-		|- api-doc.zip
-		|- changelog.txt
-		|- epr_api-2.0.5.zip
-		|- examples.zip
-		|- known-issues.txt
-		|- readme.txt
-		|- src.zip
-		|- version.txt
+		|- licenses/
+		|- modules/
+		|- CHANGELOG.txt
+		|- gpl.html
+		|- LICENSE.txt
+		|- readme.html
+		|- VERSION.txt
 
-The FUB/WeW WATER processor plug-in, named 'wew_water.jar', must simply be added
-to the $BEAM_HOME$/extensions/ and $BEAM_HOME$/lib/ subdirectories. The BEAM
-application (VISAT) will automatically integrate the FUB/WeW WATER processor
-within its interface.
-
-
-Operation
----------
-
-Once the BEAM software and the FUB/WeW WATER processor have been installed, the
-package can be operated in two different modes: interactive and automatic.
-
-To launch an interactive session, start the main BEAM software application
-(VISAT) and select the FUB/WeW WATER processor using the following
-menu selections:
-
-	Tools -> FUB/WeW WATER Processor.
-
-A dialog window will appear:
-
-	- Select the input file containing the MERIS Level-1b data to be
-	  processed.
-	- Specify the output file where you want the results to be written.
-	- Select the output format from the pull-down menu, if different from
-	  the BEAM default.
-	- Optionally, save this configuration in a separate XML file, known to
-	  BEAM software as a (reusable) 'processing request'.
-	- Initiate the FUB/WeW WATER processor itself by clicking on
-	  the 'Run' button.
-
-To process one or more data sets automatically, i.e., without requiring
-manual input, it is also possible to launch the application from the
-command line (or an executable script, for that matter).
-
-For convenience we supplied the (UNIX) script WaterProcessor.sh to run the
-FUB/WeW WATER processor in its interactive or non-interactive (= batch) mode.
-First the variable BEAM_HOME in WaterProcessor.sh must be adapted and
-InputProduct and OutputProduct in WaterProcessor.xml must be adapted, too.
-Then this script may be launched from anywhere in the following modes :
-
-Interactive mode :
-    WaterProcessor.sh -i
-
-Interactive mode with debug info :
-    WaterProcessor.sh -i -d
-
-Interactive mode with predefined request :
-    WaterProcessor.sh -i WaterProcessor.xml
-
-Batch mode with predefined request :
-    WaterProcessor.sh WaterProcessor.xml
-
+The FUB/WeW WATER processor plug-in, named 'beam-wew-water-<version>.jar', must
+simply be added to the $BEAM_HOME$/modules/. The BEAM application (VISAT) will
+automatically integrate the FUB/WeW WATER processor within its interface.
 
 Warranties and copyright information
 ------------------------------------

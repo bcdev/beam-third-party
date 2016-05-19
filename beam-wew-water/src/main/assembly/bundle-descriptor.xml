@@ -76,6 +76,16 @@
                     <name>result_flags</name>
                 </outputVariable>
             </outputVariables>
+            <jobConfig>
+                <jobParameter>
+                    <name>calvalus.calvalus.bundle</name>
+                    <value>calvalus-2.7</value>
+                </jobParameter>
+                <jobParameter>
+                    <name>calvalus.snap.bundle</name>
+                    <value>beam-5.0.1-portal</value>
+                </jobParameter>
+            </jobConfig>
         </processorDescriptor>
     </processorDescriptors>
 </bundleDescriptor>

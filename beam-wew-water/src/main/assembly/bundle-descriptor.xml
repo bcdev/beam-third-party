@@ -85,6 +85,10 @@
                     <name>calvalus.snap.bundle</name>
                     <value>beam-5.0.1-portal</value>
                 </jobParameter>
+                <jobParameter>
+                    <name>calvalus.system.beam.useAlternatePixelGeoCoding</name>
+                    <value>true</value>
+                </jobParameter>
             </jobConfig>
         </processorDescriptor>
     </processorDescriptors>
